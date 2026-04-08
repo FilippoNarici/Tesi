@@ -40,18 +40,26 @@ Queste immagini vengono poi processate dagli script python.
 
 ---
 
-## 📸 Impostazioni di Acquisizione
+## Specifiche di Acquisizione (Fotocamera e Impostazioni)
 
-Per garantire la massima coerenza, linearità e ripetibilità nelle misurazioni, tutte le impostazioni della fotocamera (Samsung Galaxy S24) sono state bloccate e mantenute rigorosamente costanti per tutte le acquisizioni dell'esperimento. 
+Le immagini utilizzate in questo progetto sono state acquisite cercando di mantenere i parametri costanti per garantire la coerenza analitica. Di seguito sono riportati i dati tecnici e le specifiche dell'obiettivo estratti direttamente dai metadati EXIF dei file RAW:
 
-I parametri di scatto, sono i seguenti:
+### 📱 Dispositivo e Sensore
+* **Dispositivo:** Samsung Galaxy S24
+* **Formato File:** DNG (Linear RAW)
+* **Profondità Colore:** 12-bit per canale (36-bit totali)
+* **Risoluzione Immagine:** 3648 x 2736 (10 Megapixel)
 
-* **Fotocamera e Ottica:** Samsung Galaxy S24 — Obiettivo Tele (Lunghezza focale: 7.0 mm, equivalente a 69 mm in formato 35mm)
-* **Formato di Acquisizione:** DNG (RAW a 12-bit, *Linear Raw*). L'uso del formato RAW è fondamentale per bypassare il post-processing software dello smartphone (bilanciamento del bianco, compressione JPEG, curve di contrasto) e preservare la linearità dell'intensità luminosa catturata dal sensore.
-* **Risoluzione:** 3648 x 2736 pixel (10 Megapixel)
-* **Apertura Diaframma:** f/2.4
-* **Tempo di Esposizione:** 1/90 s
+### 🔭 Ottica e Geometria
+* **Lunghezza Focale:** 7.0 mm (equivalente a 69 mm nel formato 35mm)
+* **Apertura Diaframma:** f/2.4 (fissa)
+* **Campo Visivo (FOV):** 29.2°
+* **Distanza Iperfocale:** 6.70 m
+
+### ⚙️ Impostazioni di Scatto (Mantenute Fisse)
+Per evitare alterazioni introdotte dal software di auto-esposizione della fotocamera, i parametri principali del triangolo dell'esposizione sono stati bloccati sui seguenti valori:
+* **Tempo di Esposizione (Shutter Speed):** 1/90 s
 * **Sensibilità ISO:** 50
-* **Compensazione Esposizione:** -0.7 EV
+* **Bilanciamento del Bianco (Illuminant):** D65 / Standard Light A
 
-Questi parametri, uniti all'uso del formato grezzo, assicurano che la variazione di intensità registrata nelle immagini dipenda unicamente dalla rotazione dell'analizzatore e dallo stato di polarizzazione della luce.
+*(Nota: L'unica variabile registrata nei metadati riguarda la compensazione dell'esposizione, che fluttua tra gli scatti, ma ISO, tempi e diaframmi sono confermati come costanti).*
