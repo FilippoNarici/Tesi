@@ -28,6 +28,19 @@ python/__pycache__/
 *.out
 *.toc
 *.lof
+
+# Ignora la configurazione di PyCharm
+.idea/
+
+# Ignora tutti i file immagine raw ovunque si trovino
+*.dng
+*.raw
+*.CR2
+*.NEF
+
+# Ignora esplicitamente la cartella dei dati pesanti
+python/data/
+python/raw_input/
 *.lot
 *.fls
 *.fdb_latexmk
