@@ -61,5 +61,3 @@ Per evitare alterazioni introdotte dal software di auto-esposizione della fotoca
 * **Tempo di Esposizione (Shutter Speed):** 1/90 s
 * **Sensibilità ISO:** 50
 * **Bilanciamento del Bianco (Illuminant):** D65 / Standard Light A
-
-*(Nota: L'unica variabile registrata nei metadati riguarda la compensazione dell'esposizione, che fluttua tra gli scatti, ma ISO, tempi e diaframmi sono confermati come costanti).*
