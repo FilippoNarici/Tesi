@@ -14,69 +14,69 @@ L'esperimento classico di polarizzazione ottica (descritto nel manuale di labora
 
 **L'innovazione di questo progetto consiste nell'espandere l'approccio puntuale 1D a un'analisi matriciale 2D.** Invece di un sensore singolo, viene utilizzato il sensore CMOS di uno smartphone per creare un **polarimetro a immagine (Imaging Polarimeter) Low-Cost**. Questo permette di:
 1. Analizzare intere superfici e mappare spazialmente lo stato di polarizzazione.
-2. Sfruttare i 3 canali colore (RGB) del sensore per un'analisi multi-lunghezza d'onda simultanea (espandendo i calcoli tramite approssimazioni spettrali).
-3. Superare le sfide computazionali e di allineamento ottico derivanti dall'uso di ottiche fotografiche e display commerciali.
+2. Sfruttare i 3 canali colore (RGB) del sensore per un'analisi multi-lunghezza d'onda simultanea (espandendo i calcoli tramite approssimazioni spettrali basate sui centroidi).
+3. Superare le sfide computazionali e di allineamento ottico derivanti dall'uso di ottiche fotografiche commerciali e display LCD/OLED.
 
 ---
 
-## 📑 Struttura della Tesi
-
-La struttura finale del documento LaTeX (configurato tramite il template `PoliMi3i_thesis.cls`) seguirà questo schema:
+## 📑 Struttura della Tesi in LaTeX (Template PoliMi3i)
 
 1. **Sommario / Abstract**
 2. **Premessa / Introduzione:** Contestualizzazione e limiti dei polarimetri tradizionali.
-3. **Teoria:** Formalismo di Stokes, matrici di Mueller, polarizzazione della luce, birifrangenza e fotoelasticità.
-4. **Apparato sperimentale:** Descrizione del setup Low-Cost (Display + Smartphone).
-5. **Raccolta dati e Campioni:** Descrizione delle misurazioni effettuate.
-6. **Analisi dati (Sviluppo Software):** Metodologia di estrazione dei dati RAW e calcolo matriciale.
-7. **Risultati e Discussione:** Analisi dei campioni.
+3. **Teoria:** Formalismo di Stokes, matrici di Mueller, polarizzazione della luce, birifrangenza, attività ottica e fotoelasticità.
+4. **Apparato sperimentale:** Setup hardware, componenti 3D, scelte progettuali.
+5. **Raccolta dati e Campioni:** Le misurazioni effettuate.
+6. **Analisi dati (Software e Matematica):** Demosaicizzazione RAW, calcolo pseudo-inversa per S0-S2, correzione S3, mascheramento, allineamento LCD e gestione numerica.
+7. **Risultati e Discussione:** Valutazione fisica dei campioni (mappe spaziali).
 8. **Conclusione**
 
 ---
 
 ## 🛠️ Materiali e Setup Sperimentale
 
-L'apparato sperimentale è stato allestito su una rotaia ottica Optosci. Le viste assionometriche del setup (presenti nella cartella `Images/` come `Vista 1.png` e `Vista 2.png`) mostrano l'allineamento dei seguenti componenti:
+L'apparato sperimentale è allestito su una rotaia ottica Optosci. I componenti, allineati sequenzialmente, sono:
 
-* **Dispositivo di acquisizione (Sensore):** Smartphone Samsung Galaxy S24 (montato alla fine della rotaia).
-* **Sorgente luminosa:** Tablet Samsung Tab S7 FE (genera luce polarizzata con asse verticale, orientamento landscape, montato all'inizio della rotaia).
-* **Componenti Ottici:** Analizzatore (polarizzatore rotante) e una Lamina $\lambda/4$ (utilizzata specificamente per il calcolo del parametro di Stokes $S_3$).
-* **Supporti:** Mount Optosci standard integrati con supporti per tablet e telefono **stampati in 3D** appositamente progettati per garantire l'allineamento ottico.
+* **Sorgente luminosa:** Tablet Samsung Tab S7 FE (genera luce polarizzata, asse "verticale", orientamento landscape).
+* **Campione da analizzare**
+* **Componenti Ottici mobili:** * Analizzatore (polarizzatore rotante).
+  * Lamina $\lambda/4$ (inserita *solo* per le acquisizioni destinate al calcolo di $S_3$).
+* **Rivelatore:** Smartphone Samsung Galaxy S24.
+* **Meccanica:** Mount Optosci standard + **supporti custom stampati in 3D** per tablet e telefono per garantire l'allineamento sul banco ottico.
 
-**Procedura di misurazione:** Il campione viene posto tra la sorgente e l'analizzatore. Vengono catturate 36 immagini ruotando l'analizzatore di 10 gradi per volta. *Nota: Nel software la convenzione del segno dell'angolo viene invertita per usare un sistema di riferimento coerente con il raggio uscente dallo schermo.*
-
----
-
-## 🧪 Campioni Analizzati
-
-Per validare il polarimetro a immagine, sono stati misurati e analizzati i seguenti campioni, scelti per evidenziare diversi fenomeni ottici:
-
-1. **Lamina $\lambda/2$ (Mezz'onda):** Per la validazione del setup e la rotazione del piano di polarizzazione.
-2. **Lamina $\lambda/4$ (Quarto d'onda):** Per la validazione dell'ellitticità.
-3. **Soluzione di Acqua e Zucchero:** Contenuta in una boccetta a base quadrata (Spessore: 1.35 cm, Volume: 6.9 ml, Zucchero disciolto: 8.4 g). Utilizzata per misurare l'**attività ottica (potere rotatorio)** e la chiralità delle molecole di saccarosio.
-4. **Righello di plastica trasparente:** Per lo studio qualitativo della **fotoelasticità** (tensioni residue di stampaggio).
-5. **Vetrino con scotch stratificato (da 0 a 5 strati):** Per analizzare la birifrangenza incrementale e la variazione di ritardo (Retardance) in funzione dello spessore del nastro.
-6. **Trave in materiale birifrangente (a sbalzo):** Supportata da un solo lato, misurata prima a riposo e poi sottoposta a un carico meccanico, per l'analisi quantitativa degli sforzi interni tramite le frange di fotoelasticità.
+**Protocollo di Acquisizione:** * **Per S0, S1, S2:** Si acquisiscono 36 immagini (RAW/DNG) ruotando l'analizzatore a passi di 10°. *Nota:* La convenzione del segno dell'angolo in elaborazione viene invertita per mantenere coerenza destrorsa col raggio uscente dallo schermo.
+* **Per S3:** Si acquisiscono due immagini specifiche inserendo la lamina $\lambda/4$ a +45° e -45°.
 
 ---
 
-## 💻 Pipeline Software (Python)
+## 📷 Specifiche di Acquisizione (Costanti Radiometriche)
 
-Il processing delle immagini è gestito da script custom in Python che lavorano direttamente sui file RAW (DNG) per mantenere la linearità del segnale radiometrico:
-
-* `final_monochrome_approx.py`: Stima la lunghezza d'onda preponderante (centroide) per i canali RGB sfruttando i dati di sensibilità spettrale del Samsung S22 (usato come proxy per l'S24) combinati con lo spettro di emissione del tablet.
-* `final_utils.py`: Cuore matematico. Gestisce il caricamento dei RAW, il downsampling, il mascheramento del background (smart select) e calcola i parametri di Stokes ($S_0, S_1, S_2, S_3$), il DoLP (Degree of Linear Polarization), l'AoLP (Angle of Linear Polarization), la Retardance ($\delta$) e il Fast Axis ($\theta$).
-* `final_polarimeter.py`: Script principale di esecuzione che genera una griglia 3x3 di grafici (heatmap) che mappano spazialmente tutti i parametri polarimetrici calcolati per l'intero campione.
-* `final_fit.py`: Un debugger interattivo. Cliccando su un singolo pixel dell'immagine, mostra in tempo reale la curva di fit dell'intensità rispetto all'angolo dell'analizzatore e l'ellisse di polarizzazione di Stokes associata a quel pixel.
+Per disabilitare la pipeline di auto-esposizione (ISP) del telefono e mantenere una risposta lineare:
+* **Formato:** DNG (Linear RAW, estratti tramite `rawpy`), profondità 12-bit per canale.
+* **Lente:** Focale 7.0 mm (69 mm eq. 35mm), Apertura f/2.4 fissa.
+* **Esposizione bloccata:** Tempo 1/90 s, ISO 50, Bilanciamento Bianco D65 / Standard Light A.
 
 ---
 
-## 📷 Specifiche di Acquisizione (Costanti)
+## 🧪 Campioni Analizzati (I Dati Reali)
 
-Per garantire la coerenza analitica e radiometrica, i parametri della fotocamera sono stati bloccati per evitare compensazioni software:
-* **Formato:** DNG (Linear RAW) a 12-bit per canale.
-* **Lunghezza Focale:** 7.0 mm (69 mm eq. 35mm).
-* **Apertura:** f/2.4 (fissa).
-* **Shutter Speed:** 1/90 s.
-* **ISO:** 50.
-* **Bilanciamento del Bianco:** D65 / Standard Light A.
+1. **Lamina $\lambda/2$:** Validazione del setup e rotazione del piano di polarizzazione.
+2. **Lamina $\lambda/4$:** Validazione dell'ellitticità.
+3. **Soluzione di Acqua e Zucchero (Attività Ottica):** Boccetta a base quadrata. Spessore attraversato: 1.35 cm, Volume: 6.9 ml, Zucchero disciolto: 8.4 g.
+4. **Righello di plastica trasparente:** Studio qualitativo delle tensioni di stampaggio (Fotoelasticità).
+5. **Vetrino con nastro adesivo stratificato (0-5 strati):** Analisi della birifrangenza incrementale e della variazione di ritardo ($\delta$).
+6. **Trave birifrangente a sbalzo (Cantilever):** Supportata da un lato, misurata scarica e poi sotto carico. Analisi quantitativa/qualitativa delle frange isocromatiche (sforzi interni).
+
+---
+
+## 💻 Algoritmi e Pipeline Software (Il "Core" dell'analisi)
+
+Gli script Python (`final_*.py`) processano le immagini matricialmente, implementando calcoli ottici avanzati:
+
+1. **Downsampling Spaziale (Binning):** I file RAW a 10 Megapixel vengono sottoposti a un downsampling (default fattore 20) calcolando la media dei blocchi di pixel. Questo passaggio abbatte il rumore del sensore e rende il calcolo matriciale computazionalmente sostenibile.
+2. **Approssimazione Monocromatica (`final_monochrome_approx.py`):** Calcola la lunghezza d'onda di centroide effettiva per i canali R, G, B sovrapponendo lo spettro del tablet con la curva di sensibilità del sensore (proxy S22).
+3. **Estrazione Stokes Lineari ($S_0, S_1, S_2$):** Eseguita risolvendo un sistema sovradeterminato tramite matrice pseudo-inversa (`numpy.linalg.pinv`) sull'equazione dell'intensità di Malus per i 36 frame.
+4. **Calcolo S3 e Correzione Dispersione:** Calcolato come $(I_{45} - I_{-45}) / \sin(\delta)$. Poiché la lamina è "zero-order" a 633nm, il termine $\sin(\delta)$ corregge lo sfasamento se l'analisi avviene a lunghezze d'onda diverse (es. canale blu).
+5. **Smart Background Mask:** Algoritmo morfologico (blur, threshold adattivo, fill holes, component isolation) che genera dinamicamente una maschera per escludere dal fit polvere, contorni e supporti meccanici, isolando la sola area illuminata.
+6. **Allineamento Reference Frame (Compensazione LCD):** Il software estrae $S_1$ e $S_2$ medi dal "vuoto" (grazie alla maschera) e applica una rotazione matematica del sistema di riferimento. In questo modo la luce in ingresso risulta ad $AoLP = 0°$ (perfettamente orizzontale), compensando l'angolo nativo del display.
+7. **Retardance ($\delta$) e Fast Axis ($\theta$) con Sicurezza Numerica:** Parametri ricavati dal vettore di Stokes completo. Il calcolo utilizza l'ampiezza reale di background (`s1_in`) per normalizzare la formula, applicando un clipping di sicurezza prima dell'arcocoseno per evitare errori di dominio (`NaN`) generati da fluttuazioni numeriche o rumore residuo.
+8. **Interfaccia Debug (`final_fit.py`):** Strumento interattivo per selezionare un singolo pixel dell'immagine e visualizzare in tempo reale la sinusoide di fit di Malus e l'ellisse di polarizzazione associata.
