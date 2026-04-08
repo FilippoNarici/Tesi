@@ -37,3 +37,21 @@ Innanzitutto, a un'estremità della rotaia è stato montato il tablet (Samsung T
 Vengono catturate svariate immagini ruotando di 10 gradi per volta l'analizzatore, così da catturare 36 immagini con il polarizzatore in uscita ad angoli crescenti (si noti che in elaborazione la convenzione del segno dell'angolo viene invertita per usare un sistema di riferimento coerente con il raggio uscente dallo schermo.
 
 Queste immagini vengono poi processate dagli script python.
+
+---
+
+## 📸 Impostazioni di Acquisizione
+
+Per garantire la massima coerenza, linearità e ripetibilità nelle misurazioni, tutte le impostazioni della fotocamera (Samsung Galaxy S24) sono state bloccate e mantenute rigorosamente costanti per tutte le acquisizioni dell'esperimento. 
+
+I parametri di scatto, estratti dai metadati EXIF, sono i seguenti:
+
+* **Fotocamera e Ottica:** Samsung Galaxy S24 — Obiettivo Tele (Lunghezza focale: 7.0 mm, equivalente a 69 mm in formato 35mm)
+* **Formato di Acquisizione:** DNG (RAW a 12-bit, *Linear Raw*). L'uso del formato RAW è fondamentale per bypassare il post-processing software dello smartphone (bilanciamento del bianco, compressione JPEG, curve di contrasto) e preservare la linearità dell'intensità luminosa catturata dal sensore.
+* **Risoluzione:** 3648 x 2736 pixel (10 Megapixel)
+* **Apertura Diaframma:** f/2.4
+* **Tempo di Esposizione:** 1/90 s
+* **Sensibilità ISO:** 50
+* **Compensazione Esposizione:** -0.7 EV
+
+Questi parametri, uniti all'uso del formato grezzo, assicurano che la variazione di intensità registrata nelle immagini dipenda unicamente dalla rotazione dell'analizzatore e dallo stato di polarizzazione della luce.
