@@ -1,3 +1,161 @@
 % Capitolo 6: Risultati e discussione
 % Autore: analista
-% TODO: da completare
+
+In questo capitolo si presentano i risultati ottenuti con il polarimetro a immagine descritto nei capitoli precedenti. Per ciascun campione analizzato si discutono le mappe dei parametri di Stokes, le grandezze polarimetriche derivate e la loro interpretazione fisica. Si conclude con una discussione critica delle capacit\`a e dei limiti del metodo.
+
+% ---------------------------------------------------------------------------
+\section{Validazione del sistema}
+\label{sec:validazione}
+
+Prima di analizzare campioni birifrangenti, il sistema \`e stato validato misurando la luce polarizzata di sfondo emessa dal display LCD senza alcun campione interposto. Dopo l'allineamento del reference frame descritto nella \cref{sec:allineamento}, ci si attende che la regione di sfondo presenti:
+\begin{itemize}
+    \item $\mathrm{DoLP} \approx 1$, poich\'e la luce del display LCD \`e fortemente polarizzata linearmente;
+    \item $\mathrm{AoLP} \approx 0\degree$, per definizione della procedura di allineamento;
+    \item $S_3 \approx 0$, in assenza di componente circolare significativa.
+\end{itemize}
+
+La dispersione dei valori nella regione di sfondo fornisce una stima dell'incertezza di misura del sistema. Lo scarto interquartile del DoLP nella maschera di sfondo indica la ripetibilit\`a della misura su pixel equivalenti, mentre la deviazione standard dell'AoLP quantifica l'incertezza angolare.
+
+\begin{figure}[htbp]
+    \centering
+    \fbox{\parbox{0.85\textwidth}{\centering\vspace{2cm}Figura: Mappa DoLP della regione di sfondo dopo allineamento. Il valore medio atteso \`e $\mathrm{DoLP} \approx 1$.\vspace{2cm}}}
+    \caption{Mappa del grado di polarizzazione lineare (DoLP) nella regione di sfondo, utilizzata per la validazione del sistema.}
+    \label{fig:validazione_dolp}
+\end{figure}
+
+% ---------------------------------------------------------------------------
+\section{Mappe dei parametri di Stokes}
+\label{sec:mappe_stokes}
+
+Per ciascun campione, la pipeline di analisi descritta nel \cref{ch:analisi} produce le mappe bidimensionali dei quattro parametri di Stokes ($S_0$, $S_1$, $S_2$, $S_3$) e delle grandezze derivate (DoLP, AoLP, ritardanza $\Delta$, asse veloce $\Theta$).
+
+\subsection{Intensit\`a totale \texorpdfstring{$S_0$}{S0}}
+\label{subsec:risultati_s0}
+
+La mappa di $S_0$ rappresenta l'intensit\`a totale trasmessa attraverso il campione, indipendentemente dallo stato di polarizzazione. Le variazioni spaziali di $S_0$ riflettono differenze di trasmittanza, spessore o assorbimento del campione. Nelle regioni esterne alla maschera, $S_0$ presenta un profilo gaussiano caratteristico dell'illuminazione LCD.
+
+\subsection{Parametri lineari \texorpdfstring{$S_1$}{S1} e \texorpdfstring{$S_2$}{S2}}
+\label{subsec:risultati_s1s2}
+
+Le mappe di $S_1$ e $S_2$ rivelano le variazioni spaziali della polarizzazione lineare introdotte dal campione. In un campione birifrangente uniforme, $S_1$ e $S_2$ presentano regioni con valori positivi e negativi ben definiti, la cui distribuzione dipende dall'orientazione dell'asse ottico rispetto all'analizzatore. Per campioni con orientazione variabile dell'asse ottico (come i provini fotoelastici sotto carico), le mappe mostrano strutture a bande caratteristiche delle isocline.
+
+\subsection{Parametro circolare \texorpdfstring{$S_3$}{S3}}
+\label{subsec:risultati_s3}
+
+La mappa di $S_3$ \`e limitata alla regione circolare della lamina quarto d'onda, pi\`u piccola del campo illuminato. Nei campioni birifrangenti, $S_3$ rivela la conversione di polarizzazione lineare in circolare, e viceversa, in funzione della ritardanza locale. La presenza di regioni con $S_3 > 0$ e $S_3 < 0$ indica variazioni spaziali della ritardanza o dell'orientazione dell'asse veloce.
+
+% ---------------------------------------------------------------------------
+\section{Risultati per campione}
+\label{sec:risultati_campioni}
+
+\subsection{Lamina d'onda a ritardo noto}
+\label{subsec:lamina_onda}
+
+Come primo campione di riferimento si \`e analizzata una lamina d'onda commerciale con ritardanza nominale nota. La mappa di ritardanza $\Delta$ mostra un valore spazialmente uniforme nella regione del campione, in accordo con il comportamento atteso di un elemento ottico omogeneo.
+
+\begin{figure}[htbp]
+    \centering
+    \fbox{\parbox{0.85\textwidth}{\centering\vspace{2cm}Figura: Griglia $3 \times 3$ dei parametri polarimetrici per la lamina d'onda di riferimento.\vspace{2cm}}}
+    \caption{Mappa completa dei parametri di Stokes e delle grandezze derivate per la lamina d'onda a ritardo noto.}
+    \label{fig:lamina_stokes}
+\end{figure}
+
+Il confronto tra il valore misurato e quello nominale fornisce un'indicazione quantitativa dell'accuratezza del sistema. Eventuali discrepanze possono essere attribuite alla calibrazione monocromatica approssimata (\cref{sec:centroide}) e all'incertezza sulla lunghezza d'onda effettiva del canale.
+
+\subsection{Strati di nastro adesivo}
+\label{subsec:nastro_adesivo}
+
+Il nastro adesivo trasparente presenta birifrangenza indotta dallo stress di laminazione. Campioni con diversi numeri di strati sovrapposti producono ritardanze crescenti, proporzionali allo spessore totale. Le mappe di $\Delta$ mostrano:
+\begin{itemize}
+    \item regioni con ritardanza uniforme all'interno di ciascuno strato;
+    \item transizioni nette ai bordi, dove il numero di strati cambia;
+    \item variazioni dell'asse veloce $\Theta$ correlate alla direzione di stesura del nastro.
+\end{itemize}
+
+\begin{figure}[htbp]
+    \centering
+    \fbox{\parbox{0.85\textwidth}{\centering\vspace{2cm}Figura: Mappa di ritardanza $\Delta$ per strati sovrapposti di nastro adesivo, mostrante la progressione della ritardanza con lo spessore.\vspace{2cm}}}
+    \caption{Mappa di ritardanza per il campione a strati di nastro adesivo. I colori diversi corrispondono a ritardanze diverse, correlate al numero di strati.}
+    \label{fig:nastro_retardance}
+\end{figure}
+
+\subsection{Soluzione zuccherina}
+\label{subsec:soluzione_zucchero}
+
+Una soluzione zuccherina in una cuvetta presenta attivit\`a ottica: la polarizzazione lineare viene ruotata di un angolo proporzionale alla concentrazione e al cammino ottico, senza introduzione di componente circolare significativa. La mappa di AoLP dovrebbe mostrare una rotazione uniforme rispetto allo sfondo, la cui entit\`a dipende dalla concentrazione della soluzione.
+
+\begin{figure}[htbp]
+    \centering
+    \fbox{\parbox{0.85\textwidth}{\centering\vspace{2cm}Figura: Mappa AoLP per la soluzione zuccherina, con evidenza della rotazione ottica rispetto al valore di sfondo.\vspace{2cm}}}
+    \caption{Angolo di polarizzazione lineare (AoLP) per la soluzione zuccherina. La differenza rispetto al valore di sfondo ($0\degree$) corrisponde alla rotazione ottica indotta dal campione.}
+    \label{fig:zucchero_aolp}
+\end{figure}
+
+\subsection{Provini fotoelastici}
+\label{subsec:fotoelasticita}
+
+I campioni fotoelastici (elementi in materiale trasparente sottoposti a sollecitazione meccanica) presentano birifrangenza indotta dallo stress, con orientazione e ritardanza variabili spazialmente. Le mappe di $\Delta$ rivelano il campo di tensioni interne sotto forma di frange isocrome, mentre le mappe di $\Theta$ mostrano le isocline, linee lungo le quali l'asse ottico \`e allineato con una direzione fissa.
+
+\begin{figure}[htbp]
+    \centering
+    \fbox{\parbox{0.85\textwidth}{\centering\vspace{2cm}Figura: Griglia $3 \times 3$ per un provino fotoelastico sotto carico. Le frange nella mappa di ritardanza corrispondono a linee di uguale differenza di tensioni principali.\vspace{2cm}}}
+    \caption{Parametri polarimetrici per un provino fotoelastico. La mappa di ritardanza mostra le frange isocrome, la mappa dell'asse veloce mostra le isocline.}
+    \label{fig:fotoelastico_stokes}
+\end{figure}
+
+La capacit\`a del sistema di risolvere simultaneamente frange isocrome e isocline in una singola acquisizione rappresenta uno dei vantaggi principali dell'approccio a immagine rispetto alla polarimetria puntuale, dove la caratterizzazione spaziale richiederebbe una scansione meccanica del campione.
+
+% ---------------------------------------------------------------------------
+\section{Discussione}
+\label{sec:discussione}
+
+\subsection{Capacit\`a del metodo}
+\label{subsec:capacita}
+
+I risultati dimostrano che il polarimetro a immagine basato su smartphone \`e in grado di:
+\begin{itemize}
+    \item ricostruire il vettore di Stokes completo ($S_0$, $S_1$, $S_2$, $S_3$) con risoluzione spaziale bidimensionale;
+    \item misurare ritardanza e orientazione dell'asse veloce su campioni macroscopici;
+    \item distinguere qualitativamente campioni con propriet\`a polarimetriche diverse (birifrangenza, attivit\`a ottica, fotoelasticit\`a);
+    \item produrre mappe polarimetriche interpretabili fisicamente con un apparato dal costo complessivo inferiore a quello di un singolo componente ottico di precisione.
+\end{itemize}
+
+\subsection{Effetto del downsampling}
+\label{subsec:effetto_downsampling}
+
+Il fattore di downsampling $f = 20$ riduce la risoluzione spaziale da circa $12$~megapixel a circa $30\,000$~pixel. Strutture con dimensioni caratteristiche inferiori a $20$~pixel nativi (corrispondenti a circa $\SI{0.1}{\milli\meter}$ sul piano del campione, a seconda dell'ottica utilizzata) non sono risolvibili. Per i campioni macroscopici analizzati, questa limitazione non ha impedito l'osservazione delle strutture di interesse. Un fattore di downsampling inferiore consentirebbe maggior dettaglio spaziale a costo di tempi di calcolo significativamente superiori.
+
+\subsection{Approssimazione monocromatica}
+\label{subsec:approssimazione_mono}
+
+L'assegnazione di una singola lunghezza d'onda effettiva a ciascun canale colore \`e un'approssimazione: il segnale reale integra la risposta del campione su una banda spettrale di diverse decine di nanometri. Per campioni con dispersione cromatica della birifrangenza (ritardanza dipendente da $\lambda$), la misura rappresenta una media pesata sulla banda del canale. Il metodo del baricentro con soglia attenua questo effetto, ma non lo elimina. Una caratterizzazione pi\`u accurata richiederebbe l'uso di filtri passa-banda stretti o di una sorgente monocromatica.
+
+\subsection{Sensibilit\`a alla calibrazione della lamina \texorpdfstring{$\lambda/4$}{lambda/4}}
+\label{subsec:sensibilita_calibrazione}
+
+La correzione $1/\sin\delta(\lambda)$ per la dispersione della lamina quarto d'onda assume un modello di dispersione lineare (\cref{eq:dispersione_lamina}). Per il canale rosso, il fattore correttivo \`e modesto (circa il $5\%$); per il canale blu, dove $\lambda$ si discosta maggiormente da $\lambda_0 = \SI{633}{\nano\meter}$, la correzione diventa pi\`u significativa e l'approssimazione meno accurata. L'uso del canale rosso come canale predefinito per l'analisi \`e motivato anche da questa considerazione.
+
+\subsection{Confronto con approcci tradizionali}
+\label{subsec:confronto}
+
+Rispetto ai polarimetri di laboratorio convenzionali, il sistema proposto presenta vantaggi in termini di costo, portabilit\`a e accessibilit\`a, a fronte di limitazioni in accuratezza, risoluzione spettrale e ripetibilit\`a. La \cref{tab:confronto} riassume il confronto.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Confronto qualitativo tra il polarimetro a immagine proposto e un polarimetro da laboratorio convenzionale.}
+    \label{tab:confronto}
+    \begin{tabularx}{0.9\textwidth}{lXX}
+        \hline
+        \textbf{Caratteristica} & \textbf{Sistema proposto} & \textbf{Laboratorio} \\
+        \hline
+        Costo & $< \SI{100}{\text{\euro}}$ (escluso smartphone) & $> \SI{10000}{\text{\euro}}$ \\
+        Portabilit\`a & Elevata (tascabile) & Limitata (banco ottico) \\
+        Risoluzione spaziale & $\sim 200 \times 150$~px (post-binning) & Variabile (CCD/CMOS dedicato) \\
+        Risoluzione spettrale & Banda larga (filtro Bayer) & Monocromatica o iperspettrale \\
+        Misura di $S_3$ & S\`i (con lamina $\lambda/4$ esterna) & S\`i \\
+        Automazione & Manuale (rotazione analizzatore) & Motorizzata \\
+        \hline
+    \end{tabularx}
+\end{table}
+
+Il sistema \`e particolarmente adatto a contesti didattici e a misure esplorative, dove la rapidit\`a di setup e il basso costo compensano le limitazioni in precisione assoluta.
