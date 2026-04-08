@@ -44,7 +44,7 @@ Queste immagini vengono poi processate dagli script python.
 
 Per garantire la massima coerenza, linearità e ripetibilità nelle misurazioni, tutte le impostazioni della fotocamera (Samsung Galaxy S24) sono state bloccate e mantenute rigorosamente costanti per tutte le acquisizioni dell'esperimento. 
 
-I parametri di scatto, estratti dai metadati EXIF, sono i seguenti:
+I parametri di scatto, sono i seguenti:
 
 * **Fotocamera e Ottica:** Samsung Galaxy S24 — Obiettivo Tele (Lunghezza focale: 7.0 mm, equivalente a 69 mm in formato 35mm)
 * **Formato di Acquisizione:** DNG (RAW a 12-bit, *Linear Raw*). L'uso del formato RAW è fondamentale per bypassare il post-processing software dello smartphone (bilanciamento del bianco, compressione JPEG, curve di contrasto) e preservare la linearità dell'intensità luminosa catturata dal sensore.
