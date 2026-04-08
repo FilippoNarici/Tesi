@@ -1,17 +1,14 @@
-% A LaTeX template for MSc Thesis submissions to 
-% Politecnico di Milano (PoliMi) - School of Industrial and Information Engineering
+% Tesi triennale - Politecnico di Milano
+% Polarimetro a Immagine 2D Low-Cost per Polarimetria Spazialmente Risolta
+% Filippo Narici - Ingegneria Fisica - A.A. 2025-26
 %
-% S. Bonetti, A. Gruttadauria, G. Mescolini, A. Zingaro
-% e-mail: template-tesi-ingind@polimi.it
-%
-% Last Revision: October 2021
-%
+% Template base: PoliMi3i (S. Bonetti, A. Gruttadauria, G. Mescolini, A. Zingaro)
 % Copyright 2021 Politecnico di Milano, Italy. NC-BY
 
 \documentclass{Configuration_Files/PoliMi3i_thesis}
 
 %------------------------------------------------------------------------------
-%	REQUIRED PACKAGES AND  CONFIGURATIONS
+%	REQUIRED PACKAGES AND CONFIGURATIONS
 %------------------------------------------------------------------------------
 
 % CONFIGURATIONS
@@ -21,18 +18,17 @@
 \usepackage{multicol} % To write in multiple columns (executive summary)
 \setlength\columnsep{15pt} % Column separation in executive summary
 \setlength\parindent{0pt} % Indentation
-\raggedbottom  
+\raggedbottom
 
 % PACKAGES FOR TITLES
 \usepackage{titlesec}
-% \titlespacing{\section}{left spacing}{before spacing}{after spacing}
 \titlespacing{\section}{0pt}{3.3ex}{2ex}
 \titlespacing{\subsection}{0pt}{3.3ex}{1.65ex}
 \titlespacing{\subsubsection}{0pt}{3.3ex}{1ex}
 \usepackage{color}
 
 % PACKAGES FOR LANGUAGE AND FONT
-\usepackage[english]{babel} % The document is in English  
+\usepackage[italian]{babel} % Tesi in italiano
 \usepackage[utf8]{inputenc} % UTF8 encoding
 \usepackage[T1]{fontenc} % Font encoding
 \usepackage[11pt]{moresize} % Big fonts
@@ -41,8 +37,8 @@
 \usepackage{graphicx}
 \usepackage{transparent} % Enables transparent images
 \usepackage{eso-pic} % For the background picture on the title page
-\usepackage{subfig} % Numbered and caption subfigures using \subfloat.
-\usepackage{tikz} % A package for high-quality hand-made figures.
+\usepackage{subfig} % Numbered and caption subfigures using \subfloat
+\usepackage{tikz} % A package for high-quality hand-made figures
 \usetikzlibrary{}
 \graphicspath{{./Images/}} % Directory of the images
 \usepackage{caption} % Coloured captions
@@ -56,7 +52,7 @@
 \usepackage{amssymb}
 \usepackage{amsfonts}
 \usepackage{bm}
-\usepackage[overload]{empheq} % For braced-style systems of equations.
+\usepackage[overload]{empheq} % For braced-style systems of equations
 \usepackage{fix-cm} % To override original LaTeX restrictions on sizes
 
 % PACKAGES FOR TABLES
@@ -69,41 +65,46 @@
 \usepackage{algorithmic}
 
 % PACKAGES FOR REFERENCES & BIBLIOGRAPHY
-\usepackage[colorlinks=true,linkcolor=black,anchorcolor=black,citecolor=black,filecolor=black,menucolor=black,runcolor=black,urlcolor=black]{hyperref} % Adds clickable links at references
+\usepackage[colorlinks=true,linkcolor=black,anchorcolor=black,citecolor=black,filecolor=black,menucolor=black,runcolor=black,urlcolor=black]{hyperref}
 \usepackage{cleveref}
-\usepackage[square, numbers, sort&compress]{natbib} % Square brackets, citing references with numbers, citations sorted by appearance in the text and compressed
-\bibliographystyle{abbrvnat} % You may use a different style adapted to your field
+\usepackage[square, numbers, sort&compress]{natbib}
+\bibliographystyle{abbrvnat}
 
 % OTHER PACKAGES
 \usepackage{pdfpages} % To include a pdf file
 \usepackage{afterpage}
-\usepackage{lipsum} % DUMMY PACKAGE
 \usepackage{fancyhdr} % For the headers
 \fancyhf{}
 
-% Input of configuration file. Do not change config.tex file unless you really know what you are doing. 
+% Input of configuration file
 \input{Configuration_Files/config}
 
-%----------------------------------------------------------------------------
+%------------------------------------------------------------------------------
 %	NEW COMMANDS DEFINED
-%----------------------------------------------------------------------------
+%------------------------------------------------------------------------------
 
-% EXAMPLES OF NEW COMMANDS
-\newcommand{\bea}{\begin{eqnarray}} % Shortcut for equation arrays
+\newcommand{\bea}{\begin{eqnarray}}
 \newcommand{\eea}{\end{eqnarray}}
-\newcommand{\e}[1]{\times 10^{#1}}  % Powers of 10 notation
+\newcommand{\e}[1]{\times 10^{#1}}
 
-%----------------------------------------------------------------------------
-%	ADD YOUR PACKAGES (be careful of package interaction)
-%----------------------------------------------------------------------------
+%------------------------------------------------------------------------------
+%	ADD YOUR PACKAGES
+%------------------------------------------------------------------------------
 
-%----------------------------------------------------------------------------
-%	ADD YOUR DEFINITIONS AND COMMANDS (be careful of existing commands)
-%----------------------------------------------------------------------------
+\usepackage{siunitx} % Unita' SI
 
-%----------------------------------------------------------------------------
+%------------------------------------------------------------------------------
+%	ADD YOUR DEFINITIONS AND COMMANDS
+%------------------------------------------------------------------------------
+
+% Vettore di Stokes
+\newcommand{\Svec}{\mathbf{S}}
+% Matrice di Mueller
+\newcommand{\Mmat}{\mathbf{M}}
+
+%------------------------------------------------------------------------------
 %	BEGIN OF YOUR DOCUMENT
-%----------------------------------------------------------------------------
+%------------------------------------------------------------------------------
 
 \begin{document}
 
@@ -113,408 +114,109 @@
 \renewcommand{\headrulewidth}{0pt}
 \renewcommand{\footrulewidth}{0pt}}
 
-%----------------------------------------------------------------------------
+%------------------------------------------------------------------------------
 %	TITLE PAGE
-%----------------------------------------------------------------------------
+%------------------------------------------------------------------------------
 
 \pagestyle{empty} % No page numbers
-\frontmatter % Use roman page numbering style (i, ii, iii, iv...) for the preamble pages
+\frontmatter % Use roman page numbering style (i, ii, iii, iv...)
 
 \puttitle{
-	title=Title, % Title of the thesis
-	name=Filippo Narici, % Author Name and Surname
-	course=Ingegneria Fisica, % Study Programme (in Italian)
-	ID  = 211644,  % Student ID number (numero di matricola)
-	advisor= Prof. Name Surname, % Supervisor name
-	coadvisor={Name Surname, Name Surname}, % Co-Supervisor name, remove this line if there is none
-	academicyear={2025-26},  % Academic Year
-} % These info will be put into your Title page 
+	title=Polarimetro a Immagine 2D Low-Cost per Polarimetria Spazialmente Risolta,
+	name=Filippo Narici,
+	course=Ingegneria Fisica,
+	ID=211644,
+	advisor=Prof. Maurizio Zani,
+	coadvisor={Sebastiano Luridiana, Giacomo Di Iorio},
+	academicyear={2025-26},
+}
 
-%----------------------------------------------------------------------------
-%	PREAMBLE PAGES: ABSTRACT (inglese e italiano), EXECUTIVE SUMMARY
-%----------------------------------------------------------------------------
+%------------------------------------------------------------------------------
+%	PREAMBLE PAGES: ABSTRACT
+%------------------------------------------------------------------------------
 \startpreamble
-\setcounter{page}{1} % Set page counter to 1
+\setcounter{page}{1}
 
 % ABSTRACT IN ENGLISH
-\chapter*{Abstract} 
-Here goes the Abstract in English of your thesis followed by a list of keywords.
-The Abstract is a concise summary of the content of the thesis (single page of text)
-and a guide to the most important contributions included in your thesis.
-The Abstract is the very last thing you write.
-It should be a self-contained text and should be clear to someone who hasn't (yet) read the whole manuscript.
-The Abstract should contain the answers to the main scientific questions that have been addressed in your thesis.
-It needs to summarize the adopted motivations and the adopted methodological approach as well as the findings of your work and their relevance and impact.
-The Abstract is the part appearing in the record of your thesis inside POLITesi,
-the Digital Archive of PhD and Master Theses (Laurea Magistrale) of Politecnico di Milano.
-The Abstract will be followed by a list of four to six keywords.
-Keywords are a tool to help indexers and search engines to find relevant documents.
-To be relevant and effective, keywords must be chosen carefully.
-They should represent the content of your work and be specific to your field or sub-field.
-Keywords may be a single word or two to four words. 
+\chapter*{Abstract}
+Classical polarimetry typically relies on single-point measurements, providing a scalar characterization of the polarization state of light at one spatial location. This thesis presents the design and validation of a low-cost two-dimensional imaging polarimeter based on the CMOS sensor of a commercial smartphone. By acquiring 36 images at equally spaced analyzer angles and two additional measurements with a quarter-wave plate, the full Stokes vector is reconstructed pixel-by-pixel via a pseudo-inverse approach. The system enables spatially resolved mapping of linear and circular polarization, retardance, and fast-axis orientation across the entire field of view. Measurements on birefringent samples --- including wave plates, adhesive tape layers, a sugar solution, and photoelastic specimens --- demonstrate the instrument's capability to produce quantitative two-dimensional polarization maps. The results confirm that smartphone-based imaging polarimetry offers a viable, accessible, and cost-effective alternative to conventional laboratory setups for educational and preliminary research applications.
 \\
 \\
-\textbf{Keywords:} here, the keywords, of your thesis % Keywords
+\textbf{Keywords:} imaging polarimetry, Stokes parameters, smartphone CMOS sensor, birefringence, photoelasticity, low-cost instrumentation
 
-% ABSTRACT IN ITALIAN
+% ABSTRACT IN ITALIANO
 \chapter*{Abstract in lingua italiana}
-Qui va l'Abstract in lingua italiana della tesi seguito dalla lista di parole chiave.
+La polarimetria classica si basa tipicamente su misure puntuali, fornendo una caratterizzazione scalare dello stato di polarizzazione della luce in una singola posizione spaziale. Questa tesi presenta la progettazione e la validazione di un polarimetro a immagine bidimensionale a basso costo, basato sul sensore CMOS di uno smartphone commerciale. Acquisendo 36 immagini a passi angolari regolari dell'analizzatore e due misure aggiuntive con una lamina quarto d'onda, il vettore di Stokes completo viene ricostruito pixel per pixel mediante un approccio a pseudo-inversa. Il sistema consente la mappatura spazialmente risolta della polarizzazione lineare e circolare, della ritardanza e dell'orientazione dell'asse veloce sull'intero campo visivo. Le misure su campioni birifrangenti --- tra cui lamine d'onda, strati di nastro adesivo, una soluzione zuccherina e provini fotoelastici --- dimostrano la capacit\`a dello strumento di produrre mappe bidimensionali quantitative di polarizzazione. I risultati confermano che la polarimetria a immagine basata su smartphone rappresenta un'alternativa accessibile, praticabile ed economica rispetto ai tradizionali apparati di laboratorio, sia per scopi didattici che per applicazioni di ricerca preliminare.
 \\
 \\
-\textbf{Parole chiave:} qui, vanno, le parole chiave, della tesi % Keywords (italian)
+\textbf{Parole chiave:} polarimetria a immagine, parametri di Stokes, sensore CMOS smartphone, birifrangenza, fotoelasticit\`a, strumentazione low-cost
 
-%----------------------------------------------------------------------------
-%	LIST OF CONTENTS/FIGURES/TABLES/SYMBOLS
-%----------------------------------------------------------------------------
+%------------------------------------------------------------------------------
+%	LIST OF CONTENTS/FIGURES/TABLES
+%------------------------------------------------------------------------------
 
-% TABLE OF CONTENTS
 \thispagestyle{empty}
-\tableofcontents % Table of contents 
+\tableofcontents
 \thispagestyle{empty}
 \cleardoublepage
 
-%-------------------------------------------------------------------------
+%------------------------------------------------------------------------------
 %	THESIS MAIN TEXT
-%-------------------------------------------------------------------------
-% In the main text of your thesis you can write the chapters in two different ways:
-%
-%(1) As presented in this template you can write:
-%    \chapter{Title of the chapter}
-%    *body of the chapter*
-%
-%(2) You can write your chapter in a separated .tex file and then include it in the main file with the following command:
-%    \chapter{Title of the chapter}
-%    \input{chapter_file.tex}
-%
-% Especially for long thesis, we recommend you the second option.
+%------------------------------------------------------------------------------
 
-\addtocontents{toc}{\vspace{2em}} % Add a gap in the Contents, for aesthetics
+\addtocontents{toc}{\vspace{2em}}
 \mainmatter % Begin numeric (1,2,3...) page numbering
 
 % --------------------------------------------------------------------------
-% NUMBERED CHAPTERS % Regular chapters following
+% CAPITOLI
 % --------------------------------------------------------------------------
-\chapter*{Introduction}
 
-This document is intended to be both an example of the Polimi \LaTeX{} template for Master Theses,
-as well as a short introduction to its use. It is not intended to be a general introduction to \LaTeX{} itself,
-and the reader is assumed to be familiar with the basics of creating and compiling \LaTeX{} documents (see \cite{oetiker1995not, kottwitz2015latex}). 
-\\
-The cover page of the thesis must contain all the relevant information:
-title of the thesis, name of the Study Programme and School, name of the author,
-student ID number, name of the supervisor, name(s) of the co-supervisor(s) (if any), academic year.
-The above information are provided by filling all the entries in the command \verb|\puttitle{}|
-in the title page section of this template.
-\\
-Be sure to select a title that is meaningful.
-It should contain important keywords to be identified by indexer.
-Keep the title as concise as possible and comprehensible even to people who are not experts in your field.
-The title has to be chosen at the end of your work so that it accurately captures the main subject of the manuscript. 
-\\
-Since a thesis might be a substantial document, it is convenient to break it into chapters.
-You can create a new chapter as done in this template by simply using the following command
-\begin{verbatim}
-\chapter{Title of the chapter}
-\end{verbatim}
-followed by the body text.
-\\
-Especially for long manuscripts, it is recommended to give each chapter its own file.
-In this case, you write your chapter in a separated \verb|chapter_n.tex| file
-and then include it in the main file with the following command
-\begin{verbatim}
-\input{chapter_n.tex}
-\end{verbatim}
-It is recommended to give a label to each chapter by using the command
-\begin{verbatim}
-\label{ch:chapter_name}%
-\end{verbatim}
-where the argument is just a text string that you'll use to reference that part
-as follows: \textit{Chapter~\ref{ch:chapter_one} contains \sc{an introduction to}  \dots}.\\
-If necessary, an unnumbered chapter can be created by
-\begin{verbatim}
-\chapter*{Title of the unnumbered chapter}
-\end{verbatim}
+\chapter{Introduzione}
+\label{ch:introduzione}
+\input{chapters/cap1_introduzione.tex}
 
-\chapter{Chapter one}
-\label{ch:chapter_one}%
-% The \label{...}% enables to remove the small indentation that is generated, always leave the % symbol.
+\chapter{Fondamenti teorici della polarimetria}
+\label{ch:teoria}
+\input{chapters/cap2_teoria.tex}
 
-In this chapter additional useful information are reported.
+\chapter{Apparato sperimentale}
+\label{ch:apparato}
+\input{chapters/cap3_apparato.tex}
 
-\section{Sections and subsections}
-\label{sec:section_name}
-Chapters are typically subdivided into sections and subsections, and, optionally,
-subsubsections, paragraphs and subparagraphs.
-All can have a title, but only sections and subsections are numbered.
-A new section is created by the command
-\begin{verbatim}
-\section{Title of the section}
-\end{verbatim}
-The numbering can be turned off by using \verb|\section*{}|.
-\\
-A new subsection is created by the command
-\begin{verbatim}
-\subsection{Title of the subsection}
-\end{verbatim}
-and, similarly, the numbering can be turned off by adding an asterisk as follows 
-\begin{verbatim}
-\subsection*{}
-\end{verbatim}
+\chapter{Raccolta dati e campioni}
+\label{ch:campioni}
+\input{chapters/cap4_campioni.tex}
 
-\section{Equations}
-\label{sec:eqs}
-This section gives some examples of writing mathematical equations in your thesis.
+\chapter{Analisi dei dati}
+\label{ch:analisi}
+\input{chapters/cap5_analisi.tex}
 
-Maxwell's equations read:
-\begin{subequations}
-    \label{eq:maxwell}
-    \begin{align}[left=\empheqlbrace]
-    \nabla\cdot \bm{D} & = \rho, \label{eq:maxwell1} \\
-    \nabla \times \bm{E} +  \frac{\partial \bm{B}}{\partial t} & = \bm{0}, \label{eq:maxwell2} \\
-    \nabla\cdot \bm{B} & = 0, \label{eq:maxwell3} \\
-    \nabla \times \bm{H} - \frac{\partial \bm{D}}{\partial t} &= \bm{J}. \label{eq:maxwell4}
-    \end{align}
-\end{subequations}
+\chapter{Risultati e discussione}
+\label{ch:risultati}
+\input{chapters/cap6_risultati.tex}
 
-Equation~\eqref{eq:maxwell} is automatically labeled by \texttt{cleveref},
-as well as Equation~\eqref{eq:maxwell1} and Equation~\eqref{eq:maxwell3}.
-Thanks to the \verb|cleveref| package, there is no need to use \verb|\eqref|.
-Remember that Equations have to be numbered only if they are referenced in the text.
+\chapter{Conclusioni e sviluppi futuri}
+\label{ch:conclusioni}
+\input{chapters/cap7_conclusioni.tex}
 
-Equations~\eqref{eq:maxwell_multilabels1}, \eqref{eq:maxwell_multilabels2}, \eqref{eq:maxwell_multilabels3}, and \eqref{eq:maxwell_multilabels4} show again Maxwell's equations without brace:
-\begin{align}
-    \nabla\cdot \bm{D} & = \rho, \label{eq:maxwell_multilabels1} \\
-    \nabla \times \bm{E} +  \frac{\partial \bm{B}}{\partial t} &= \bm{0}, \label{eq:maxwell_multilabels2} \\
-    \nabla\cdot \bm{B} & = 0, \label{eq:maxwell_multilabels3} \\
-    \nabla \times \bm{H} - \frac{\partial \bm{D}}{\partial t} &= \bm{J} \label{eq:maxwell_multilabels4}.
-\end{align}
-
-Equation~\eqref{eq:maxwell_singlelabel} is the same as before,
-but with just one label:
-\begin{equation}
-    \label{eq:maxwell_singlelabel}
-    \left\{
-    \begin{aligned}
-    \nabla\cdot \bm{D} & = \rho, \\
-    \nabla \times \bm{E} +  \frac{\partial \bm{B}}{\partial t} &= \bm{0},\\
-    \nabla\cdot \bm{B} & = 0, \\
-    \nabla \times \bm{H} - \frac{\partial \bm{D}}{\partial t} &= \bm{J}.
-    \end{aligned}
-    \right.
-\end{equation}
-
-\section{Figures, Tables and Algorithms}
-Figures, Tables and Algorithms have to contain a Caption that describe their content, and have to be properly reffered in the text.
-
-\subsection{Figures}
-\label{subsec:figures}
-
-For including pictures in your text you can use \texttt{TikZ} for high-quality hand-made figures,
-or just include them as usual with the command
-\begin{verbatim}
-\includegraphics[options]{filename.xxx}
-\end{verbatim}
-Here xxx is the correct format, e.g. \verb|.png|, \verb|.jpg|, \verb|.eps|, \dots.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.3\textwidth]{logo_polimi_scritta.eps}
-    \caption{Caption of the Figure to appear in the List of Figures.}
-    \label{fig:quadtree}
-\end{figure}
-
-Thanks to the \texttt{\textbackslash subfloat} command, a single figure, such as Figure~\ref{fig:quadtree},
-can contain multiple sub-figures with their own caption and label, e.g. \color{black} Figure~\ref{fig:polimi_logo1} and Figure~\ref{fig:polimi_logo2}. 
-
-\begin{figure}[H]
-    \centering
-    \subfloat[One PoliMi logo.\label{fig:polimi_logo1}]{
-        \includegraphics[scale=0.5]{Images/logo_polimi_scritta.eps}
-    }
-    \quad
-    \subfloat[Another one PoliMi logo.\label{fig:polimi_logo2}]{
-        \includegraphics[scale=0.5]{Images/logo_polimi_scritta2.eps}
-    }
-    \caption[Shorter caption]{This is a very long caption you don't want to appear in the List of Figures.}
-    \label{fig:quadtree2}
-\end{figure}
-
-
-\subsection{Tables}
-\label{subsec:tables}
-
-Within the environments \texttt{table} and  \texttt{tabular} you can create very fancy tables as the one shown in Table~\ref{table:example}.
-\begin{table}[H]
-    \caption*{\textbf{Title of Table (optional)}}
-    \centering 
-    \begin{tabular}{|p{3em} c c c |}
-    \hline
-    \rowcolor{bluepoli!40} % comment this line to remove the color
-     & \textbf{column 1} & \textbf{column 2} & \textbf{column 3} \T\B \\
-    \hline \hline
-    \textbf{row 1} & 1 & 2 & 3 \T\B \\
-    \textbf{row 2} & $\alpha$ & $\beta$ & $\gamma$ \T\B\\
-    \textbf{row 3} & alpha & beta & gamma \B\\
-    \hline
-    \end{tabular}
-    \\[10pt]
-    \caption{Caption of the Table to appear in the List of Tables.}
-    \label{table:example}
-\end{table}
-
-You can also consider to highlight selected columns or rows in order to make tables more readable.
-Moreover, with the use of \texttt{table*} and the option \texttt{bp} it is possible to align them at the bottom of the page. One example is presented in Table~\ref{table:exampleC}. 
-
-\begin{table}[H]
-\centering 
-    \begin{tabular}{|p{3em} | c | c | c | c | c | c|}
-    \hline
-%    \rowcolor{bluepoli!40}
-     & \textbf{column1} & \textbf{column2} & \textbf{column3} & \textbf{column4} & \textbf{column5} & \textbf{column6} \T\B \\
-    \hline \hline
-    \textbf{row1} & 1 & 2 & 3 & 4 & 5 & 6 \T\B\\
-    \textbf{row2} & a & b & c & d & e & f \T\B\\
-    \textbf{row3} & $\alpha$ & $\beta$ & $\gamma$ & $\delta$ & $\phi$ & $\omega$ \T\B\\
-    \textbf{row4} & alpha & beta & gamma & delta & phi & omega \B\\
-    \hline
-    \end{tabular}
-    \\[10pt]
-    \caption{Highlighting the columns}
-    \label{table:exampleC}
-\end{table}
-
-\begin{table}[H]
-\centering 
-    \begin{tabular}{|p{3em} c c c c c c|}
-    \hline
-%    \rowcolor{bluepoli!40}
-     & \textbf{column1} & \textbf{column2} & \textbf{column3} & \textbf{column4} & \textbf{column5} & \textbf{column6} \T\B \\
-    \hline \hline
-    \textbf{row1} & 1 & 2 & 3 & 4 & 5 & 6 \T\B\\
-    \hline
-    \textbf{row2} & a & b & c & d & e & f \T\B\\
-    \hline
-    \textbf{row3} & $\alpha$ & $\beta$ & $\gamma$ & $\delta$ & $\phi$ & $\omega$ \T\B\\
-    \hline
-    \textbf{row4} & alpha & beta & gamma & delta & phi & omega \B\\
-    \hline
-    \end{tabular}
-    \\[10pt]
-    \caption{Highlighting the rows}
-    \label{table:exampleR}
-\end{table}
-
-\subsection{Algorithms}
-\label{subsec:algorithms}
-
-Pseudo-algorithms can be written in \LaTeX{} with the \texttt{algorithm} and \texttt{algorithmic} packages.
-An example is shown in Algorithm~\ref{alg:var}.
-\begin{algorithm}[H]
-    \label{alg:example}
-    \caption{Name of the Algorithm}
-    \label{alg:var}
-    \label{protocol1}
-    \begin{algorithmic}[1]
-    \STATE Initial instructions
-    \FOR{$for-condition$}
-    \STATE{Some instructions}
-    \IF{$if-condition$}
-    \STATE{Some other instructions}
-    \ENDIF
-    \ENDFOR
-    \WHILE{$while-condition$}
-    \STATE{Some further instructions}
-    \ENDWHILE
-    \STATE Final instructions
-    \end{algorithmic}
-\end{algorithm} 
-
-\vspace{5mm}
-
-\section{Theorems, propositions and lists}
-
-\subsection{Theorems}
-Theorems have to be formatted as:
-\begin{theorem}
-\label{a_theorem}
-Write here your theorem. 
-\end{theorem}
-\textit{Proof.} If useful you can report here the proof.
-
-\subsection{Propositions}
-Propositions have to be formatted as:
-\begin{proposition}
-Write here your proposition.
-\end{proposition}
-
-\subsection{Lists}
-How to  insert itemized lists:
-\begin{itemize}
-    \item first item;
-    \item second item.
-\end{itemize}
-How to insert numbered lists:
-\begin{enumerate}
-    \item first item;
-    \item second item.
-\end{enumerate}
-
-\section{Use of copyrighted material}
-
-Each student is responsible for obtaining copyright permissions, if necessary, to include published material in the thesis.
-This applies typically to third-party material published by someone else.
-
-\section{Plagiarism}
-
-You have to be sure to respect the rules on Copyright and avoid an involuntary plagiarism.
-It is allowed to take other persons' ideas only if the author and his original work are clearly mentioned.
-As stated in the Code of Ethics and Conduct, Politecnico di Milano \textit{promotes the integrity of research,
-condemns manipulation and the infringement of intellectual property}, and gives opportunity to all those
-who carry out research activities to have an adequate training on ethical conduct and integrity while doing research.
-To be sure to respect the copyright rules, read the guides on Copyright legislation and citation styles available
-at:
-\begin{verbatim}
-https://www.biblio.polimi.it/en/tools/courses-and-tutorials
-\end{verbatim}
-You can also attend the courses which are periodically organized on "Bibliographic citations and bibliography management".
-
-\section{Bibliography and citations}
-Your thesis must contain a suitable Bibliography which lists all the sources consulted on developing the work.
-The list of references is placed at the end of the manuscript after the chapter containing the conclusions.
-We suggest to use the BibTeX package and save the bibliographic references  in the file \verb|Thesis_bibliography.bib|.
-This is indeed a database containing all the information about the references. To cite in your manuscript, use the \verb|\cite{}| command as follows:
-\\
-\textit{Here is how you cite bibliography entries: \cite{knuth74}, or multiple ones at once: \cite{knuth92,lamport94}}.
-\\
-The bibliography and list of references are generated automatically by running BibTeX \cite{bibtex}.
-
-\chapter{Conclusions and future developments}
-\label{ch:conclusions}%
-A final chapter containing the main conclusions of your research/study
-and possible future developments of your work have to be inserted in this chapter.
-
-%-------------------------------------------------------------------------
+%------------------------------------------------------------------------------
 %	BIBLIOGRAPHY
-%-------------------------------------------------------------------------
+%------------------------------------------------------------------------------
 
-\addtocontents{toc}{\vspace{2em}} % Add a gap in the Contents, for aesthetics
-\bibliography{Thesis_bibliography} % The references information are stored in the file named "Thesis_bibliography.bib"
+\addtocontents{toc}{\vspace{2em}}
+\bibliography{Thesis_bibliography}
 
-%-------------------------------------------------------------------------
+%------------------------------------------------------------------------------
 %	APPENDICES
-%-------------------------------------------------------------------------
+%------------------------------------------------------------------------------
 
 \cleardoublepage
-\addtocontents{toc}{\vspace{2em}} % Add a gap in the Contents, for aesthetics
+\addtocontents{toc}{\vspace{2em}}
 \appendix
-\chapter{Appendix A}
-If you need to include an appendix to support the research in your thesis, you can place it at the end of the manuscript.
-An appendix contains supplementary material (figures, tables, data, codes, mathematical proofs, surveys, \dots)
-which supplement the main results contained in the previous chapters.
 
-\chapter{Appendix B}
-It may be necessary to include another appendix to better organize the presentation of supplementary material.
-
+\chapter{Codice sorgente}
+\label{app:codice}
+% TODO: inserire listati dei principali script Python
 
 % LIST OF FIGURES
 \listoffigures
@@ -523,20 +225,24 @@ It may be necessary to include another appendix to better organize the presentat
 \listoftables
 
 % LIST OF SYMBOLS
-% Write out the List of Symbols in this page
-\chapter*{List of Symbols} % You have to include a chapter for your list of symbols (
+\chapter*{Lista dei simboli}
 \begin{table}[H]
     \centering
     \begin{tabular}{lll}
-        \textbf{Variable} & \textbf{Description} & \textbf{SI unit} \\\hline\\[-9px]
-        $\bm{u}$ & solid displacement & m \\[2px]
-        $\bm{u}_f$ & fluid displacement & m \\[2px]
+        \textbf{Simbolo} & \textbf{Descrizione} & \textbf{Unita' SI} \\\hline\\[-9px]
+        $\Svec$ & Vettore di Stokes & -- \\[2px]
+        $S_0, S_1, S_2, S_3$ & Componenti del vettore di Stokes & \si{\watt\per\meter\squared} \\[2px]
+        $\Mmat$ & Matrice di Mueller & -- \\[2px]
+        $\delta$ & Ritardanza (ritardo di fase) & \si{\radian} \\[2px]
+        $\theta$ & Angolo dell'analizzatore & \si{\degree} \\[2px]
+        $\lambda$ & Lunghezza d'onda & \si{\nano\meter} \\[2px]
+        $\alpha$ & Angolo dell'asse veloce & \si{\degree} \\[2px]
     \end{tabular}
 \end{table}
 
 % ACKNOWLEDGEMENTS
-\chapter*{Acknowledgements}
-Here you might want to acknowledge someone.
+\chapter*{Ringraziamenti}
+% TODO: da completare
 
 \cleardoublepage
 
