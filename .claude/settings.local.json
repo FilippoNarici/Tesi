@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pdflatex -interaction=nonstopmode Thesis.tex)",
+      "Read(//usr/local/**)",
+      "Read(//c//**)",
+      "Read(//c/Users/filip/AppData/Local//**)",
+      "Bash(cmd.exe:*)"
+    ]
+  }
+}
