@@ -1,6 +1,6 @@
 """
 Generazione di figure singole per la tesi.
-Produce un file PDF vettoriale per il parametro selezionato in final_utils.
+Produce file PDF vettoriali per i parametri selezionati in final_utils.
 """
 
 import os
@@ -174,18 +174,34 @@ def generate_figure(param_name, data, channel_idx=0):
 # =============================================================================
 
 def main():
-    param_name = utils.THESIS_FIGURE_PARAM
-    if param_name not in PARAM_CONFIG:
-        print(f"Errore: parametro '{param_name}' non riconosciuto.")
-        print(f"Parametri disponibili: {', '.join(PARAM_CONFIG.keys())}")
+    # Supporta la nuova variabile (lista o 'all') ma fa un fallback alla vecchia se dimenticata
+    raw_params = getattr(utils, 'THESIS_FIGURE_PARAMS', getattr(utils, 'THESIS_FIGURE_PARAM', 'S0'))
+
+    if isinstance(raw_params, str):
+        if raw_params.lower() == 'all':
+            target_params = list(PARAM_CONFIG.keys())
+        else:
+            target_params = [raw_params]
+    else:
+        target_params = list(raw_params)
+
+    # Verifica validità parametri richiesti
+    valid_params = [p for p in target_params if p in PARAM_CONFIG]
+    invalid_params = [p for p in target_params if p not in PARAM_CONFIG]
+
+    if invalid_params:
+        print(f"Attenzione: i seguenti parametri non sono riconosciuti e verranno ignorati: {', '.join(invalid_params)}")
+
+    if not valid_params:
+        print(f"Nessun parametro valido da generare. Parametri disponibili: {', '.join(PARAM_CONFIG.keys())}")
         return
 
-    print(f"--- Generazione figura per: {param_name} ---")
+    print(f"--- Generazione figure per: {', '.join(valid_params)} ---")
 
-    # Determina se servono S3 e i parametri derivati
-    needs_s3 = param_name in ('S3', 'delta', 'theta', 'mask')
-    needs_retardance = param_name in ('delta', 'theta')
-    needs_dolp_aolp = param_name in ('DoLP', 'AoLP')
+    # Determina quali calcoli complessi servono in base all'insieme di figure
+    needs_s3 = any(p in ('S3', 'delta', 'theta', 'mask') for p in valid_params)
+    needs_retardance = any(p in ('delta', 'theta') for p in valid_params)
+    needs_dolp_aolp = any(p in ('DoLP', 'AoLP') for p in valid_params)
 
     # 1. Caricamento Stokes lineari (servono sempre)
     angles, stack = utils.load_rotation_sequence(
@@ -215,14 +231,22 @@ def main():
     DoLP, AoLP = None, None
     delta_deg, theta_deg = None, None
 
-    if needs_dolp_aolp or param_name in ('S1', 'S2'):
+    if needs_dolp_aolp or any(p in ('S1', 'S2') for p in valid_params):
         DoLP, AoLP = utils.calculate_dolp_aolp(S0, S1_al, S2_al)
 
     if needs_retardance:
         delta_deg, theta_deg = utils.calculate_retardance_and_fast_axis(
             S0, S1_al, S2_al, S3, bg_mask)
 
-    # 5. Seleziona i dati da plottare
+    # 5. Genera e salva le figure per ogni parametro valido
+
+    # Preparazione della directory di output: Images/generated/<nome_campione>/
+    sample_name = os.path.basename(os.path.normpath(utils.TARGET_FOLDER))
+    out_dir = os.path.join(utils.THESIS_FIGURES_DIR, sample_name)
+    os.makedirs(out_dir, exist_ok=True)
+    channel_prefix = {0: 'R', 1: 'G', 2: 'B'}.get(utils.TARGET_CHANNEL_IDX, 'X')
+
+    # Dizionario che mappa i nomi delle stringhe alle matrici generate
     data_map = {
         'S0': S0,
         'S1': S1_al,
@@ -234,31 +258,27 @@ def main():
         'theta': theta_deg,
     }
 
-    if param_name == 'mask':
-        S0_norm = (S0 - np.min(S0)) / (np.max(S0) - np.min(S0) + 1e-8)
-        data = np.where(bg_mask, S0_norm, 0.0)
-    else:
-        data = data_map[param_name]
+    # Loop attraverso l'array di richieste ed esportazione sequenziale
+    for param_name in valid_params:
+        if param_name == 'mask':
+            S0_norm = (S0 - np.min(S0)) / (np.max(S0) - np.min(S0) + 1e-8)
+            data = np.where(bg_mask, S0_norm, 0.0)
+        else:
+            data = data_map[param_name]
 
-    if data is None:
-        print(f"Errore: dati non disponibili per '{param_name}'. Servono le immagini con lamina λ/4?")
-        return
+        if data is None:
+            print(f"Errore: dati non disponibili per '{param_name}'. Servono le immagini con lamina λ/4?")
+            continue
 
-    # 6. Genera e salva la figura
-    fig = generate_figure(param_name, data, utils.TARGET_CHANNEL_IDX)
+        fig = generate_figure(param_name, data, utils.TARGET_CHANNEL_IDX)
 
-    # Percorso output: Images/generated/<nome_campione>/
-    sample_name = os.path.basename(os.path.normpath(utils.TARGET_FOLDER))
-    out_dir = os.path.join(utils.THESIS_FIGURES_DIR, sample_name)
-    os.makedirs(out_dir, exist_ok=True)
+        filename = f"{channel_prefix}_{param_name}.pdf"
+        out_path = os.path.join(out_dir, filename)
+        fig.savefig(out_path, format='pdf')
+        plt.close(fig)
 
-    channel_prefix = {0: 'R', 1: 'G', 2: 'B'}.get(utils.TARGET_CHANNEL_IDX, 'X')
-    filename = f"{channel_prefix}_{param_name}.pdf"
-    out_path = os.path.join(out_dir, filename)
-    fig.savefig(out_path, format='pdf')
-    plt.close(fig)
+        print(f"  -> Figura salvata: {out_path}")
 
-    print(f"Figura salvata: {out_path}")
     print("--- Fatto ---")
 
 

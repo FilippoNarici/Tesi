@@ -15,13 +15,13 @@ from tqdm import tqdm
 # COMMON CONFIGURATION
 # =============================================================================
 
-TARGET_FOLDER = './raw/zucchero'
+TARGET_FOLDER = './raw/lambdaquarti_50deg'
 POL_SUBFOLDER = os.path.join(TARGET_FOLDER, 'pol')
 WAV_SUBFOLDER = os.path.join(TARGET_FOLDER, 'wav')
 WAVELENGTHS_CSV = './outputs/rgb_wavelengths.csv'
 
 # Sensor channels: 0: Red, 1: Green, 2: Blue
-TARGET_CHANNEL_IDX = 0
+TARGET_CHANNEL_IDX = 2
 
 # Default downsampling factor for the full polarimeter mapping
 DOWNSAMPLE_FACTOR = 10
@@ -30,8 +30,9 @@ DOWNSAMPLE_FACTOR = 10
 # THESIS FIGURE CONFIGURATION
 # =============================================================================
 
-# Which parameter to plot (one of: S0, S1, S2, S3, DoLP, AoLP, delta, theta, mask)
-THESIS_FIGURE_PARAM = 'AoLP'
+# Which parameters to plot.
+# Can be a single string, a list like ['AoLP', 'DoLP'], or 'all' to export everything.
+THESIS_FIGURE_PARAMS = "all"
 
 # Output directory base (subfolder named after sample is created automatically)
 THESIS_FIGURES_DIR = '../Images/generated'
