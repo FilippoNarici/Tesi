@@ -85,8 +85,8 @@ PARAM_CONFIG = {
         'titolo': "Angolo di polarizzazione lineare (AoLP)",
         'unita': '°',
         'cmap': 'twilight',
-        'vmin': -22.5,
-        'vmax': 22.5,
+        'vmin': -90,
+        'vmax': 90,
     },
     'delta': {
         'titolo': 'Ritardo di fase $\\delta$',
