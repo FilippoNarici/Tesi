@@ -1,3 +1,62 @@
 % Capitolo 7: Conclusioni e sviluppi futuri
 % Autore: architetto
-% TODO: da completare
+
+\section{Riepilogo del lavoro svolto}
+\label{sec:riepilogo}
+
+In questo lavoro di tesi è stato progettato, realizzato e validato un polarimetro a immagine bidimensionale a basso costo, basato sul sensore CMOS di uno smartphone commerciale (Samsung Galaxy S24). L'apparato, allestito su una rotaia ottica Optosci con componenti commerciali e supporti meccanici stampati in 3D, utilizza un display LCD (tablet Samsung Tab S7 FE) come sorgente di luce polarizzata e un analizzatore lineare rotante per la modulazione dello stato di polarizzazione.
+
+La ricostruzione del vettore di Stokes completo avviene pixel per pixel: i parametri lineari $S_0$, $S_1$ e $S_2$ sono estratti da 36 immagini RAW acquisite a passi angolari di $\SI{10}{\degree}$ tramite la pseudo-inversa di Moore-Penrose, mentre il parametro circolare $S_3$ è determinato da due misure aggiuntive con lamina $\lambda/4$ zero-order, corrette per la dispersione cromatica. L'intera pipeline di analisi --- dalla pre-elaborazione delle immagini RAW al calcolo della ritardanza e dell'asse veloce --- è stata implementata in Python con architettura vettorializzata e validata su campioni con proprietà polarimetriche note e diversificate.
+
+
+\section{Risultati principali}
+\label{sec:risultati_principali}
+
+Il sistema si è dimostrato capace di produrre mappe bidimensionali quantitative dei quattro parametri di Stokes e delle grandezze derivate (grado di polarizzazione lineare, angolo di polarizzazione, ritardanza, asse veloce) su campioni macroscopici di diversa natura:
+
+\begin{itemize}
+    \item Le \textbf{lamine d'onda} commerciali hanno fornito valori di ritardanza spazialmente uniformi e coerenti con i valori nominali, confermando l'accuratezza del metodo di ricostruzione.
+    \item Il campione a \textbf{strati di nastro adesivo} ha mostrato una ritardanza crescente in modo proporzionale al numero di strati, verificando la linearità della risposta del sistema.
+    \item La \textbf{soluzione di saccarosio} ha evidenziato la rotazione del piano di polarizzazione attesa per effetto dell'attività ottica, rilevabile come variazione uniforme dell'angolo di polarizzazione rispetto allo sfondo.
+    \item I \textbf{provini fotoelastici} hanno prodotto mappe di ritardanza con frange isocromatiche chiaramente risolte, dimostrando la capacità del sistema di visualizzare la distribuzione spaziale degli sforzi interni in materiali trasparenti.
+\end{itemize}
+
+Questi risultati confermano che il sensore CMOS di uno smartphone, combinato con un protocollo di acquisizione controllato e una pipeline di analisi robusta, costituisce un rivelatore adeguato per la polarimetria a immagine di campioni macroscopici.
+
+
+\section{Limiti dell'approccio}
+\label{sec:limiti}
+
+Il sistema presenta alcune limitazioni intrinseche che ne delimitano il campo di applicabilità:
+
+\begin{itemize}
+    \item \textbf{Downsampling e risoluzione spaziale.} Il fattore di riduzione $f = 20$ applicato alle immagini RAW, necessario per rendere il calcolo computazionalmente sostenibile, riduce la risoluzione spaziale a circa $200 \times 150$ pixel. Strutture con dimensioni inferiori a $20$ pixel nativi non sono risolvibili. Per i campioni macroscopici analizzati questa limitazione non ha impedito l'osservazione delle strutture di interesse, ma un'analisi a risoluzione superiore richiederebbe un'ottimizzazione significativa dell'implementazione software.
+
+    \item \textbf{Approssimazione monocromatica.} L'assegnazione di una singola lunghezza d'onda effettiva a ciascun canale colore tramite il metodo del centroide con soglia è un'approssimazione: la risposta spettrale dei filtri Bayer ha una larghezza di banda di diverse decine di nanometri. Per campioni con forte dispersione cromatica della birifrangenza, la misura rappresenta una media pesata sulla banda del canale, con conseguente perdita di accuratezza.
+
+    \item \textbf{Calibrazione della lamina $\lambda/4$.} La lamina quarto d'onda utilizzata è di tipo zero-order, calibrata per $\SI{633}{\nano\meter}$. Il modello di dispersione adottato per la correzione cromatica assume una dipendenza lineare dalla lunghezza d'onda. Per il canale rosso, prossimo alla lunghezza d'onda di progetto, la correzione è modesta e affidabile; per il canale blu, la deviazione dal modello è più significativa e l'accuratezza della misura di $S_3$ ne risente.
+
+    \item \textbf{Acquisizione manuale.} La rotazione dell'analizzatore viene effettuata manualmente, introducendo una possibile incertezza sulla posizione angolare e limitando la velocità di acquisizione. L'intera sequenza di 38 immagini richiede un tempo dell'ordine di qualche minuto, durante il quale il campione e l'apparato devono rimanere perfettamente stabili.
+
+    \item \textbf{Sorgente a banda larga.} L'uso di un display LCD come sorgente non consente un'analisi spettrale fine; il sistema opera di fatto in tre bande spettrali larghe (R, G, B), a differenza dei polarimetri monocromatici o iperspettrali di laboratorio.
+\end{itemize}
+
+
+\section{Sviluppi futuri}
+\label{sec:sviluppi_futuri}
+
+A partire dai risultati ottenuti e dai limiti identificati, si possono individuare diverse direzioni di sviluppo:
+
+\begin{itemize}
+    \item \textbf{Automazione dell'acquisizione.} L'integrazione di un motore passo-passo per la rotazione dell'analizzatore, controllato via Bluetooth o USB dallo smartphone, eliminerebbe l'incertezza angolare manuale e consentirebbe acquisizioni più rapide e ripetibili.
+
+    \item \textbf{Riduzione del downsampling.} L'implementazione della pipeline su GPU (ad esempio tramite CuPy o PyTorch) o l'adozione di un'elaborazione a blocchi (\emph{tiled processing}) permetterebbero di lavorare a risoluzioni significativamente superiori senza tempi di calcolo proibitivi.
+
+    \item \textbf{Sorgente monocromatica.} La sostituzione del display LCD con LED monocromatici a banda stretta migliorerebbe l'accuratezza della correzione per la dispersione della lamina $\lambda/4$ e renderebbe non necessaria l'approssimazione del centroide spettrale.
+
+    \item \textbf{Caratterizzazione spettrale completa.} L'acquisizione sistematica con sorgenti a diverse lunghezze d'onda consentirebbe di misurare la dispersione della birifrangenza dei campioni, estendendo le capacità del sistema dalla polarimetria spaziale alla polarimetria spettro-spaziale.
+
+    \item \textbf{Integrazione didattica.} Il basso costo e la riproducibilità dell'apparato ne fanno un candidato ideale per l'inserimento in corsi di laboratorio di ottica, dove gli studenti potrebbero affiancare l'esperimento puntuale classico con un'analisi a immagine, sviluppando competenze sia sperimentali sia computazionali.
+\end{itemize}
+
+In conclusione, il polarimetro a immagine 2D low-cost sviluppato in questo lavoro dimostra che la transizione dalla misura puntuale alla misura spazialmente risolta dei parametri di Stokes è realizzabile con strumentazione accessibile e un investimento minimo, aprendo prospettive interessanti sia per la didattica della fisica sperimentale sia per applicazioni esplorative di ricerca.
