@@ -161,7 +161,7 @@ Il sistema non richiede una calibrazione assoluta nel senso tradizionale del ter
 \begin{itemize}
     \item \textbf{Disabilitazione dell'ISP:} l'acquisizione in formato RAW con parametri manuali elimina le correzioni automatiche (auto-esposizione, auto-bilanciamento del bianco, correzione gamma) che introdurrebbero non-linearit\`a nella risposta del sensore.
     % TODO: Fattore di downsampling variabile, selezionato durante l'elaborazione per avere o misure piu stabili o maggiore risoluzione
-    \item \textbf{Downsampling spaziale:} le immagini RAW vengono sottoposte a un downsampling con fattore 20, calcolando la media di blocchi di $20 \times 20$ pixel. Questo binning spaziale svolge una duplice funzione: riduce il rumore del sensore (mediando su 400 pixel indipendenti) e rende il calcolo matriciale computazionalmente sostenibile.
+    \item \textbf{Downsampling spaziale:} le immagini RAW vengono sottoposte a un downsampling con fattore $f$ configurabile (tipicamente tra 10 e 20), calcolando la media di blocchi di $f \times f$ pixel. Questo binning spaziale svolge una duplice funzione: riduce il rumore del sensore (mediando su $f^2$ pixel indipendenti) e rende il calcolo matriciale computazionalmente sostenibile.
     \item \textbf{Allineamento del sistema di riferimento:} l'angolo di polarizzazione della luce emessa dal tablet non \`e esattamente noto \emph{a priori}. L'algoritmo di allineamento descritto nel \cref{ch:analisi} compensa questo offset ruotando matematicamente il piano $S_1$--$S_2$ in modo che la luce di fondo risulti polarizzata orizzontalmente ($\text{AoLP} = 0^\circ$).
 \end{itemize}
 

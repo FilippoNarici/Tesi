@@ -16,9 +16,9 @@ La demosaicizzazione viene eseguita tramite la libreria \texttt{rawpy}, che appl
 
 Le immagini del sensore hanno una risoluzione nativa dell'ordine di $4000 \times 3000$~pixel. Poich\'e la pipeline richiede l'elaborazione simultanea di 36 immagini per la ricostruzione dei parametri di Stokes lineari, pi\`u ulteriori immagini per $S_3$, il carico computazionale e il consumo di memoria risulterebbero proibitivi senza una riduzione della risoluzione.
 
-Si applica pertanto un downsampling con fattore $f = 20$: l'immagine viene suddivisa in blocchi non sovrapposti di $f \times f$~pixel, e ciascun blocco viene sostituito dal valore medio delle intensit\`a contenute. Prima della suddivisione, le dimensioni dell'immagine vengono ritagliate al pi\`u grande multiplo di $f$, in modo da garantire blocchi uniformi. La risoluzione risultante \`e circa $200 \times 150$~pixel, sufficiente per risolvere le strutture macroscopiche dei campioni in esame e per completare l'analisi in tempi dell'ordine di pochi secondi.
+Si applica pertanto un downsampling con fattore $f$ configurabile: l'immagine viene suddivisa in blocchi non sovrapposti di $f \times f$~pixel, e ciascun blocco viene sostituito dal valore medio delle intensit\`a contenute. Prima della suddivisione, le dimensioni dell'immagine vengono ritagliate al pi\`u grande multiplo di $f$, in modo da garantire blocchi uniformi. Il fattore viene scelto di volta in volta in base al compromesso tra risoluzione spaziale e sostenibilit\`a computazionale: valori tipici sono compresi tra $f = 10$ e $f = 20$, corrispondenti a risoluzioni risultanti dell'ordine di $400 \times 300$ e $200 \times 150$~pixel rispettivamente. % TODO: fissare il valore definitivo di f usato per le figure in tesi
 
-Il trade-off introdotto dal downsampling \`e la perdita di dettagli spaziali fini: strutture con dimensioni inferiori a $20$~pixel nativi non sono risolvibili. Tuttavia, per i campioni macroscopici utilizzati in questo lavoro (lamine d'onda, nastro adesivo, provini fotoelastici), questa risoluzione \`e ampiamente adeguata.
+Il trade-off introdotto dal downsampling \`e la perdita di dettagli spaziali fini: strutture con dimensioni inferiori a $f$~pixel nativi non sono risolvibili. Tuttavia, per i campioni macroscopici utilizzati in questo lavoro (lamine d'onda, nastro adesivo, provini fotoelastici), questa risoluzione \`e ampiamente adeguata.
 
 % ---------------------------------------------------------------------------
 \section{Stima delle lunghezze d'onda centroide RGB}
@@ -232,7 +232,7 @@ Questo strumento ha consentito di identificare e correggere errori nella convenz
 La pipeline produce una visualizzazione sintetica in formato griglia $3 \times 3$, che presenta simultaneamente tutti i parametri polarimetrici calcolati:
 
 \begin{itemize}
-    \item \textbf{Riga 1}: $S_0$ (scala di grigi), $S_1$ e $S_2$ (colormap divergente \texttt{bwr}, normalizzata al percentile $99$ del valore assoluto per robustezza agli outlier).
+    \item \textbf{Riga 1}: $S_0$ (colormap monocromatica dal nero al colore del canale selezionato: rosso, verde o blu), $S_1$ e $S_2$ (colormap divergente \texttt{bwr}, normalizzata al percentile $99$ del valore assoluto per robustezza agli outlier).
     \item \textbf{Riga 2}: $S_3$ (colormap \texttt{bwr}), DoLP (colormap \texttt{viridis}, intervallo $[0, 1]$), AoLP (colormap ciclica \texttt{twilight}, intervallo $[-90^\circ, +90^\circ]$).
     \item \textbf{Riga 3}: asse veloce $\Theta$ (colormap \texttt{twilight}), ritardanza $\Delta$ (colormap \texttt{twilight}, intervallo $[-180^\circ, +180^\circ]$), maschera di sfondo sovrapposta a $S_0$ normalizzato per verifica visiva.
 \end{itemize}
