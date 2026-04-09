@@ -52,7 +52,7 @@ Quando luce parzialmente polarizzata attraversa un analizzatore lineare orientat
     I(\theta) = \frac{1}{2}\bigl(S_0 + S_1 \cos 2\theta + S_2 \sin 2\theta\bigr)
     \label{eq:malus_generalizzata}
 \end{equation}
-dove $S_0$, $S_1$ e $S_2$ sono i primi tre parametri di Stokes. Per ogni pixel dell'immagine, le intensit\`a misurate a $N = 36$ angoli equispaziati ($\theta_i = 0\degree, 10\degree, 20\degree, \ldots, 350\degree$) forniscono un sistema di 36 equazioni in 3 incognite.
+dove $S_0$, $S_1$ e $S_2$ sono i primi tre parametri di Stokes. Per ogni pixel dell'immagine, le intensit\`a misurate a $N = 36$ angoli equispaziati ($\theta_i = 0^\circ, 10^\circ, 20^\circ, \ldots, 350^\circ$) forniscono un sistema di 36 equazioni in 3 incognite.
 
 \subsection{Formulazione matriciale e pseudo-inversa}
 \label{subsec:pseudoinversa}
@@ -87,7 +87,7 @@ Per evitare cicli espliciti su ogni pixel, l'implementazione sfrutta la struttur
 \subsection{Convenzione degli angoli}
 \label{subsec:convenzione_angoli}
 
-Gli angoli nominali dell'analizzatore $\theta_{\mathrm{nom}}$ corrispondono alla rotazione meccanica effettuata durante l'acquisizione. Per garantire coerenza con la convenzione destrorsa adottata nel formalismo di Stokes, gli angoli vengono invertiti: $\theta = (360\degree - \theta_{\mathrm{nom}}) \bmod 360\degree$. Questa trasformazione \`e necessaria perch\'e la rotazione del polarizzatore avviene in verso opposto rispetto alla convenzione standard di osservazione lungo la direzione di propagazione.
+Gli angoli nominali dell'analizzatore $\theta_{\mathrm{nom}}$ corrispondono alla rotazione meccanica effettuata durante l'acquisizione. Per garantire coerenza con la convenzione destrorsa adottata nel formalismo di Stokes, gli angoli vengono invertiti: $\theta = (360^\circ - \theta_{\mathrm{nom}}) \bmod 360^\circ$. Questa trasformazione \`e necessaria perch\'e la rotazione del polarizzatore avviene in verso opposto rispetto alla convenzione standard di osservazione lungo la direzione di propagazione.
 
 % ---------------------------------------------------------------------------
 \section{Misura del parametro di Stokes \texorpdfstring{$S_3$}{S3}}
@@ -98,14 +98,14 @@ Il parametro $S_3$, che quantifica la componente di polarizzazione circolare, no
 \subsection{Configurazione di misura}
 \label{subsec:config_s3}
 
-Si acquisiscono due immagini con la lamina $\lambda/4$ orientata a $+45\degree$ e $-45\degree$ rispetto all'asse dell'analizzatore. Le intensit\`a corrispondenti, $I_{+45}$ e $I_{-45}$, sono legate a $S_3$ dalla relazione:
+Si acquisiscono due immagini con la lamina $\lambda/4$ orientata a $+45^\circ$ e $-45^\circ$ rispetto all'asse dell'analizzatore. Le intensit\`a corrispondenti, $I_{+45}$ e $I_{-45}$, sono legate a $S_3$ dalla relazione:
 \begin{equation}
     S_3 = \frac{I_{+45} - I_{-45}}{\sin\delta}
     \label{eq:s3_formula}
 \end{equation}
 dove $\delta$ \`e il ritardo di fase effettivo della lamina alla lunghezza d'onda di lavoro.
 
-Come per gli angoli del polarizzatore, anche l'orientazione della lamina viene invertita per coerenza con la convenzione destrorsa: l'immagine acquisita alla posizione nominale $-45\degree$ corrisponde a $I_{+45}$ e viceversa.
+Come per gli angoli del polarizzatore, anche l'orientazione della lamina viene invertita per coerenza con la convenzione destrorsa: l'immagine acquisita alla posizione nominale $-45^\circ$ corrisponde a $I_{+45}$ e viceversa.
 
 \subsection{Correzione per dispersione cromatica}
 \label{subsec:correzione_dispersione}
@@ -172,7 +172,7 @@ Dai parametri di Stokes allineati si calcolano il grado di polarizzazione linear
 \end{equation}
 Il DoLP \`e limitato per definizione all'intervallo $[0, 1]$: valori prossimi a $1$ indicano luce completamente polarizzata linearmente, valori prossimi a $0$ indicano luce non polarizzata o polarizzata circolarmente. Per prevenire divergenze numeriche, $S_0$ viene sostituito con un valore minimo di $10^{-8}$ dove nullo, e il DoLP viene successivamente limitato (clipping) all'intervallo $[0, 1]$.
 
-L'AoLP \`e calcolato in gradi e varia nell'intervallo $[-90\degree, +90\degree]$, rappresentando la direzione dell'asse di polarizzazione lineare predominante in ciascun pixel.
+L'AoLP \`e calcolato in gradi e varia nell'intervallo $[-90^\circ, +90^\circ]$, rappresentando la direzione dell'asse di polarizzazione lineare predominante in ciascun pixel.
 
 % ---------------------------------------------------------------------------
 \section{Calcolo della ritardanza e dell'asse veloce}
@@ -203,7 +203,7 @@ La ritardanza si ottiene dalla relazione:
     \cos\Delta = 1 - \frac{s_{1,\mathrm{in}} - s_1}{s_{1,\mathrm{in}} \cdot \sin^2\!2\Theta}
     \label{eq:ritardanza}
 \end{equation}
-dove il denominatore $\sin^2\!2\Theta$ pu\`o diventare molto piccolo quando l'asse veloce \`e prossimo a $0\degree$ o $90\degree$, generando instabilit\`a numeriche. Per questo motivo, il calcolo viene eseguito solo sui pixel in cui $\sin^2\!2\Theta > 0.02$; nei pixel rimanenti si assegna $\Delta = 0$.
+dove il denominatore $\sin^2\!2\Theta$ pu\`o diventare molto piccolo quando l'asse veloce \`e prossimo a $0^\circ$ o $90^\circ$, generando instabilit\`a numeriche. Per questo motivo, il calcolo viene eseguito solo sui pixel in cui $\sin^2\!2\Theta > 0.02$; nei pixel rimanenti si assegna $\Delta = 0$.
 
 L'argomento della funzione $\arccos$ viene inoltre limitato all'intervallo $[-1, 1]$ (clipping) prima del calcolo, per prevenire valori NaN dovuti a piccole eccedenze numeriche.
 
@@ -233,8 +233,8 @@ La pipeline produce una visualizzazione sintetica in formato griglia $3 \times 3
 
 \begin{itemize}
     \item \textbf{Riga 1}: $S_0$ (scala di grigi), $S_1$ e $S_2$ (colormap divergente \texttt{bwr}, normalizzata al percentile $99$ del valore assoluto per robustezza agli outlier).
-    \item \textbf{Riga 2}: $S_3$ (colormap \texttt{bwr}), DoLP (colormap \texttt{viridis}, intervallo $[0, 1]$), AoLP (colormap ciclica \texttt{twilight}, intervallo $[-90\degree, +90\degree]$).
-    \item \textbf{Riga 3}: asse veloce $\Theta$ (colormap \texttt{twilight}), ritardanza $\Delta$ (colormap \texttt{twilight}, intervallo $[-180\degree, +180\degree]$), maschera di sfondo sovrapposta a $S_0$ normalizzato per verifica visiva.
+    \item \textbf{Riga 2}: $S_3$ (colormap \texttt{bwr}), DoLP (colormap \texttt{viridis}, intervallo $[0, 1]$), AoLP (colormap ciclica \texttt{twilight}, intervallo $[-90^\circ, +90^\circ]$).
+    \item \textbf{Riga 3}: asse veloce $\Theta$ (colormap \texttt{twilight}), ritardanza $\Delta$ (colormap \texttt{twilight}, intervallo $[-180^\circ, +180^\circ]$), maschera di sfondo sovrapposta a $S_0$ normalizzato per verifica visiva.
 \end{itemize}
 
 La scelta delle colormap segue le convenzioni della letteratura polarimetrica: colormap divergenti per grandezze con segno ($S_1$, $S_2$, $S_3$), colormap cicliche per angoli ($\mathrm{AoLP}$, $\Theta$, $\Delta$), e colormap sequenziali per grandezze positive ($S_0$, DoLP). La normalizzazione al percentile $99$ anzich\'e al valore massimo rende la visualizzazione robusta rispetto a pixel anomali isolati.

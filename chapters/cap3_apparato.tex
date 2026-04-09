@@ -38,7 +38,7 @@ Questa caratteristica risulta vantaggiosa per il setup sperimentale: la luce inc
 \subsection{Analizzatore}
 \label{subsec:analizzatore}
 
-L'analizzatore \`e costituito da un polarizzatore lineare a film (tipo Polaroid), montato su un supporto rotante calibrato solidale alla rotaia ottica. Il polarizzatore pu\`o essere ruotato manualmente con una risoluzione angolare sufficiente per i passi di $\SI{10}{\degree}$ previsti dal protocollo di acquisizione.
+L'analizzatore \`e costituito da un polarizzatore lineare a film (tipo Polaroid), montato su un supporto rotante calibrato solidale alla rotaia ottica. Il polarizzatore pu\`o essere ruotato manualmente con una risoluzione angolare sufficiente per i passi di \SI{10}{\degree} previsti dal protocollo di acquisizione.
 
 La qualit\`a del polarizzatore \`e critica per l'accuratezza delle misure: un rapporto di estinzione elevato garantisce che la modulazione dell'intensit\`a trasmessa in funzione dell'angolo segua fedelmente la legge di Malus, minimizzando errori sistematici nell'estrazione dei parametri di Stokes.
 
@@ -98,7 +98,7 @@ L'acquisizione in modalit\`a RAW manuale viene effettuata tramite un'applicazion
 \subsection{Acquisizione per i parametri di Stokes lineari ($S_0$, $S_1$, $S_2$)}
 \label{subsec:acquisizione-lineari}
 
-La determinazione dei parametri di Stokes lineari $S_0$, $S_1$ e $S_2$ si basa sull'acquisizione di una sequenza di 36 immagini RAW, corrispondenti a 36 posizioni angolari dell'analizzatore distribuite uniformemente tra $\SI{0}{\degree}$ e $\SI{350}{\degree}$ con passo di $\SI{10}{\degree}$.
+La determinazione dei parametri di Stokes lineari $S_0$, $S_1$ e $S_2$ si basa sull'acquisizione di una sequenza di 36 immagini RAW, corrispondenti a 36 posizioni angolari dell'analizzatore distribuite uniformemente tra \SI{0}{\degree} e \SI{350}{\degree} con passo di \SI{10}{\degree}.
 
 L'intensit\`a misurata in funzione dell'angolo dell'analizzatore $\theta$ segue la legge di Malus generalizzata:
 \begin{equation}
@@ -107,19 +107,19 @@ I(\theta) = \frac{1}{2}\left(S_0 + S_1 \cos 2\theta + S_2 \sin 2\theta\right)
 \end{equation}
 Con 36 misure per 3 incognite, il sistema \`e fortemente sovradeterminato. I parametri di Stokes vengono estratti risolvendo il sistema lineare mediante la matrice pseudo-inversa di Moore-Penrose, come descritto nel \cref{ch:analisi}. La sovradeterminazione migliora la robustezza statistica del fit, riducendo l'effetto del rumore del sensore sulle stime dei parametri.
 
-\textbf{Convenzione degli angoli.} Nel software di analisi, la convenzione del segno dell'angolo di rotazione viene invertita ($\theta \rightarrow 360° - \theta$) per mantenere la coerenza con un sistema di riferimento destrorso rispetto alla direzione di propagazione del fascio luminoso uscente dalla sorgente.
+\textbf{Convenzione degli angoli.} Nel software di analisi, la convenzione del segno dell'angolo di rotazione viene invertita ($\theta \rightarrow 360^\circ - \theta$) per mantenere la coerenza con un sistema di riferimento destrorso rispetto alla direzione di propagazione del fascio luminoso uscente dalla sorgente.
 
 \subsection{Acquisizione per il parametro di Stokes circolare ($S_3$)}
 \label{subsec:acquisizione-s3}
 
 Per la determinazione di $S_3$ si acquisiscono due immagini aggiuntive inserendo la lamina $\lambda/4$ nel percorso ottico tra il campione e l'analizzatore:
 \begin{itemize}
-    \item un'immagine con l'asse veloce della lamina orientato a $+\SI{45}{\degree}$ rispetto all'asse dell'analizzatore;
-    \item un'immagine con l'asse veloce orientato a $-\SI{45}{\degree}$.
+    \item un'immagine con l'asse veloce della lamina orientato a $+45^\circ$ rispetto all'asse dell'analizzatore;
+    \item un'immagine con l'asse veloce orientato a $-45^\circ$.
 \end{itemize}
 Il parametro $S_3$ viene calcolato dalla differenza delle intensit\`a misurate nelle due configurazioni, con la correzione per la dispersione cromatica della lamina descritta nella \cref{subsec:lamina-qwp}.
 
-L'inversione della convenzione degli angoli si applica anche alle immagini della lamina $\lambda/4$: nel software, l'immagine acquisita con l'etichetta $+\SI{45}{\degree}$ viene assegnata alla configurazione $-\SI{45}{\degree}$ e viceversa.
+L'inversione della convenzione degli angoli si applica anche alle immagini della lamina $\lambda/4$: nel software, l'immagine acquisita con l'etichetta $+45^\circ$ viene assegnata alla configurazione $-45^\circ$ e viceversa.
 
 \subsection{Costanti radiometriche}
 \label{subsec:costanti-radiometriche}
@@ -160,7 +160,7 @@ Il sistema non richiede una calibrazione assoluta nel senso tradizionale del ter
 \begin{itemize}
     \item \textbf{Disabilitazione dell'ISP:} l'acquisizione in formato RAW con parametri manuali elimina le correzioni automatiche (auto-esposizione, auto-bilanciamento del bianco, correzione gamma) che introdurrebbero non-linearit\`a nella risposta del sensore.
     \item \textbf{Downsampling spaziale:} le immagini RAW vengono sottoposte a un downsampling con fattore 20, calcolando la media di blocchi di $20 \times 20$ pixel. Questo binning spaziale svolge una duplice funzione: riduce il rumore del sensore (mediando su 400 pixel indipendenti) e rende il calcolo matriciale computazionalmente sostenibile.
-    \item \textbf{Allineamento del sistema di riferimento:} l'angolo di polarizzazione della luce emessa dal tablet non \`e esattamente noto \emph{a priori}. L'algoritmo di allineamento descritto nel \cref{ch:analisi} compensa questo offset ruotando matematicamente il piano $S_1$--$S_2$ in modo che la luce di fondo risulti polarizzata orizzontalmente ($\text{AoLP} = \SI{0}{\degree}$).
+    \item \textbf{Allineamento del sistema di riferimento:} l'angolo di polarizzazione della luce emessa dal tablet non \`e esattamente noto \emph{a priori}. L'algoritmo di allineamento descritto nel \cref{ch:analisi} compensa questo offset ruotando matematicamente il piano $S_1$--$S_2$ in modo che la luce di fondo risulti polarizzata orizzontalmente ($\text{AoLP} = 0^\circ$).
 \end{itemize}
 
 La riproducibilit\`a delle misure \`e garantita dalla combinazione di parametri di esposizione fissi, stabilit\`a meccanica della rotaia e procedure software standardizzate. La variabilit\`a residua \`e dominata dal rumore del sensore, che viene efficacemente ridotto dal binning spaziale e dalla sovradeterminazione del sistema lineare.
