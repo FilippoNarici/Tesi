@@ -85,8 +85,8 @@ PARAM_CONFIG = {
         'titolo': "Angolo di polarizzazione lineare (AoLP)",
         'unita': '°',
         'cmap': 'twilight',
-        'vmin': -90,
-        'vmax': 90,
+        'vmin': -22.5,
+        'vmax': 22.5,
     },
     'delta': {
         'titolo': 'Ritardo di fase $\\delta$',
@@ -252,7 +252,8 @@ def main():
     out_dir = os.path.join(utils.THESIS_FIGURES_DIR, sample_name)
     os.makedirs(out_dir, exist_ok=True)
 
-    filename = f"{param_name}.pdf"
+    channel_prefix = {0: 'R', 1: 'G', 2: 'B'}.get(utils.TARGET_CHANNEL_IDX, 'X')
+    filename = f"{channel_prefix}_{param_name}.pdf"
     out_path = os.path.join(out_dir, filename)
     fig.savefig(out_path, format='pdf')
     plt.close(fig)
