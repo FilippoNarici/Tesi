@@ -1,3 +1,54 @@
 % Capitolo 1: Introduzione
 % Autore: architetto
-% TODO: da completare
+
+La polarizzazione della luce è una proprietà fondamentale della radiazione elettromagnetica che descrive l'orientazione e il comportamento temporale del campo elettrico nel piano trasversale alla direzione di propagazione. Sebbene meno intuitiva della frequenza o dell'intensità, la polarizzazione porta con sé un'informazione ricca e spesso decisiva sulle proprietà del mezzo attraversato dalla luce: la struttura cristallina di un materiale, lo stato di sollecitazione meccanica di un componente trasparente, la chiralità delle molecole in soluzione. Per questa ragione, la polarimetria --- ovvero la misura quantitativa dello stato di polarizzazione --- è uno strumento ampiamente impiegato in ottica, scienza dei materiali, chimica analitica e ingegneria strutturale.
+
+Le applicazioni della polarimetria spaziano dall'analisi delle tensioni meccaniche in componenti trasparenti (fotoelasticità), alla caratterizzazione di film sottili e cristalli liquidi, fino alla diagnostica biomedica e all'osservazione astronomica. In ambito industriale, la polarimetria consente il controllo non distruttivo di componenti in vetro e plastica, rivelando difetti e tensioni residue introdotte dai processi di fabbricazione. In ambito scientifico, la misura dei parametri di Stokes fornisce una descrizione completa dello stato di polarizzazione, includendo informazioni sia sulla componente lineare sia su quella circolare.
+
+
+\section{Polarimetria classica e suoi limiti}
+\label{sec:polarimetria_classica}
+
+L'approccio tradizionale alla polarimetria si basa su un rivelatore puntuale, tipicamente un fotodiodo, posto dietro un sistema di analizzatore e lamine ritardatrici. Ruotando l'analizzatore e misurando la variazione di intensità trasmessa, è possibile ricostruire i quattro parametri di Stokes che descrivono completamente lo stato di polarizzazione del fascio incidente. Questa configurazione è consolidata, accurata e didatticamente efficace: il manuale di laboratorio del corso di Fisica Sperimentale del Politecnico di Milano~\cite{manuale_polarizzazione} descrive un esperimento basato esattamente su questo principio, in cui un diodo laser, lamine ritardatrici e un fotodiodo vengono utilizzati per determinare i parametri di Stokes di un fascio luminoso.
+
+Il limite principale di questo approccio risiede nella sua natura \emph{zero-dimensionale}: il rivelatore puntuale fornisce una singola misura scalare per ciascun parametro di Stokes, integrata sull'intera sezione del fascio. Se il campione presenta variazioni spaziali delle proprietà ottiche --- come accade nella maggior parte delle situazioni di interesse pratico, dai campi di tensione nei materiali fotoelastici alla birifrangenza non uniforme di un film polimerico --- l'informazione spaziale viene irrimediabilmente perduta. Per ottenere una mappa bidimensionale sarebbe necessaria una scansione meccanica punto per punto, operazione lenta, complessa e raramente praticata in contesti didattici o di ricerca preliminare.
+
+Un secondo limite è di natura economica: i polarimetri da laboratorio convenzionali, dotati di sensori dedicati, componenti ottiche di precisione e sistemi motorizzati, hanno costi dell'ordine delle decine di migliaia di euro. Questo ne limita l'accessibilità nei laboratori didattici e nei contesti di ricerca con budget contenuti.
+
+
+\section{Polarimetria a immagine}
+\label{sec:polarimetria_immagine}
+
+L'idea di sostituire il rivelatore puntuale con un sensore a matrice --- una fotocamera --- trasforma il polarimetro da strumento scalare a strumento di imaging: ogni pixel del sensore diventa un polarimetro indipendente, e la misura restituisce una mappa bidimensionale dello stato di polarizzazione su tutto il campo visivo. Questo approccio, noto come \emph{imaging polarimetry} o polarimetria a immagine, è oggetto di crescente interesse nella comunità scientifica e trova applicazioni in telerilevamento, diagnostica biomedica, controllo qualità industriale e astrofisica.
+
+I polarimetri a immagine commerciali e di ricerca utilizzano tipicamente sensori CCD o CMOS dedicati, dotati di griglie micropolarizzatrici integrate o di cristalli liquidi modulabili, e raggiungono prestazioni elevate in termini di accuratezza, velocità di acquisizione e risoluzione spettrale. Tuttavia, il costo di questi sistemi rimane elevato, rendendoli inaccessibili per scopi didattici e per indagini esplorative che non giustifichino un investimento significativo.
+
+L'ampia diffusione degli smartphone dotati di sensori CMOS ad alta risoluzione e capacità di acquisizione in formato RAW apre una prospettiva interessante: utilizzare un dispositivo già posseduto dalla quasi totalità degli studenti come rivelatore per un polarimetro a immagine, abbattendo drasticamente i costi e rendendo l'esperimento riproducibile in qualsiasi laboratorio.
+
+
+\section{Obiettivo della tesi}
+\label{sec:obiettivo}
+
+Il presente lavoro di tesi si propone di progettare, realizzare e validare un \textbf{polarimetro a immagine bidimensionale a basso costo}, utilizzando come rivelatore il sensore CMOS di uno smartphone commerciale (Samsung Galaxy S24). L'obiettivo è dimostrare che è possibile estendere l'approccio puntuale classico della polarimetria a un'analisi matriciale 2D con strumentazione accessibile: un display LCD (tablet Samsung Tab S7 FE) come sorgente di luce polarizzata, un polarizzatore lineare rotante come analizzatore, una lamina quarto d'onda zero-order a $\SI{633}{\nano\meter}$ e uno smartphone per l'acquisizione delle immagini, il tutto montato su una rotaia ottica da laboratorio didattico con supporti personalizzati stampati in 3D.
+
+Il sistema acquisisce 36 immagini RAW a passi angolari di $\SI{10}{\degree}$ dell'analizzatore per ricostruire i parametri di Stokes lineari $S_0$, $S_1$ e $S_2$ tramite la pseudo-inversa di Moore-Penrose, e due immagini aggiuntive con la lamina $\lambda/4$ per determinare il parametro circolare $S_3$. Il vettore di Stokes completo viene così ricostruito pixel per pixel, consentendo la generazione di mappe spazialmente risolte del grado di polarizzazione, dell'angolo di polarizzazione lineare, della ritardanza e dell'orientazione dell'asse veloce.
+
+L'intera pipeline di analisi --- dalla demosaicizzazione delle immagini RAW al calcolo delle grandezze polarimetriche --- è stata implementata in Python, sfruttando un'architettura vettorializzata che consente l'elaborazione simultanea di tutti i pixel dell'immagine. Per validare il sistema, sono stati analizzati campioni rappresentativi di diverse classi di fenomeni ottici: lamine d'onda a ritardo noto, film polimerici birifrangenti con strati incrementali di nastro adesivo, soluzioni di saccarosio per l'attività ottica e provini trasparenti sottoposti a sollecitazione meccanica per la fotoelasticità.
+
+
+\section{Struttura della tesi}
+\label{sec:struttura}
+
+La tesi è organizzata come segue.
+
+Nel \cref{ch:teoria} si richiamano i fondamenti teorici necessari alla comprensione del lavoro: il formalismo di Stokes e la sfera di Poincaré per la descrizione degli stati di polarizzazione, le matrici di Mueller per la modellizzazione degli elementi ottici, la legge di Malus generalizzata che costituisce la base del metodo di misura, e i fenomeni fisici indagati nei campioni --- birifrangenza, attività ottica e fotoelasticità.
+
+Nel \cref{ch:apparato} si descrive l'apparato sperimentale realizzato: la configurazione ottica su rotaia, i componenti utilizzati (sorgente LCD, analizzatore rotante, lamina $\lambda/4$ zero-order, supporti stampati in 3D), le caratteristiche del sensore CMOS dello smartphone e il protocollo di acquisizione adottato, incluse le costanti radiometriche fissate per garantire la linearità della risposta.
+
+Nel \cref{ch:campioni} si illustrano i campioni selezionati per la validazione del sistema --- lamine d'onda, nastro adesivo stratificato, soluzione zuccherina, righello in plastica e trave a sbalzo --- con le motivazioni della scelta, le caratteristiche fisiche attese e le condizioni di preparazione e montaggio.
+
+Nel \cref{ch:analisi} si documenta l'intera pipeline di analisi dei dati: la pre-elaborazione delle immagini RAW con downsampling spaziale, l'approssimazione monocromatica per i canali colore del sensore, la ricostruzione dei parametri di Stokes tramite pseudo-inversa, la misura di $S_3$ con correzione per la dispersione cromatica della lamina, il mascheramento morfologico dell'area illuminata, l'allineamento del sistema di riferimento e il calcolo della ritardanza e dell'asse veloce con le relative guardie numeriche.
+
+Nel \cref{ch:risultati} si presentano i risultati ottenuti sui diversi campioni, con le mappe bidimensionali dei parametri polarimetrici, la loro interpretazione fisica e una discussione critica delle capacità e dei limiti del metodo, incluso un confronto qualitativo con i polarimetri da laboratorio convenzionali.
+
+Infine, nel \cref{ch:conclusioni} si riassumono i risultati principali e si discutono le possibili direzioni di sviluppo futuro del sistema.
