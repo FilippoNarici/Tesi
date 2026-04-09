@@ -27,6 +27,16 @@ TARGET_CHANNEL_IDX = 2
 DOWNSAMPLE_FACTOR = 20
 
 # =============================================================================
+# THESIS FIGURE CONFIGURATION
+# =============================================================================
+
+# Which parameter to plot (one of: S0, S1, S2, S3, DoLP, AoLP, delta, theta, mask)
+THESIS_FIGURE_PARAM = 'DoLP'
+
+# Output directory base (subfolder named after sample is created automatically)
+THESIS_FIGURES_DIR = '../Images/generated'
+
+# =============================================================================
 # LOADING & PROCESSING FUNCTIONS
 # =============================================================================
 
