@@ -34,7 +34,7 @@ dove $S_0, S_1, S_2, S_3$ sono i parametri di Stokes, introdotti nella sezione s
 
 \section{Formalismo di Stokes}
 \label{sec:stokes}
-
+% TODO: Cos'è Jones? non lo conosco e non è menzionato prima
 Il formalismo di Jones descrive efficacemente la polarizzazione mediante un vettore complesso a due componenti, ma è limitato alla luce completamente polarizzata. Per trattare anche la luce parzialmente polarizzata, è necessario un formalismo più generale: il \textbf{formalismo di Stokes}, introdotto da George Gabriel Stokes nel 1852~\cite{goldstein2011polarized}.
 
 \subsection{Definizione dei parametri di Stokes}
@@ -67,6 +67,7 @@ S_0^2 \geq S_1^2 + S_2^2 + S_3^2,
 \end{equation}
 con l'uguaglianza valida esclusivamente per luce totalmente polarizzata.
 
+% TODO: Valutare se necessario introdurre sfera, se si aggiungere immagine
 \subsection{Sfera di Poincaré}
 \label{subsec:poincare}
 
@@ -101,7 +102,7 @@ Nel caso di luce parzialmente polarizzata, la legge si generalizza utilizzando i
 \label{eq:malus_generalizzata}
 I(\theta) = \frac{1}{2}\bigl(S_0 + S_1\cos 2\theta + S_2\sin 2\theta\bigr).
 \end{equation}
-
+% TODO: Matrice di Mueller non introdotta prima, quindi segnalare di guardare sotto oppure parlarne dopo, attualmente "Spaventa" il lettore
 L'\cref{eq:malus_generalizzata} può essere derivata applicando la matrice di Mueller di un polarizzatore lineare ruotato di $\theta$ al vettore di Stokes incidente e leggendo la componente $S_0'$ del vettore uscente. Si osservi che l'intensità trasmessa dipende solo dai primi tre parametri di Stokes e non da $S_3$: un polarizzatore lineare è insensibile alla polarizzazione circolare.
 
 L'\cref{eq:malus_generalizzata} è di importanza fondamentale per il polarimetro sviluppato in questa tesi: acquisendo $N$ immagini a diversi angoli $\theta_i$ dell'analizzatore, si ottiene un sistema sovradeterminato di equazioni lineari nei tre parametri incogniti $S_0$, $S_1$ e $S_2$, risolvibile tramite il metodo della pseudo-inversa. Questo approccio è descritto in dettaglio nel \cref{ch:analisi}.
