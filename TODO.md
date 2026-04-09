@@ -6,13 +6,13 @@
 
 | Capitolo | File | Responsabile | Stato |
 |----------|------|-------------|-------|
-| 1. Introduzione | `chapters/cap1_introduzione.tex` | Architetto | [ ] pending |
-| 2. Fondamenti teorici | `chapters/cap2_teoria.tex` | Teorico | [ ] pending |
-| 3. Apparato sperimentale | `chapters/cap3_apparato.tex` | Sperimentale | [ ] pending |
-| 4. Campioni e dati | `chapters/cap4_campioni.tex` | Sperimentale | [ ] pending |
-| 5. Analisi dati | `chapters/cap5_analisi.tex` | Analista | [ ] pending |
-| 6. Risultati e discussione | `chapters/cap6_risultati.tex` | Analista | [ ] pending |
-| 7. Conclusioni | `chapters/cap7_conclusioni.tex` | Architetto | [ ] pending |
+| 1. Introduzione | `chapters/cap1_introduzione.tex` | Architetto | [x] completato |
+| 2. Fondamenti teorici | `chapters/cap2_teoria.tex` | Teorico | [x] completato |
+| 3. Apparato sperimentale | `chapters/cap3_apparato.tex` | Sperimentale | [x] completato |
+| 4. Campioni e dati | `chapters/cap4_campioni.tex` | Sperimentale | [x] completato |
+| 5. Analisi dati | `chapters/cap5_analisi.tex` | Analista | [x] completato |
+| 6. Risultati e discussione | `chapters/cap6_risultati.tex` | Analista | [x] completato |
+| 7. Conclusioni | `chapters/cap7_conclusioni.tex` | Architetto | [x] completato |
 
 ## Note tecniche importanti
 
