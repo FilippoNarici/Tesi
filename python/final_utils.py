@@ -15,13 +15,13 @@ from tqdm import tqdm
 # COMMON CONFIGURATION
 # =============================================================================
 
-TARGET_FOLDER = './raw/strati_v2'
+TARGET_FOLDER = './raw/zucchero'
 POL_SUBFOLDER = os.path.join(TARGET_FOLDER, 'pol')
 WAV_SUBFOLDER = os.path.join(TARGET_FOLDER, 'wav')
 WAVELENGTHS_CSV = './outputs/rgb_wavelengths.csv'
 
 # Sensor channels: 0: Red, 1: Green, 2: Blue
-TARGET_CHANNEL_IDX = 0
+TARGET_CHANNEL_IDX = 2
 
 # Default downsampling factor for the full polarimeter mapping
 DOWNSAMPLE_FACTOR = 20

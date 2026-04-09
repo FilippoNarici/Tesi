@@ -6,6 +6,7 @@ Calculates the full Stokes vector (S0, S1, S2, S3), DoLP, AoLP, Retardance, and 
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
+from matplotlib.colors import LinearSegmentedColormap
 
 # Import shared functions and configs
 import final_utils as utils
@@ -19,16 +20,26 @@ except:
 # PLOTTING
 # =============================================================================
 
-def plot_all_parameters(S0, S1, S2, S3, DoLP, AoLP, delta, theta, bg_mask):
+def plot_all_parameters(S0, S1, S2, S3, DoLP, AoLP, delta, theta, bg_mask, channel_idx):
     """Plots all 9 parameters in a 3x3 grid."""
     print("\nGenerating plots...")
+
+    # Set colormap for S0 based on target channel (0: Red, 1: Green, 2: Blue)
+    if channel_idx == 0:
+        cmap_s0 = LinearSegmentedColormap.from_list('black_red', ['black', 'red'])
+    elif channel_idx == 1:
+        cmap_s0 = LinearSegmentedColormap.from_list('black_green', ['black', 'green'])
+    elif channel_idx == 2:
+        cmap_s0 = LinearSegmentedColormap.from_list('black_blue', ['black', 'blue'])
+    else:
+        cmap_s0 = 'gray'
 
     # Adjusted to a 3x3 grid to gracefully accommodate the mask
     fig, axes = plt.subplots(3, 3, figsize=(18, 14))
     fig.suptitle("Full Stokes, Polarization, & Retardance Parameters", fontsize=16)
 
     # --- ROW 1: S0, S1, S2 ---
-    im0 = axes[0, 0].imshow(S0, cmap='gray')
+    im0 = axes[0, 0].imshow(S0, cmap=cmap_s0)
     axes[0, 0].set_title('S0 (Total Intensity)')
     axes[0, 0].axis('off')
     fig.colorbar(im0, ax=axes[0, 0], fraction=0.046, pad=0.04)
@@ -85,8 +96,9 @@ def plot_all_parameters(S0, S1, S2, S3, DoLP, AoLP, delta, theta, bg_mask):
 
     # Create the debug mask: Normalize S0 to 0-1 range
     S0_norm = (S0 - np.min(S0)) / (np.max(S0) - np.min(S0) + 1e-8)
-    # Put 1.0 (white) where bg_mask is True, otherwise show the underlying S0_norm
-    debug_mask_img = np.where(bg_mask, 1.0, S0_norm)
+
+    # Put 0.0 (black) where bg_mask is False (excluded from average), otherwise show S0_norm
+    debug_mask_img = np.where(bg_mask, S0_norm, 0.0)
 
     im_mask = axes[2, 2].imshow(debug_mask_img, cmap='gray', vmin=0, vmax=1)
     axes[2, 2].set_title('Safe Background Mask (Debug)')
@@ -134,8 +146,8 @@ def main():
     DoLP, AoLP = utils.calculate_dolp_aolp(S0, S1_aligned, S2_aligned)
     delta_degrees, theta_degrees = utils.calculate_retardance_and_fast_axis(S0, S1_aligned, S2_aligned, S3, bg_mask)
 
-    # 6. Plotting
-    plot_all_parameters(S0, S1_aligned, S2_aligned, S3, DoLP, AoLP, delta_degrees, theta_degrees, bg_mask)
+    # 6. Plotting - Pass the channel index for S0 coloring
+    plot_all_parameters(S0, S1_aligned, S2_aligned, S3, DoLP, AoLP, delta_degrees, theta_degrees, bg_mask, utils.TARGET_CHANNEL_IDX)
 
     print("--- Finished ---")
 

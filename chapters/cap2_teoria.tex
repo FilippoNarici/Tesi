@@ -49,7 +49,7 @@ dove le parentesi angolari indicano la media temporale. Ciascun parametro ha un 
 \begin{itemize}
     \item $S_0$: intensità totale del fascio;
     \item $S_1$: prevalenza della polarizzazione orizzontale ($S_1 > 0$) o verticale ($S_1 < 0$);
-    \item $S_2$: prevalenza della polarizzazione a $+45°$ ($S_2 > 0$) o $-45°$ ($S_2 < 0$);
+    \item $S_2$: prevalenza della polarizzazione a $+45^\circ$ ($S_2 > 0$) o $-45^\circ$ ($S_2 < 0$);
     \item $S_3$: prevalenza della polarizzazione circolare destra ($S_3 > 0$) o sinistra ($S_3 < 0$).
 \end{itemize}
 
@@ -58,7 +58,7 @@ I parametri di Stokes possono essere espressi equivalentemente in termini di int
 \label{eq:stokes_intensita}
 \Svec = \begin{pmatrix} I_H + I_V \\ I_H - I_V \\ I_{+45} - I_{-45} \\ I_{RCP} - I_{LCP} \end{pmatrix},
 \end{equation}
-dove $I_H$, $I_V$, $I_{+45}$, $I_{-45}$ sono le intensità trasmesse da polarizzatori lineari orientati rispettivamente a $0°$, $90°$, $+45°$ e $-45°$, mentre $I_{RCP}$ e $I_{LCP}$ corrispondono alle componenti circolare destra e sinistra.
+dove $I_H$, $I_V$, $I_{+45}$, $I_{-45}$ sono le intensità trasmesse da polarizzatori lineari orientati rispettivamente a $0^\circ$, $90^\circ$, $+45^\circ$ e $-45^\circ$, mentre $I_{RCP}$ e $I_{LCP}$ corrispondono alle componenti circolare destra e sinistra.
 
 Per qualsiasi stato di polarizzazione vale la disuguaglianza fondamentale:
 \begin{equation}
@@ -84,7 +84,7 @@ L'\textbf{equatore} della sfera corrisponde alla polarizzazione lineare ($\chi =
 
 Dal punto di vista sperimentale, la determinazione dei parametri $S_0$, $S_1$ e $S_2$ richiede misure di intensità attraverso un polarizzatore lineare a diversi angoli. Come descritto nella \cref{sec:malus}, l'intensità trasmessa da un analizzatore a un angolo $\theta$ è funzione di $S_0$, $S_1$ e $S_2$; acquisendo misure a più angoli, i tre parametri possono essere ricostruiti tramite un fit sinusoidale o una pseudo-inversa.
 
-Il parametro $S_3$, legato alla polarizzazione circolare, non è accessibile con un solo polarizzatore lineare: è necessario introdurre una lamina quarto d'onda ($\lambda/4$) prima dell'analizzatore. Due misure con la lamina orientata a $+45°$ e $-45°$ rispetto all'asse di trasmissione dell'analizzatore consentono di isolare $S_3$. La procedura specifica adottata nel polarimetro è descritta nel \cref{ch:analisi}.
+Il parametro $S_3$, legato alla polarizzazione circolare, non è accessibile con un solo polarizzatore lineare: è necessario introdurre una lamina quarto d'onda ($\lambda/4$) prima dell'analizzatore. Due misure con la lamina orientata a $+45^\circ$ e $-45^\circ$ rispetto all'asse di trasmissione dell'analizzatore consentono di isolare $S_3$. La procedura specifica adottata nel polarimetro è descritta nel \cref{ch:analisi}.
 
 
 \section{Legge di Malus generalizzata}
@@ -128,9 +128,9 @@ dove $\Mmat_1$ è la matrice del primo elemento incontrato dal fascio.
 La matrice di Mueller di un polarizzatore lineare ideale con asse di trasmissione orizzontale è:
 \begin{equation}
 \label{eq:mueller_pol}
-\Mmat_\text{pol}(0°) = \frac{1}{2}\begin{pmatrix} 1 & 1 & 0 & 0 \\ 1 & 1 & 0 & 0 \\ 0 & 0 & 0 & 0 \\ 0 & 0 & 0 & 0 \end{pmatrix}.
+\Mmat_\text{pol}(0^\circ) = \frac{1}{2}\begin{pmatrix} 1 & 1 & 0 & 0 \\ 1 & 1 & 0 & 0 \\ 0 & 0 & 0 & 0 \\ 0 & 0 & 0 & 0 \end{pmatrix}.
 \end{equation}
-Per un polarizzatore con asse ruotato di un angolo $\theta$, la matrice si ottiene applicando la trasformazione di rotazione $\Mmat_\text{pol}(\theta) = \Mmat_R(-\theta)\,\Mmat_\text{pol}(0°)\,\Mmat_R(\theta)$, dove $\Mmat_R(\theta)$ è la matrice di rotazione nello spazio di Stokes (\cref{eq:mueller_rotatore}).
+Per un polarizzatore con asse ruotato di un angolo $\theta$, la matrice si ottiene applicando la trasformazione di rotazione $\Mmat_\text{pol}(\theta) = \Mmat_R(-\theta)\,\Mmat_\text{pol}(0^\circ)\,\Mmat_R(\theta)$, dove $\Mmat_R(\theta)$ è la matrice di rotazione nello spazio di Stokes (\cref{eq:mueller_rotatore}).
 
 \subsection{Lamina a ritardo (retarder)}
 \label{subsec:mueller_retarder}
@@ -173,7 +173,7 @@ dove $\lambda$ è la lunghezza d'onda nel vuoto. La ritardanza è il parametro f
 
 Le \textbf{lamine d'onda} sono componenti ottiche in materiale birifrangente realizzate con spessore $d$ controllato per ottenere una specifica ritardanza:
 \begin{itemize}
-    \item \textbf{Lamina $\lambda/4$:} $\Gamma = \pi/2$, converte polarizzazione lineare a $45°$ in circolare e viceversa.
+    \item \textbf{Lamina $\lambda/4$:} $\Gamma = \pi/2$, converte polarizzazione lineare a $45^\circ$ in circolare e viceversa.
     \item \textbf{Lamina $\lambda/2$:} $\Gamma = \pi$, ruota la direzione di polarizzazione lineare di un angolo doppio rispetto all'orientazione della lamina.
 \end{itemize}
 

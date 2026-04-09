@@ -50,7 +50,7 @@ I valori centroide risultanti vengono salvati in un file CSV e richiamati automa
 Quando luce parzialmente polarizzata attraversa un analizzatore lineare orientato ad angolo $\theta$ rispetto all'asse di riferimento, l'intensit\`a trasmessa segue la legge di Malus generalizzata:
 \begin{equation}
     I(\theta) = \frac{1}{2}\bigl(S_0 + S_1 \cos 2\theta + S_2 \sin 2\theta\bigr)
-    \label{eq:malus_generalizzata}
+    \label{eq:malus_generalizzata_analisi}
 \end{equation}
 dove $S_0$, $S_1$ e $S_2$ sono i primi tre parametri di Stokes. Per ogni pixel dell'immagine, le intensit\`a misurate a $N = 36$ angoli equispaziati ($\theta_i = 0^\circ, 10^\circ, 20^\circ, \ldots, 350^\circ$) forniscono un sistema di 36 equazioni in 3 incognite.
 
@@ -196,12 +196,12 @@ L'angolo dell'asse veloce del campione birifrangente \`e dato da:
 dove $s_{1,\mathrm{in}} - s_1$ rappresenta la variazione del parametro di Stokes normalizzato rispetto allo stato di ingresso. L'uso di $\arctan$ a due argomenti garantisce la corretta determinazione del quadrante.
 
 \subsection{Ritardanza}
-\label{subsec:ritardanza}
+\label{subsec:calcolo_ritardanza}
 
 La ritardanza si ottiene dalla relazione:
 \begin{equation}
     \cos\Delta = 1 - \frac{s_{1,\mathrm{in}} - s_1}{s_{1,\mathrm{in}} \cdot \sin^2\!2\Theta}
-    \label{eq:ritardanza}
+    \label{eq:ritardanza_analisi}
 \end{equation}
 dove il denominatore $\sin^2\!2\Theta$ pu\`o diventare molto piccolo quando l'asse veloce \`e prossimo a $0^\circ$ o $90^\circ$, generando instabilit\`a numeriche. Per questo motivo, il calcolo viene eseguito solo sui pixel in cui $\sin^2\!2\Theta > 0.02$; nei pixel rimanenti si assegna $\Delta = 0$.
 
