@@ -61,7 +61,7 @@ Per disabilitare la pipeline di auto-esposizione (ISP) del telefono e mantenere 
 
 1. **Lamina $\lambda/2$:** Validazione del setup e rotazione del piano di polarizzazione.
 2. **Lamina $\lambda/4$:** Validazione dell'ellitticità.
-3. **Soluzione di Acqua e Zucchero (Attività Ottica):** Boccetta a base quadrata. Spessore attraversato: 1.35 cm, Volume: 6.9 ml, Zucchero disciolto: 8.4 g.
+3. **Soluzione di Acqua e Zucchero (Attività Ottica):** Boccetta a base quadrata. Spessore attraversato: 13mm
 4. **Righello di plastica trasparente:** Studio qualitativo delle tensioni di stampaggio (Fotoelasticità).
 5. **Vetrino con nastro adesivo stratificato (0-5 strati):** Analisi della birifrangenza incrementale e della variazione di ritardo ($\delta$).
 6. **Trave birifrangente a sbalzo (Cantilever):** Supportata da un lato, misurata scarica e poi sotto carico. Analisi quantitativa/qualitativa delle frange isocromatiche (sforzi interni).
