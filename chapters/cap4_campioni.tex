@@ -19,7 +19,6 @@ I campioni analizzati in questo lavoro sono stati selezionati con l'obiettivo di
 
 \subsection{Lamina \texorpdfstring{$\lambda/2$}{lambda/2}}
 \label{subsec:lamina-hw}
-% TODO: Lamina posizionata a 50 gradi
 La lamina mezz'onda (\emph{half-wave plate}, HWP) \`e un elemento ottico birifrangente che introduce un ritardo di fase di $\pi$ radianti (\SI{180}{\degree}) tra le componenti del campo elettrico parallela e perpendicolare al suo asse veloce. L'effetto macroscopico \`e una rotazione del piano di polarizzazione della luce linearmente polarizzata incidente di un angolo pari al doppio dell'angolo tra la direzione di polarizzazione e l'asse veloce della lamina.
 
 Questo campione \`e stato utilizzato come primo test di validazione del polarimetro: la mappa dell'angolo di polarizzazione lineare (AoLP) deve mostrare una rotazione uniforme e quantitativamente coerente con la posizione angolare della lamina, mentre il grado di polarizzazione lineare (DoLP) deve rimanere prossimo all'unit\`a. La ritardanza misurata $\delta$ deve risultare circa \SI{180}{\degree}.
@@ -31,27 +30,33 @@ La lamina quarto d'onda (\emph{quarter-wave plate}, QWP), con ritardo nominale d
 
 Questo campione permette di validare la capacit\`a del sistema di misurare il parametro $S_3$ e la polarizzazione circolare. In particolare, con l'asse veloce della lamina orientato a \SI{45}{\degree} rispetto alla polarizzazione incidente, la luce trasmessa deve risultare circolarmente polarizzata, con $|S_3/S_0| \approx 1$.
 
-% TODO: Riscrivere questa sezione, non preporsi di calcolare a priori la rotazione, esporre relazione tra lambda e rotazione, poi inserire tabella con le 3 misurazioni per i 3 canali e fare fit e vedere cosa viene e a che concentrazione corrisponde, sapendo che spessore è 13 mm 
 \subsection{Soluzione di acqua e zucchero}
 \label{subsec:saccarosio}
 
-Una soluzione acquosa di saccarosio rappresenta un campione classico per lo studio dell'attivit\`a ottica: le molecole di zucchero, chirali, ruotano il piano di polarizzazione della luce linearmente polarizzata che attraversa la soluzione. L'angolo di rotazione $\alpha$ dipende dalla concentrazione della soluzione, dallo spessore attraversato e dalla lunghezza d'onda secondo la relazione:
+Una soluzione acquosa di saccarosio rappresenta un campione classico per lo studio dell'attivit\`a ottica: le molecole di zucchero, chirali, ruotano il piano di polarizzazione della luce linearmente polarizzata che attraversa la soluzione. L'angolo di rotazione $\alpha_\mathrm{rot}$ segue la legge di Biot (\cref{eq:biot}):
 \begin{equation}
-\alpha = [\alpha]_\lambda^T \cdot c \cdot l
+\alpha_\mathrm{rot} = [\alpha]_\lambda^T \cdot c \cdot l
 \label{eq:rotazione-ottica}
 \end{equation}
-dove $[\alpha]_\lambda^T$ \`e il potere rotatorio specifico (dipendente da temperatura $T$ e lunghezza d'onda $\lambda$), $c$ la concentrazione e $l$ il cammino ottico.
+dove $[\alpha]_\lambda^T$ \`e il potere rotatorio specifico (dipendente da temperatura $T$ e lunghezza d'onda $\lambda$), $c$ la concentrazione in \si{\gram\per\milli\liter} e $l$ il cammino ottico in decimetri.
 
-La soluzione \`e stata preparata sciogliendo $\SI{8.4}{\gram}$ di zucchero in acqua all'interno di una boccetta a base quadrata con spessore di attraversamento pari a $\SI{1.35}{\centi\meter}$ e volume di $\SI{6.9}{\milli\liter}$. La concentrazione risultante \`e di circa $\SI{1.22}{\gram\per\milli\liter}$.
+Il potere rotatorio specifico del saccarosio dipende dalla lunghezza d'onda secondo la \emph{dispersione rotatoria ottica} (ORD). In prima approssimazione, la dipendenza segue il modello di Drude semplificato:
+\begin{equation}
+[\alpha]_\lambda \approx [\alpha]_D \cdot \frac{\lambda_D^2}{\lambda^2}
+\label{eq:drude-ord}
+\end{equation}
+dove $[\alpha]_D = \SI{66.47}{\degree\per(\deci\meter\cdot\gram\per\milli\liter)}$ \`e il potere rotatorio specifico alla riga D del sodio ($\lambda_D = \SI{589.3}{\nano\meter}$) a \SI{20}{\celsius}. Combinando l'\cref{eq:rotazione-ottica} con l'\cref{eq:drude-ord}, la rotazione attesa varia come $\alpha_\mathrm{rot} \propto 1/\lambda^2$: la rotazione \`e pi\`u intensa alle lunghezze d'onda corte.
 
-Questo campione \`e particolarmente interessante per il polarimetro a immagine poich\'e l'attivit\`a ottica produce una rotazione uniforme del piano di polarizzazione sull'intera sezione trasversale del fascio, risultando in una variazione omogenea dell'AoLP. Inoltre, la dipendenza dalla lunghezza d'onda del potere rotatorio (\emph{dispersione rotatoria}) pu\`o essere indagata confrontando i risultati ottenuti sui diversi canali colore del sensore.
+La soluzione \`e stata preparata sciogliendo $\SI{8.4}{\gram}$ di zucchero in acqua all'interno di una boccetta a base quadrata con volume di $\SI{6.9}{\milli\liter}$ e spessore di attraversamento pari a $l = \SI{13}{\milli\meter} = \SI{0.13}{\deci\meter}$. La concentrazione gravimetrica risultante \`e $c_\mathrm{grav} = 8.4/6.9 \approx \SI{1.22}{\gram\per\milli\liter}$.
+
+Questo campione \`e particolarmente interessante per il polarimetro a immagine per due ragioni: l'attivit\`a ottica produce una rotazione uniforme del piano di polarizzazione sull'intera sezione trasversale del fascio, risultando in una variazione omogenea dell'AoLP facilmente misurabile; inoltre, la disponibilit\`a di tre canali colore consente di verificare la legge di dispersione $\alpha_\mathrm{rot} \propto 1/\lambda^2$ e, dal fit, di ricavare una stima ottica indipendente della concentrazione della soluzione.
 
 \subsection{Righello di plastica trasparente}
 \label{subsec:righello}
 
 Un comune righello in plastica trasparente (policarbonato o polistirene) costituisce un esempio di campione fotoelastico: le tensioni residue introdotte durante il processo di stampaggio a iniezione generano una birifrangenza non uniforme nel materiale. Quando il righello viene posto tra polarizzatore e analizzatore, le regioni a diverso stato di tensione producono pattern cromatici e frange caratteristiche.
 
-L'analisi con il polarimetro a immagine consente di mappare spazialmente la distribuzione delle tensioni interne, evidenziando le zone di concentrazione degli sforzi. Le mappe di ritardanza $\delta$ e di orientazione dell'asse veloce $\theta$ forniscono un'immagine diretta della distribuzione tensoriale delle deformazioni nel materiale.
+L'analisi con il polarimetro a immagine consente di mappare spazialmente la distribuzione delle tensioni interne, evidenziando le zone di concentrazione degli sforzi. Le mappe di ritardanza $\delta$ e di orientazione dell'asse veloce $\alpha$ forniscono un'immagine diretta della distribuzione tensoriale delle deformazioni nel materiale.
 
 \subsection{Vetrino con nastro adesivo stratificato}
 \label{subsec:nastro-adesivo}

@@ -6,12 +6,16 @@
 
 Il polarimetro a immagine sviluppato in questo lavoro di tesi si basa su una configurazione ottica in trasmissione, allestita su una rotaia ottica commerciale. L'idea fondamentale consiste nel sostituire il tradizionale rivelatore puntuale --- tipicamente un fotodiodo --- con il sensore CMOS di uno smartphone, ottenendo cos\`i una misura spazialmente risolta dello stato di polarizzazione della luce trasmessa attraverso un campione.
 
-% TODO: Attezione che lo schema al momento straborda a dx ed esce dal foglio, inoltre si potrebbero aggiungere Vista 1 e Vista 2 visto che sono gli schemi del setup
 Lo schema ottico generale del setup \`e il seguente:
-\begin{equation}
-\text{Sorgente (tablet)} \;\longrightarrow\; \text{Campione} \;\longrightarrow\; \left[\text{Lamina } \lambda/4\right] \;\longrightarrow\; \text{Analizzatore} \;\longrightarrow\; \text{Sensore (smartphone)}
-\label{eq:schema-ottico}
-\end{equation}
+\begin{figure}[H]
+    \centering
+    \begin{tabular}{ccccccccc}
+        Sorgente & & Campione & & $\left[\text{Lamina } \lambda/4\right]$ & & Analizzatore & & Sensore \\
+        (tablet) & $\longrightarrow$ & & $\longrightarrow$ & & $\longrightarrow$ & & $\longrightarrow$ & (smartphone)
+    \end{tabular}
+    \caption{Schema ottico del polarimetro a immagine. La lamina $\lambda/4$ (tra parentesi quadre) viene inserita solo per la misura di $S_3$.}
+    \label{fig:schema-ottico}
+\end{figure}
 dove la lamina $\lambda/4$ viene inserita nel percorso ottico solamente durante le acquisizioni destinate alla determinazione del parametro di Stokes $S_3$, relativo alla polarizzazione circolare.
 
 La filosofia progettuale che ha guidato la realizzazione dell'apparato \`e quella di un sistema \emph{low-cost}: tutti i componenti utilizzati sono commerciali e facilmente reperibili, i supporti meccanici personalizzati sono stati realizzati mediante stampa 3D, e il rivelatore \`e uno smartphone di uso comune. Questo approccio rende il sistema riproducibile e accessibile anche in contesti didattici, pur mantenendo la capacit\`a di produrre mappe di polarizzazione quantitative.
@@ -38,15 +42,13 @@ Questa caratteristica risulta vantaggiosa per il setup sperimentale: la luce inc
 
 \subsection{Analizzatore}
 \label{subsec:analizzatore}
-% TODO: Polarizzatore, cosi come le lamine e supporti è marca optosci
-L'analizzatore \`e costituito da un polarizzatore lineare a film (tipo Polaroid), montato su un supporto rotante calibrato solidale alla rotaia ottica. Il polarizzatore pu\`o essere ruotato manualmente con una risoluzione angolare sufficiente per i passi di \SI{10}{\degree} previsti dal protocollo di acquisizione.
+L'analizzatore \`e costituito da un polarizzatore lineare a film (tipo Polaroid) Optosci, montato su un supporto rotante calibrato solidale alla rotaia ottica. Il polarizzatore pu\`o essere ruotato manualmente con una risoluzione angolare sufficiente per i passi di \SI{10}{\degree} previsti dal protocollo di acquisizione.
 
 La qualit\`a del polarizzatore \`e critica per l'accuratezza delle misure: un rapporto di estinzione elevato garantisce che la modulazione dell'intensit\`a trasmessa in funzione dell'angolo segua fedelmente la legge di Malus, minimizzando errori sistematici nell'estrazione dei parametri di Stokes.
 
 \subsection{Lamina \texorpdfstring{$\lambda/4$}{lambda/4} zero-order}
 \label{subsec:lamina-qwp}
-% TODO: Nessuna scelta, avevamo quelle in laboratorio per culo
-Per la determinazione del parametro $S_3$ viene utilizzata una lamina quarto d'onda (\emph{quarter-wave plate}, QWP) di tipo \emph{zero-order}, progettata per la lunghezza d'onda di $\SI{633}{\nano\meter}$ (He-Ne). La scelta di una lamina zero-order, rispetto a una multi-ordine, \`e motivata dalla minore sensibilit\`a alla lunghezza d'onda e alla temperatura, che garantisce prestazioni pi\`u stabili e prevedibili.
+Per la determinazione del parametro $S_3$ viene utilizzata una lamina quarto d'onda (\emph{quarter-wave plate}, QWP) Optosci di tipo \emph{zero-order}, progettata per la lunghezza d'onda di $\SI{633}{\nano\meter}$ (He-Ne), disponibile nella dotazione del laboratorio didattico. Rispetto a una lamina multi-ordine, una lamina zero-order presenta una minore sensibilit\`a alla lunghezza d'onda e alla temperatura, garantendo prestazioni pi\`u stabili e prevedibili.
 
 Poich\'e il sensore CMOS opera simultaneamente sui tre canali colore (rosso, verde, blu), ciascuno con una diversa lunghezza d'onda effettiva, il ritardo di fase introdotto dalla lamina varia con il canale spettrale. La correzione per questo effetto cromatico \`e descritta nel \cref{ch:analisi}: il ritardo effettivo $\delta$ della lamina alla lunghezza d'onda $\lambda$ del canale in esame viene calcolato come
 \begin{equation}
@@ -57,8 +59,7 @@ e il parametro $S_3$ viene corretto dividendo per il fattore $\sin\delta(\lambda
 
 \subsection{Supporti meccanici stampati in 3D}
 \label{subsec:supporti-3d}
-% TODO: Stampa PLA
-Per integrare il tablet e lo smartphone nella rotaia ottica Optosci sono stati progettati e realizzati supporti personalizzati mediante stampa 3D a deposizione di filamento fuso (FDM). Questi supporti garantiscono:
+Per integrare il tablet e lo smartphone nella rotaia ottica Optosci sono stati progettati e realizzati supporti personalizzati mediante stampa 3D a deposizione di filamento fuso (FDM) in PLA (acido polilattico). Questi supporti garantiscono:
 \begin{itemize}
     \item il posizionamento stabile e ripetibile dei dispositivi sulla rotaia;
     \item l'allineamento del centro del display (sorgente) e del sensore (rivelatore) con l'asse ottico;
@@ -89,8 +90,7 @@ Per questo motivo, tutte le acquisizioni vengono effettuate in formato RAW (DNG,
     \item \textbf{Profondit\`a a 12~bit:} una dinamica di $2^{12} = 4096$ livelli per canale, che garantisce una risoluzione sufficiente per distinguere variazioni sottili nell'intensit\`a polarizzata;
     \item \textbf{Accesso ai canali colore separati:} ciascun canale (R, G, B) pu\`o essere estratto e analizzato indipendentemente, consentendo un'analisi multi-lunghezza d'onda.
 \end{itemize}
-% TODO: Applicazione fotografica è la fotocamera, inoltre non è da aggiungere necessariamente qua ma menzionerei da qualche parte che il telefono era connesso via cavo a un pc e operato via scrcpy per minimizzare le vibrazioni
-L'acquisizione in modalit\`a RAW manuale viene effettuata tramite un'applicazione fotografica che consente il controllo completo dei parametri di esposizione, disabilitando l'ISP automatico dello smartphone.
+L'acquisizione in modalit\`a RAW manuale viene effettuata tramite l'applicazione fotocamera nativa dello smartphone, che consente il controllo completo dei parametri di esposizione, disabilitando l'ISP automatico. Per minimizzare le vibrazioni indotte dal contatto con il dispositivo, lo smartphone \`e stato collegato via cavo USB a un computer e controllato da remoto tramite il software \texttt{scrcpy}, che replica lo schermo del telefono e ne consente l'operazione senza toccarlo.
 
 
 \section{Protocollo di acquisizione}
@@ -160,7 +160,6 @@ Il sistema non richiede una calibrazione assoluta nel senso tradizionale del ter
 
 \begin{itemize}
     \item \textbf{Disabilitazione dell'ISP:} l'acquisizione in formato RAW con parametri manuali elimina le correzioni automatiche (auto-esposizione, auto-bilanciamento del bianco, correzione gamma) che introdurrebbero non-linearit\`a nella risposta del sensore.
-    % TODO: Fattore di downsampling variabile, selezionato durante l'elaborazione per avere o misure piu stabili o maggiore risoluzione
     \item \textbf{Downsampling spaziale:} le immagini RAW vengono sottoposte a un downsampling con fattore $f$ configurabile (tipicamente tra 10 e 20), calcolando la media di blocchi di $f \times f$ pixel. Questo binning spaziale svolge una duplice funzione: riduce il rumore del sensore (mediando su $f^2$ pixel indipendenti) e rende il calcolo matriciale computazionalmente sostenibile.
     \item \textbf{Allineamento del sistema di riferimento:} l'angolo di polarizzazione della luce emessa dal tablet non \`e esattamente noto \emph{a priori}. L'algoritmo di allineamento descritto nel \cref{ch:analisi} compensa questo offset ruotando matematicamente il piano $S_1$--$S_2$ in modo che la luce di fondo risulti polarizzata orizzontalmente ($\text{AoLP} = 0^\circ$).
 \end{itemize}

@@ -27,7 +27,7 @@ La dispersione dei valori nella regione di sfondo fornisce una stima dell'incert
 \section{Mappe dei parametri di Stokes}
 \label{sec:mappe_stokes}
 
-Per ciascun campione, la pipeline di analisi descritta nel \cref{ch:analisi} produce le mappe bidimensionali dei quattro parametri di Stokes ($S_0$, $S_1$, $S_2$, $S_3$) e delle grandezze derivate (DoLP, AoLP, ritardanza $\Delta$, asse veloce $\Theta$).
+Per ciascun campione, la pipeline di analisi descritta nel \cref{ch:analisi} produce le mappe bidimensionali dei quattro parametri di Stokes ($S_0$, $S_1$, $S_2$, $S_3$) e delle grandezze derivate (DoLP, AoLP, ritardanza $\delta$, asse veloce $\alpha$).
 
 \subsection{Intensit\`a totale \texorpdfstring{$S_0$}{S0}}
 \label{subsec:risultati_s0}
@@ -178,7 +178,7 @@ La ritardanza vera cresce linearmente con il numero di strati: $\delta_\mathrm{v
     \end{tabular}
 \end{table}
 
-L'accordo tra modello e dati \`e buono su entrambi i canali, con scarti tipici dell'ordine di $\SI{10}{\degree}$--$\SI{15}{\degree}$. Si osservano instabilit\`a di segno per le configurazioni in cui $\delta_\mathrm{vero} \bmod 360^\circ$ cade in prossimit\`a di $\SI{180}{\degree}$ (canale verde a $N = 2$, canale blu a $N = 4$): in queste condizioni, l'assegnazione del segno tramite $S_3 \cdot \sin(2\Theta)$ diverge, causando oscillazioni tra $+\delta$ e $-\delta$ che non sono difetti del sistema ma conseguenze matematiche della procedura.
+L'accordo tra modello e dati \`e buono su entrambi i canali, con scarti tipici dell'ordine di $\SI{10}{\degree}$--$\SI{15}{\degree}$. Si osservano instabilit\`a di segno per le configurazioni in cui $\delta_\mathrm{vero} \bmod 360^\circ$ cade in prossimit\`a di $\SI{180}{\degree}$ (canale verde a $N = 2$, canale blu a $N = 4$): in queste condizioni, l'assegnazione del segno tramite $S_3 \cdot \sin(2\alpha)$ diverge, causando oscillazioni tra $+\delta$ e $-\delta$ che non sono difetti del sistema ma conseguenze matematiche della procedura.
 
 \subsubsection{Dispersione cromatica della birifrangenza}
 \label{subsubsec:dispersione_nastro}

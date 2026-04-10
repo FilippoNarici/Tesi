@@ -178,7 +178,7 @@ L'AoLP \`e calcolato in gradi e varia nell'intervallo $[-90^\circ, +90^\circ]$, 
 \section{Calcolo della ritardanza e dell'asse veloce}
 \label{sec:retardance}
 
-La ritardanza $\Delta$ e l'orientazione dell'asse veloce $\Theta$ del campione vengono estratte combinando tutti e quattro i parametri di Stokes. Questa analisi richiede la conoscenza dello stato di polarizzazione in ingresso, che viene caratterizzato dalla regione di sfondo.
+La ritardanza $\delta$ e l'orientazione dell'asse veloce $\alpha$ del campione vengono estratte combinando tutti e quattro i parametri di Stokes. Questa analisi richiede la conoscenza dello stato di polarizzazione in ingresso, che viene caratterizzato dalla regione di sfondo.
 
 \subsection{Normalizzazione e stato di ingresso}
 \label{subsec:normalizzazione}
@@ -190,7 +190,7 @@ I parametri di Stokes vengono normalizzati rispetto all'intensit\`a totale: $s_i
 
 L'angolo dell'asse veloce del campione birifrangente \`e dato da:
 \begin{equation}
-    \Theta = \frac{1}{2} \arctan\!\left(\frac{s_{1,\mathrm{in}} - s_1}{s_2}\right)
+    \alpha = \frac{1}{2} \arctan\!\left(\frac{s_{1,\mathrm{in}} - s_1}{s_2}\right)
     \label{eq:asse_veloce}
 \end{equation}
 dove $s_{1,\mathrm{in}} - s_1$ rappresenta la variazione del parametro di Stokes normalizzato rispetto allo stato di ingresso. L'uso di $\arctan$ a due argomenti garantisce la corretta determinazione del quadrante.
@@ -200,17 +200,17 @@ dove $s_{1,\mathrm{in}} - s_1$ rappresenta la variazione del parametro di Stokes
 
 La ritardanza si ottiene dalla relazione:
 \begin{equation}
-    \cos\Delta = 1 - \frac{s_{1,\mathrm{in}} - s_1}{s_{1,\mathrm{in}} \cdot \sin^2\!2\Theta}
+    \cos\delta = 1 - \frac{s_{1,\mathrm{in}} - s_1}{s_{1,\mathrm{in}} \cdot \sin^2\!2\alpha}
     \label{eq:ritardanza_analisi}
 \end{equation}
-dove il denominatore $\sin^2\!2\Theta$ pu\`o diventare molto piccolo quando l'asse veloce \`e prossimo a $0^\circ$ o $90^\circ$, generando instabilit\`a numeriche. Per questo motivo, il calcolo viene eseguito solo sui pixel in cui $\sin^2\!2\Theta > 0.02$; nei pixel rimanenti si assegna $\Delta = 0$.
+dove il denominatore $\sin^2\!2\alpha$ pu\`o diventare molto piccolo quando l'asse veloce \`e prossimo a $0^\circ$ o $90^\circ$, generando instabilit\`a numeriche. Per questo motivo, il calcolo viene eseguito solo sui pixel in cui $\sin^2\!2\alpha > 0.02$; nei pixel rimanenti si assegna $\delta = 0$.
 
 L'argomento della funzione $\arccos$ viene inoltre limitato all'intervallo $[-1, 1]$ (clipping) prima del calcolo, per prevenire valori NaN dovuti a piccole eccedenze numeriche.
 
 \subsection{Segno della ritardanza}
 \label{subsec:segno_ritardanza}
 
-Il segno di $\Delta$ viene determinato dal prodotto $s_{3,\mathrm{corr}} \cdot \sin 2\Theta$: se negativo, la ritardanza \`e assegnata con segno negativo. Questa convenzione distingue ritardanze positive (asse veloce ``avanti'') da ritardanze negative, e preserva l'informazione sulla chiralit\`a del campione.
+Il segno di $\delta$ viene determinato dal prodotto $s_{3,\mathrm{corr}} \cdot \sin 2\alpha$: se negativo, la ritardanza \`e assegnata con segno negativo. Questa convenzione distingue ritardanze positive (asse veloce ``avanti'') da ritardanze negative, e preserva l'informazione sulla chiralit\`a del campione.
 
 % ---------------------------------------------------------------------------
 \section{Strumento di validazione interattivo}
@@ -234,7 +234,7 @@ La pipeline produce una visualizzazione sintetica in formato griglia $3 \times 3
 \begin{itemize}
     \item \textbf{Riga 1}: $S_0$ (colormap monocromatica dal nero al colore del canale selezionato: rosso, verde o blu), $S_1$ e $S_2$ (colormap divergente \texttt{bwr}, normalizzata al percentile $99$ del valore assoluto per robustezza agli outlier).
     \item \textbf{Riga 2}: $S_3$ (colormap \texttt{bwr}), DoLP (colormap \texttt{viridis}, intervallo $[0, 1]$), AoLP (colormap ciclica \texttt{twilight}, intervallo $[-90^\circ, +90^\circ]$).
-    \item \textbf{Riga 3}: asse veloce $\Theta$ (colormap \texttt{twilight}), ritardanza $\Delta$ (colormap \texttt{twilight}, intervallo $[-180^\circ, +180^\circ]$), maschera di sfondo sovrapposta a $S_0$ normalizzato per verifica visiva.
+    \item \textbf{Riga 3}: asse veloce $\alpha$ (colormap \texttt{twilight}), ritardanza $\delta$ (colormap \texttt{twilight}, intervallo $[-180^\circ, +180^\circ]$), maschera di sfondo sovrapposta a $S_0$ normalizzato per verifica visiva.
 \end{itemize}
 
-La scelta delle colormap segue le convenzioni della letteratura polarimetrica: colormap divergenti per grandezze con segno ($S_1$, $S_2$, $S_3$), colormap cicliche per angoli ($\mathrm{AoLP}$, $\Theta$, $\Delta$), e colormap sequenziali per grandezze positive ($S_0$, DoLP). La normalizzazione al percentile $99$ anzich\'e al valore massimo rende la visualizzazione robusta rispetto a pixel anomali isolati.
+La scelta delle colormap segue le convenzioni della letteratura polarimetrica: colormap divergenti per grandezze con segno ($S_1$, $S_2$, $S_3$), colormap cicliche per angoli ($\mathrm{AoLP}$, $\alpha$, $\delta$), e colormap sequenziali per grandezze positive ($S_0$, DoLP). La normalizzazione al percentile $99$ anzich\'e al valore massimo rende la visualizzazione robusta rispetto a pixel anomali isolati.

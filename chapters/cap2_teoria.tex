@@ -34,8 +34,7 @@ dove $S_0, S_1, S_2, S_3$ sono i parametri di Stokes, introdotti nella sezione s
 
 \section{Formalismo di Stokes}
 \label{sec:stokes}
-% TODO: Cos'è Jones? non lo conosco e non è menzionato prima
-Il formalismo di Jones descrive efficacemente la polarizzazione mediante un vettore complesso a due componenti, ma è limitato alla luce completamente polarizzata. Per trattare anche la luce parzialmente polarizzata, è necessario un formalismo più generale: il \textbf{formalismo di Stokes}, introdotto da George Gabriel Stokes nel 1852~\cite{goldstein2011polarized}.
+Per descrivere la polarizzazione della luce esistono diversi formalismi. Il \emph{formalismo di Jones}, basato su un vettore complesso a due componenti, è efficace ma limitato alla luce completamente polarizzata. Per trattare anche la luce parzialmente polarizzata --- situazione comune nella pratica sperimentale --- è necessario un formalismo più generale: il \textbf{formalismo di Stokes}, introdotto da George Gabriel Stokes nel 1852~\cite{goldstein2011polarized}.
 
 \subsection{Definizione dei parametri di Stokes}
 \label{subsec:stokes_def}
@@ -67,7 +66,6 @@ S_0^2 \geq S_1^2 + S_2^2 + S_3^2,
 \end{equation}
 con l'uguaglianza valida esclusivamente per luce totalmente polarizzata.
 
-% TODO: Valutare se necessario introdurre sfera, se si aggiungere immagine
 \subsection{Sfera di Poincaré}
 \label{subsec:poincare}
 
@@ -102,8 +100,7 @@ Nel caso di luce parzialmente polarizzata, la legge si generalizza utilizzando i
 \label{eq:malus_generalizzata}
 I(\theta) = \frac{1}{2}\bigl(S_0 + S_1\cos 2\theta + S_2\sin 2\theta\bigr).
 \end{equation}
-% TODO: Matrice di Mueller non introdotta prima, quindi segnalare di guardare sotto oppure parlarne dopo, attualmente "Spaventa" il lettore
-L'\cref{eq:malus_generalizzata} può essere derivata applicando la matrice di Mueller di un polarizzatore lineare ruotato di $\theta$ al vettore di Stokes incidente e leggendo la componente $S_0'$ del vettore uscente. Si osservi che l'intensità trasmessa dipende solo dai primi tre parametri di Stokes e non da $S_3$: un polarizzatore lineare è insensibile alla polarizzazione circolare.
+L'\cref{eq:malus_generalizzata} può essere derivata applicando la matrice di Mueller di un polarizzatore lineare ruotato di $\theta$ al vettore di Stokes incidente e leggendo la componente $S_0'$ del vettore uscente (il formalismo delle matrici di Mueller è introdotto nella \cref{sec:mueller}). Si osservi che l'intensità trasmessa dipende solo dai primi tre parametri di Stokes e non da $S_3$: un polarizzatore lineare è insensibile alla polarizzazione circolare.
 
 L'\cref{eq:malus_generalizzata} è di importanza fondamentale per il polarimetro sviluppato in questa tesi: acquisendo $N$ immagini a diversi angoli $\theta_i$ dell'analizzatore, si ottiene un sistema sovradeterminato di equazioni lineari nei tre parametri incogniti $S_0$, $S_1$ e $S_2$, risolvibile tramite il metodo della pseudo-inversa. Questo approccio è descritto in dettaglio nel \cref{ch:analisi}.
 
@@ -136,12 +133,12 @@ Per un polarizzatore con asse ruotato di un angolo $\theta$, la matrice si ottie
 \subsection{Lamina a ritardo (retarder)}
 \label{subsec:mueller_retarder}
 
-Una lamina a ritardo introduce una differenza di fase $\Gamma$ tra le componenti del campo polarizzate lungo l'asse veloce e l'asse lento. La matrice di Mueller per una lamina con asse veloce orizzontale è~\cite{collett2005polarized}:
+Una lamina a ritardo introduce una differenza di fase $\delta$ tra le componenti del campo polarizzate lungo l'asse veloce e l'asse lento. La matrice di Mueller per una lamina con asse veloce orizzontale è~\cite{collett2005polarized}:
 \begin{equation}
 \label{eq:mueller_retarder}
-\Mmat_\text{ret}(\Gamma) = \begin{pmatrix} 1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & \cos\Gamma & \sin\Gamma \\ 0 & 0 & -\sin\Gamma & \cos\Gamma \end{pmatrix}.
+\Mmat_\text{ret}(\delta) = \begin{pmatrix} 1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & \cos\delta & \sin\delta \\ 0 & 0 & -\sin\delta & \cos\delta \end{pmatrix}.
 \end{equation}
-I casi di interesse principale sono la lamina \textbf{quarto d'onda} ($\Gamma = \pi/2$) e la lamina \textbf{mezzo d'onda} ($\Gamma = \pi$). Per una lamina con asse veloce ruotato di un angolo $\alpha$, si applica la stessa trasformazione di rotazione descritta per il polarizzatore.
+I casi di interesse principale sono la lamina \textbf{quarto d'onda} ($\delta = \pi/2$) e la lamina \textbf{mezzo d'onda} ($\delta = \pi$). Per una lamina con asse veloce ruotato di un angolo $\alpha$, si applica la stessa trasformazione di rotazione descritta per il polarizzatore.
 
 \subsection{Rotatore ottico}
 \label{subsec:mueller_rotatore}
@@ -168,14 +165,14 @@ Un materiale è \textbf{birifrangente} quando il suo indice di rifrazione dipend
 Quando un'onda polarizzata attraversa un mezzo birifrangente di spessore $d$, le due componenti del campo lungo gli assi ordinario e straordinario accumulano una differenza di fase detta \textbf{ritardanza} (o \textit{retardance}):
 \begin{equation}
 \label{eq:ritardanza}
-\Gamma = \frac{2\pi}{\lambda}\,\Delta n\, d,
+\delta = \frac{2\pi}{\lambda}\,\Delta n\, d,
 \end{equation}
 dove $\lambda$ è la lunghezza d'onda nel vuoto. La ritardanza è il parametro fondamentale che caratterizza l'effetto di un elemento birifrangente sulla polarizzazione.
 
 Le \textbf{lamine d'onda} sono componenti ottiche in materiale birifrangente realizzate con spessore $d$ controllato per ottenere una specifica ritardanza:
 \begin{itemize}
-    \item \textbf{Lamina $\lambda/4$:} $\Gamma = \pi/2$, converte polarizzazione lineare a $45^\circ$ in circolare e viceversa.
-    \item \textbf{Lamina $\lambda/2$:} $\Gamma = \pi$, ruota la direzione di polarizzazione lineare di un angolo doppio rispetto all'orientazione della lamina.
+    \item \textbf{Lamina $\lambda/4$:} $\delta = \pi/2$, converte polarizzazione lineare a $45^\circ$ in circolare e viceversa.
+    \item \textbf{Lamina $\lambda/2$:} $\delta = \pi$, ruota la direzione di polarizzazione lineare di un angolo doppio rispetto all'orientazione della lamina.
 \end{itemize}
 
 \subsection{Dipendenza dalla lunghezza d'onda}
@@ -183,7 +180,7 @@ Le \textbf{lamine d'onda} sono componenti ottiche in materiale birifrangente rea
 
 Dall'\cref{eq:ritardanza} si osserva che la ritardanza dipende inversamente dalla lunghezza d'onda $\lambda$. Inoltre, la birifrangenza $\Delta n$ stessa varia con $\lambda$ per effetto della dispersione. Una lamina \textbf{zero-order}, il cui ritardo è ottenuto con un singolo passaggio attraverso un cristallo sottile, presenta una dipendenza dalla lunghezza d'onda più debole rispetto a una lamina \textbf{multi-order}, dove il ritardo è un multiplo intero di $2\pi$ più la frazione desiderata.
 
-Questa dipendenza cromatica ha una conseguenza importante per il polarimetro sviluppato in questa tesi: la lamina $\lambda/4$ utilizzata è progettata per una lunghezza d'onda di \SI{633}{\nano\meter}, e il ritardo effettivo a lunghezze d'onda diverse deve essere corretto tramite il rapporto $\sin(\Gamma(\lambda))/\sin(\Gamma(\SI{633}{\nano\meter}))$, come descritto nel \cref{ch:analisi}.
+Questa dipendenza cromatica ha una conseguenza importante per il polarimetro sviluppato in questa tesi: la lamina $\lambda/4$ utilizzata è progettata per una lunghezza d'onda di \SI{633}{\nano\meter}, e il ritardo effettivo a lunghezze d'onda diverse deve essere corretto tramite il rapporto $\sin(\delta(\lambda))/\sin(\delta(\SI{633}{\nano\meter}))$, come descritto nel \cref{ch:analisi}.
 
 
 \section{Attività ottica}
@@ -224,7 +221,7 @@ Quando un campione fotoelastico è osservato in un polarimetro a campo pieno, si
 Il ritardo di fase introdotto dal campione fotoelastico è dato dalla combinazione dell'\cref{eq:ritardanza} con l'\cref{eq:fotoelastica}:
 \begin{equation}
 \label{eq:ritardanza_fotoelastica}
-\Gamma = \frac{2\pi}{\lambda}\,C\,(\sigma_1 - \sigma_2)\,d,
+\delta = \frac{2\pi}{\lambda}\,C\,(\sigma_1 - \sigma_2)\,d,
 \end{equation}
 dove $d$ è lo spessore del campione attraversato dalla luce.
 
