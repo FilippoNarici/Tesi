@@ -15,7 +15,7 @@ from tqdm import tqdm
 # COMMON CONFIGURATION
 # =============================================================================
 
-TARGET_FOLDER = './raw/lambdaquarti_50deg'
+TARGET_FOLDER = './raw/strati_v2'
 POL_SUBFOLDER = os.path.join(TARGET_FOLDER, 'pol')
 WAV_SUBFOLDER = os.path.join(TARGET_FOLDER, 'wav')
 WAVELENGTHS_CSV = './outputs/rgb_wavelengths.csv'
@@ -24,7 +24,7 @@ WAVELENGTHS_CSV = './outputs/rgb_wavelengths.csv'
 TARGET_CHANNEL_IDX = 2
 
 # Default downsampling factor for the full polarimeter mapping
-DOWNSAMPLE_FACTOR = 10
+DOWNSAMPLE_FACTOR = 20
 
 # =============================================================================
 # THESIS FIGURE CONFIGURATION
