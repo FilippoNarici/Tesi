@@ -4,14 +4,15 @@
 \section{Panoramica del setup}
 \label{sec:panoramica-setup}
 
+% TODO: Evitare gli em-dash come la peste, dead giveaway di uso di ai
 Il polarimetro a immagine sviluppato in questo lavoro di tesi si basa su una configurazione ottica in trasmissione, allestita su una rotaia ottica commerciale. L'idea fondamentale consiste nel sostituire il tradizionale rivelatore puntuale --- tipicamente un fotodiodo --- con il sensore CMOS di uno smartphone, ottenendo cos\`i una misura spazialmente risolta dello stato di polarizzazione della luce trasmessa attraverso un campione.
 
+% TODO: Sistemare questa cosa al momento è trattata come figura ma non è una figura vera e propria, dovrebbe essere tipo un equazione inoltre aggiungerei da qualche parte le due figure vere che abbiamo del sistema (Vista 1 e Vista 2 .png)
 Lo schema ottico generale del setup \`e il seguente:
 \begin{figure}[H]
     \centering
     \begin{tabular}{ccccccccc}
-        Sorgente & & Campione & & $\left[\text{Lamina } \lambda/4\right]$ & & Analizzatore & & Sensore \\
-        (tablet) & $\longrightarrow$ & & $\longrightarrow$ & & $\longrightarrow$ & & $\longrightarrow$ & (smartphone)
+        Sorgente & $\longrightarrow$ & Campione & $\longrightarrow$ & $\left[\text{Lamina } \lambda/4\right]$ & $\longrightarrow$ & Analizzatore & $\longrightarrow$ & Sensore
     \end{tabular}
     \caption{Schema ottico del polarimetro a immagine. La lamina $\lambda/4$ (tra parentesi quadre) viene inserita solo per la misura di $S_3$.}
     \label{fig:schema-ottico}
@@ -42,7 +43,7 @@ Questa caratteristica risulta vantaggiosa per il setup sperimentale: la luce inc
 
 \subsection{Analizzatore}
 \label{subsec:analizzatore}
-L'analizzatore \`e costituito da un polarizzatore lineare a film (tipo Polaroid) Optosci, montato su un supporto rotante calibrato solidale alla rotaia ottica. Il polarizzatore pu\`o essere ruotato manualmente con una risoluzione angolare sufficiente per i passi di \SI{10}{\degree} previsti dal protocollo di acquisizione.
+L'analizzatore \`e costituito da un polarizzatore lineare circolare Optosci, montato su un supporto rotante calibrato solidale alla rotaia ottica. Il polarizzatore pu\`o essere ruotato manualmente con una risoluzione angolare sufficiente per i passi di \SI{10}{\degree} previsti dal protocollo di acquisizione.
 
 La qualit\`a del polarizzatore \`e critica per l'accuratezza delle misure: un rapporto di estinzione elevato garantisce che la modulazione dell'intensit\`a trasmessa in funzione dell'angolo segua fedelmente la legge di Malus, minimizzando errori sistematici nell'estrazione dei parametri di Stokes.
 
