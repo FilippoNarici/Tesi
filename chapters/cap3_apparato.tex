@@ -4,14 +4,12 @@
 \section{Panoramica del setup}
 \label{sec:panoramica-setup}
 
-Il polarimetro a immagine sviluppato in questo lavoro di tesi si basa su una configurazione ottica in trasmissione, allestita su una rotaia ottica commerciale. L'idea fondamentale consiste nel sostituire il tradizionale rivelatore puntuale, tipicamente un fotodiodo, con il sensore CMOS di uno smartphone, ottenendo cos\`i una misura spazialmente risolta dello stato di polarizzazione della luce trasmessa attraverso un campione.
-
-Lo schema ottico generale del setup \`e il seguente:
+L'apparato opera in configurazione di trasmissione su rotaia ottica. Lo schema generale \`e:
 \begin{equation}
 \text{Sorgente} \;\longrightarrow\; \text{Campione} \;\longrightarrow\; \left[\,\lambda/4\,\right] \;\longrightarrow\; \text{Analizzatore} \;\longrightarrow\; \text{Sensore}
 \label{eq:schema-ottico}
 \end{equation}
-dove la lamina $\lambda/4$ (tra parentesi quadre) viene inserita nel percorso ottico solamente durante le acquisizioni destinate alla determinazione del parametro di Stokes $S_3$, relativo alla polarizzazione circolare. La \cref{fig:setup-foto} mostra due viste dell'apparato assemblato sulla rotaia ottica.
+dove la lamina $\lambda/4$ viene inserita solo per la determinazione di $S_3$. La \cref{fig:setup-foto} mostra due viste dell'apparato assemblato. Le sezioni seguenti descrivono ciascun componente.
 
 \begin{figure}[htbp]
     \centering
@@ -22,9 +20,6 @@ dove la lamina $\lambda/4$ (tra parentesi quadre) viene inserita nel percorso ot
     \label{fig:setup-foto}
 \end{figure}
 
-La filosofia progettuale che ha guidato la realizzazione dell'apparato \`e quella di un sistema \emph{low-cost}: tutti i componenti utilizzati sono commerciali e facilmente reperibili, i supporti meccanici personalizzati sono stati realizzati mediante stampa 3D, e il rivelatore \`e uno smartphone di uso comune. Questo approccio rende il sistema riproducibile e accessibile anche in contesti didattici, pur mantenendo la capacit\`a di produrre mappe di polarizzazione quantitative.
-
-Rispetto al polarimetro puntuale descritto nel manuale di laboratorio~\cite{manuale_polarizzazione}, che fornisce una singola misura scalare dei parametri di Stokes, il sistema qui presentato estende l'analisi a due dimensioni spaziali: ogni pixel del sensore costituisce un rivelatore indipendente, consentendo la ricostruzione simultanea del vettore di Stokes su tutto il campo visivo.
 
 
 \section{Componenti ottici}
@@ -33,16 +28,12 @@ Rispetto al polarimetro puntuale descritto nel manuale di laboratorio~\cite{manu
 \subsection{Rotaia ottica}
 \label{subsec:rotaia}
 
-L'intero apparato \`e montato su una rotaia ottica Optosci, un sistema modulare progettato per esperimenti di ottica didattica e di ricerca. La rotaia fornisce un riferimento meccanico rettilineo lungo il quale i vari componenti possono essere posizionati e allineati con precisione. I cavalieri scorrevoli permettono di regolare la distanza tra gli elementi ottici e di garantire che l'asse ottico sia comune a tutti i componenti.
-
-L'utilizzo della rotaia \`e fondamentale per la riproducibilit\`a delle misure: una volta fissata la geometria, l'allineamento viene mantenuto per tutta la durata della sessione di acquisizione, minimizzando errori sistematici legati a disallineamenti angolari o traslazionali.
+L'apparato \`e montato su una rotaia ottica Optosci con cavalieri scorrevoli, che garantisce l'allineamento dei componenti lungo un asse ottico comune e la riproducibilit\`a del posizionamento tra sessioni di misura.
 
 \subsection{Sorgente luminosa}
 \label{subsec:sorgente}
 
-Come sorgente luminosa viene utilizzato un tablet Samsung Galaxy Tab S7 FE, il cui display viene impostato su una schermata completamente bianca alla massima luminosit\`a. Il display del tablet genera luce bianca a banda larga, che viene emessa attraverso un polarizzatore integrato nello stack del pannello LCD. Di conseguenza, la luce in uscita dal tablet \`e gi\`a parzialmente polarizzata linearmente, con l'asse di polarizzazione orientato approssimativamente in direzione verticale quando il dispositivo \`e tenuto in orientamento \emph{landscape}.
-
-Questa caratteristica risulta vantaggiosa per il setup sperimentale: la luce incidente sul campione possiede uno stato di polarizzazione ben definito e relativamente uniforme su tutta la superficie del display, fungendo da sorgente estesa che illumina l'intero campo visivo del sensore. L'angolo esatto di polarizzazione della sorgente viene successivamente compensato via software attraverso l'allineamento del sistema di riferimento, come descritto nel \cref{ch:analisi}.
+La sorgente \`e un tablet Samsung Galaxy Tab S7 FE con display impostato su schermata bianca alla massima luminosit\`a. Il pannello LCD emette luce bianca a banda larga attraverso un polarizzatore integrato: la luce in uscita \`e quindi gi\`a polarizzata linearmente, con asse orientato approssimativamente in verticale in configurazione landscape. Questa caratteristica rende il display una sorgente estesa a stato di polarizzazione ben definito e relativamente uniforme, ideale per illuminare l'intero campo visivo del sensore.
 
 \subsection{Analizzatore}
 \label{subsec:analizzatore}
@@ -79,9 +70,7 @@ Il porta-campione, anch'esso montato sulla rotaia, consente l'inserimento e la r
 \subsection{Smartphone Samsung Galaxy S24}
 \label{subsec:smartphone}
 
-Il rivelatore del polarimetro \`e il sensore CMOS della fotocamera principale di uno smartphone Samsung Galaxy S24. Il sensore \`e dotato di un obiettivo con lunghezza focale di $\SI{7.0}{\milli\meter}$ (equivalente a $\SI{69}{\milli\meter}$ nel formato 35~mm) e apertura fissa $f/2.4$.
-
-La scelta di utilizzare uno smartphone come rivelatore \`e il punto cardine dell'approccio low-cost: il sensore CMOS di un moderno smartphone offre una risoluzione spaziale dell'ordine di $10$~megapixel, una profondit\`a di acquisizione fino a 12~bit per canale in modalit\`a RAW, e una sensibilit\`a sufficiente per operare con sorgenti luminose a bassa potenza.
+Il rivelatore \`e la fotocamera principale di uno smartphone Samsung Galaxy S24, con sensore CMOS da circa 10 megapixel effettivi, obiettivo a focale $\SI{7.0}{\milli\meter}$ (equivalente $\SI{69}{\milli\meter}$), apertura $f/2.4$, e profondit\`a di acquisizione fino a 12~bit per canale in modalit\`a RAW.
 
 \subsection{Matrice di Bayer e acquisizione RAW}
 \label{subsec:bayer-raw}
@@ -160,12 +149,4 @@ Le acquisizioni vengono effettuate in condizioni di oscurit\`a ambientale, con l
 \section{Calibrazione e riproducibilit\`a}
 \label{sec:calibrazione}
 
-Il sistema non richiede una calibrazione assoluta nel senso tradizionale del termine, poich\'e i parametri di Stokes normalizzati ($s_1 = S_1/S_0$, $s_2 = S_2/S_0$, $s_3 = S_3/S_0$) sono per definizione indipendenti dall'intensit\`a assoluta della sorgente. Tuttavia, alcune procedure di calibrazione relativa vengono applicate per migliorare l'accuratezza:
-
-\begin{itemize}
-    \item \textbf{Disabilitazione dell'ISP:} l'acquisizione in formato RAW con parametri manuali elimina le correzioni automatiche (auto-esposizione, auto-bilanciamento del bianco, correzione gamma) che introdurrebbero non-linearit\`a nella risposta del sensore.
-    \item \textbf{Downsampling spaziale:} le immagini RAW vengono sottoposte a un downsampling con fattore $f$ configurabile (tipicamente tra 10 e 20), calcolando la media di blocchi di $f \times f$ pixel. Questo binning spaziale svolge una duplice funzione: riduce il rumore del sensore (mediando su $f^2$ pixel indipendenti) e rende il calcolo matriciale computazionalmente sostenibile.
-    \item \textbf{Allineamento del sistema di riferimento:} l'angolo di polarizzazione della luce emessa dal tablet non \`e esattamente noto \emph{a priori}. L'algoritmo di allineamento descritto nel \cref{ch:analisi} compensa questo offset ruotando matematicamente il piano $S_1$--$S_2$ in modo che la luce di fondo risulti polarizzata orizzontalmente ($\text{AoLP} = 0^\circ$).
-\end{itemize}
-
-La riproducibilit\`a delle misure \`e garantita dalla combinazione di parametri di esposizione fissi, stabilit\`a meccanica della rotaia e procedure software standardizzate. La variabilit\`a residua \`e dominata dal rumore del sensore, che viene efficacemente ridotto dal binning spaziale e dalla sovradeterminazione del sistema lineare.
+I parametri di Stokes normalizzati ($s_i = S_i/S_0$) sono per definizione indipendenti dall'intensit\`a assoluta della sorgente, eliminando la necessit\`a di una calibrazione assoluta. L'accuratezza \`e garantita da tre accorgimenti: acquisizione in formato RAW con parametri manuali (per preservare la linearit\`a della risposta), downsampling spaziale (per ridurre il rumore, \cref{sec:preelaborazione}), e allineamento software del sistema di riferimento (per compensare l'offset angolare della sorgente, \cref{sec:allineamento}). La variabilit\`a residua \`e dominata dal rumore del sensore, ridotto dal binning e dalla sovradeterminazione del sistema lineare.

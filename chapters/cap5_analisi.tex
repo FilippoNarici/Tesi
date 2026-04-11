@@ -7,9 +7,7 @@ In questo capitolo si descrive in dettaglio la pipeline di elaborazione sviluppa
 \section{Pre-elaborazione delle immagini RAW}
 \label{sec:preelaborazione}
 
-Le immagini acquisite dallo smartphone vengono salvate in formato DNG (Digital Negative), che preserva i dati grezzi del sensore CMOS senza compressione con perdita. Il primo passo della pipeline consiste nel caricamento e nella conversione di ciascuna immagine RAW in una matrice numerica a 16~bit per canale.
-
-La demosaicizzazione viene eseguita tramite la libreria \texttt{rawpy}, che applica il bilanciamento del bianco della fotocamera (\texttt{use\_camera\_wb=True}) e una curva di trasferimento lineare con gamma $(1,1)$, evitando qualsiasi correzione automatica di luminosit\`a. Il risultato \`e un array tridimensionale $H \times W \times 3$ in formato RGB a 16~bit, dal quale si estrae il singolo canale colore di interesse (rosso, verde o blu) come matrice bidimensionale $H \times W$ in virgola mobile a 32~bit.
+Il primo passo della pipeline consiste nel caricamento di ciascun file DNG e nella conversione in matrice numerica. La demosaicizzazione viene eseguita tramite \texttt{rawpy} con bilanciamento del bianco della fotocamera e curva di trasferimento lineare, producendo un array $H \times W \times 3$ in RGB a 16~bit. Si estrae poi il singolo canale colore di interesse come matrice $H \times W$ in virgola mobile a 32~bit.
 
 \subsection{Downsampling}
 \label{subsec:downsampling}
@@ -82,7 +80,7 @@ I parametri di Stokes si recuperano come $S_0 = 2p_0$, $S_1 = 2p_1$, $S_2 = 2p_2
 \subsection{Implementazione vettorializzata}
 \label{subsec:implementazione_vettorializzata}
 
-Per evitare cicli espliciti su ogni pixel, l'implementazione sfrutta la struttura matriciale di NumPy. Lo stack di $N$ immagini, ciascuna di dimensioni $H \times W$, viene riorganizzato in una matrice $N \times (H \cdot W)$. La pseudo-inversa $\mathbf{A}^+$ (di dimensioni $3 \times N$) viene calcolata una sola volta con \texttt{np.linalg.pinv} e moltiplicata per l'intera matrice dei dati tramite un singolo prodotto matriciale. Il risultato \`e una matrice $3 \times (H \cdot W)$ che viene poi riorganizzata nelle tre mappe $S_0$, $S_1$, $S_2$ di dimensioni $H \times W$.
+Per evitare cicli espliciti sui pixel, lo stack di $N$ immagini viene riorganizzato in una matrice $N \times (H \cdot W)$. La pseudo-inversa, calcolata una sola volta, viene moltiplicata per l'intera matrice dei dati con un singolo prodotto matriciale, restituendo le tre mappe $S_0$, $S_1$, $S_2$.
 
 \subsection{Convenzione degli angoli}
 \label{subsec:convenzione_angoli}
@@ -126,17 +124,7 @@ Solo una porzione del campo visivo del sensore \`e effettivamente illuminata dal
 \subsection{Pipeline morfologica}
 \label{subsec:pipeline_morfologica}
 
-La procedura di mascheramento, denominata \emph{smart mask}, opera sulla mappa di intensit\`a totale $S_0$ secondo i seguenti passi:
-
-\begin{enumerate}
-    \item \textbf{Profilo di illuminazione locale}: si applica un filtro gaussiano a $S_0$ con $\sigma$ pari al $2\%$ della dimensione maggiore dell'immagine, ottenendo un profilo di illuminazione a bassa frequenza spaziale.
-    \item \textbf{Soglia adattiva}: i pixel con $S_0 < 0.95 \cdot S_{0,\mathrm{blur}}$ vengono identificati come bordi dell'oggetto illuminato. La soglia relativa al profilo locale garantisce robustezza rispetto a disuniformit\`a di illuminazione.
-    \item \textbf{Dilatazione morfologica}: i bordi rilevati vengono dilatati con un elemento strutturante $3 \times 3$ per un numero di iterazioni pari al $2.5\%$ della dimensione dell'immagine, in modo da chiudere eventuali discontinuit\`a nel contorno.
-    \item \textbf{Riempimento}: le cavit\`a interne alla regione delimitata vengono riempite tramite l'operazione di \emph{binary fill holes}.
-    \item \textbf{Selezione della componente principale}: tramite etichettatura delle componenti connesse, si conserva unicamente la componente con area maggiore, eliminando artefatti isolati (polvere, riflessi del supporto).
-    \item \textbf{Margine di sicurezza}: una dilatazione finale del $2\%$ espande leggermente la regione dell'oggetto, assicurando che i pixel di transizione al bordo siano inclusi.
-    \item \textbf{Inversione}: la maschera di sfondo \`e il complemento della regione oggetto.
-\end{enumerate}
+La procedura di mascheramento, denominata \emph{smart mask}, opera sulla mappa di intensit\`a totale $S_0$. Si calcola un profilo di illuminazione locale tramite filtro gaussiano e si identificano come bordi i pixel con intensit\`a inferiore al $95\%$ del profilo locale. I bordi vengono dilatati per chiudere eventuali discontinuit\`a, le cavit\`a interne riempite, e si conserva unicamente la componente connessa di area maggiore. Un margine di sicurezza dilata leggermente la regione individuata. Il complemento di questa regione costituisce la maschera di sfondo.
 
 \subsection{Raffinamento con \texorpdfstring{$S_3$}{S3}}
 \label{subsec:raffinamento_s3}
@@ -216,14 +204,7 @@ Il segno di $\delta$ viene determinato dal prodotto $s_{3,\mathrm{corr}} \cdot \
 \section{Strumento di validazione interattivo}
 \label{sec:debugger}
 
-A supporto della pipeline automatizzata \`e stato sviluppato un debugger interattivo che consente la verifica pixel-per-pixel della qualit\`a del fit dei parametri di Stokes. Lo strumento presenta tre pannelli affiancati:
-\begin{itemize}
-    \item \textbf{Pannello immagine}: visualizza l'immagine acquisita con un marcatore sul pixel selezionato dall'utente tramite click del mouse.
-    \item \textbf{Pannello fit}: sovrappone i 36 valori di intensit\`a misurati alla curva $I(\theta)$ calcolata dai parametri $S_0$, $S_1$, $S_2$ del pixel. Un indicatore mobile segue il frame corrente nell'animazione.
-    \item \textbf{Pannello ellisse}: mostra l'ellisse di polarizzazione corrispondente, con semiassi $A = \sqrt{S_0(1 + \mathrm{DoLP})/2}$ e $B = \sqrt{S_0(1 - \mathrm{DoLP})/2}$, ruotata dell'angolo AoLP. L'asse maggiore \`e evidenziato per indicare la direzione di polarizzazione predominante.
-\end{itemize}
-
-Questo strumento ha consentito di identificare e correggere errori nella convenzione degli angoli e di verificare la consistenza del fit su regioni con diverso grado di polarizzazione.
+A supporto della pipeline \`e stato sviluppato un debugger interattivo per la verifica pixel-per-pixel della qualit\`a del fit. Lo strumento consente di sovrapporre i 36 valori misurati alla curva teorica e di visualizzare l'ellisse di polarizzazione per qualsiasi pixel selezionato.
 
 % ---------------------------------------------------------------------------
 \section{Visualizzazione dei risultati}

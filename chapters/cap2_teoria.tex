@@ -24,12 +24,7 @@ I casi particolari si ottengono per valori specifici di $\delta$ e del rapporto 
     \item \textbf{Polarizzazione ellittica:} il caso generale, in cui l'estremità del vettore campo elettrico descrive un'ellisse con semiassi e orientazione determinati da $E_{0x}$, $E_{0y}$ e $\delta$.
 \end{itemize}
 
-Nella realtà, le sorgenti luminose comuni emettono luce \textbf{non polarizzata} (o naturale), in cui la fase $\delta$ varia in modo casuale e rapido nel tempo. Quando una componente polarizzata si sovrappone a una componente non polarizzata, si parla di \textbf{luce parzialmente polarizzata}. Il \textbf{grado di polarizzazione} (DOP, dall'inglese \textit{Degree of Polarization}) quantifica la frazione di luce polarizzata~\cite{bornwolf1999}:
-\begin{equation}
-\label{eq:DOP}
-\text{DOP} = \frac{\sqrt{S_1^2 + S_2^2 + S_3^2}}{S_0},
-\end{equation}
-dove $S_0, S_1, S_2, S_3$ sono i parametri di Stokes, introdotti nella sezione successiva. Il DOP vale 1 per luce totalmente polarizzata e 0 per luce completamente non polarizzata.
+Nella realtà, le sorgenti comuni emettono luce \textbf{non polarizzata}, in cui la fase $\delta$ varia casualmente nel tempo. La sovrapposizione di una componente polarizzata e una non polarizzata produce \textbf{luce parzialmente polarizzata}, il cui grado di polarizzazione è definito formalmente nella \cref{sec:stokes}.
 
 
 \section{Formalismo di Stokes}
@@ -64,7 +59,14 @@ Per qualsiasi stato di polarizzazione vale la disuguaglianza fondamentale:
 \label{eq:stokes_disuguaglianza}
 S_0^2 \geq S_1^2 + S_2^2 + S_3^2,
 \end{equation}
-con l'uguaglianza valida esclusivamente per luce totalmente polarizzata.
+con l'uguaglianza valida esclusivamente per luce totalmente polarizzata. Il \textbf{grado di polarizzazione} (DOP, dall'inglese \textit{Degree of Polarization}) quantifica la frazione di luce polarizzata~\cite{bornwolf1999}:
+\begin{equation}
+\label{eq:DOP}
+\text{DOP} = \frac{\sqrt{S_1^2 + S_2^2 + S_3^2}}{S_0},
+\end{equation}
+Il DOP vale 1 per luce totalmente polarizzata e 0 per luce completamente non polarizzata.
+
+Dal punto di vista sperimentale, $S_0$, $S_1$ e $S_2$ si ottengono da misure di intensità attraverso un analizzatore lineare a diversi angoli, come mostrato dalla legge di Malus generalizzata (\cref{sec:malus}). Il parametro $S_3$ richiede l'inserimento di una lamina $\lambda/4$ prima dell'analizzatore.
 
 \subsection{Sfera di Poincaré}
 \label{subsec:poincare}
@@ -77,14 +79,6 @@ La posizione sulla sfera è parametrizzata dagli angoli $2\psi$ (azimutale, lega
 \frac{1}{S_0}\begin{pmatrix} S_1 \\ S_2 \\ S_3 \end{pmatrix} = \begin{pmatrix} \cos 2\chi \cos 2\psi \\ \cos 2\chi \sin 2\psi \\ \sin 2\chi \end{pmatrix}.
 \end{equation}
 L'\textbf{equatore} della sfera corrisponde alla polarizzazione lineare ($\chi = 0$), i \textbf{poli} alla polarizzazione circolare ($\chi = \pm\pi/4$), e tutti gli altri punti alla polarizzazione ellittica.
-
-\subsection{Misura sperimentale dei parametri di Stokes}
-\label{subsec:stokes_misura}
-
-Dal punto di vista sperimentale, la determinazione dei parametri $S_0$, $S_1$ e $S_2$ richiede misure di intensità attraverso un polarizzatore lineare a diversi angoli. Come descritto nella \cref{sec:malus}, l'intensità trasmessa da un analizzatore a un angolo $\theta$ è funzione di $S_0$, $S_1$ e $S_2$; acquisendo misure a più angoli, i tre parametri possono essere ricostruiti tramite un fit sinusoidale o una pseudo-inversa.
-
-Il parametro $S_3$, legato alla polarizzazione circolare, non è accessibile con un solo polarizzatore lineare: è necessario introdurre una lamina quarto d'onda ($\lambda/4$) prima dell'analizzatore. Due misure con la lamina orientata a $+45^\circ$ e $-45^\circ$ rispetto all'asse di trasmissione dell'analizzatore consentono di isolare $S_3$. La procedura specifica adottata nel polarimetro è descritta nel \cref{ch:analisi}.
-
 
 \section{Legge di Malus generalizzata}
 \label{sec:malus}
@@ -102,7 +96,7 @@ I(\theta) = \frac{1}{2}\bigl(S_0 + S_1\cos 2\theta + S_2\sin 2\theta\bigr).
 \end{equation}
 L'\cref{eq:malus_generalizzata} può essere derivata applicando la matrice di Mueller di un polarizzatore lineare ruotato di $\theta$ al vettore di Stokes incidente e leggendo la componente $S_0'$ del vettore uscente (il formalismo delle matrici di Mueller è introdotto nella \cref{sec:mueller}). Si osservi che l'intensità trasmessa dipende solo dai primi tre parametri di Stokes e non da $S_3$: un polarizzatore lineare è insensibile alla polarizzazione circolare.
 
-L'\cref{eq:malus_generalizzata} è di importanza fondamentale per il polarimetro sviluppato in questa tesi: acquisendo $N$ immagini a diversi angoli $\theta_i$ dell'analizzatore, si ottiene un sistema sovradeterminato di equazioni lineari nei tre parametri incogniti $S_0$, $S_1$ e $S_2$, risolvibile tramite il metodo della pseudo-inversa. Questo approccio è descritto in dettaglio nel \cref{ch:analisi}.
+Acquisendo $N$ immagini a diversi angoli $\theta_i$ dell'analizzatore, l'\cref{eq:malus_generalizzata} fornisce un sistema sovradeterminato di equazioni lineari nei tre parametri incogniti $S_0$, $S_1$ e $S_2$, risolvibile tramite il metodo della pseudo-inversa.
 
 
 \section{Matrici di Mueller}
@@ -180,7 +174,6 @@ Le \textbf{lamine d'onda} sono componenti ottiche in materiale birifrangente rea
 
 Dall'\cref{eq:ritardanza} si osserva che la ritardanza dipende inversamente dalla lunghezza d'onda $\lambda$. Inoltre, la birifrangenza $\Delta n$ stessa varia con $\lambda$ per effetto della dispersione. Una lamina \textbf{zero-order}, il cui ritardo è ottenuto con un singolo passaggio attraverso un cristallo sottile, presenta una dipendenza dalla lunghezza d'onda più debole rispetto a una lamina \textbf{multi-order}, dove il ritardo è un multiplo intero di $2\pi$ più la frazione desiderata.
 
-Questa dipendenza cromatica ha una conseguenza importante per il polarimetro sviluppato in questa tesi: la lamina $\lambda/4$ utilizzata è progettata per una lunghezza d'onda di \SI{633}{\nano\meter}, e il ritardo effettivo a lunghezze d'onda diverse deve essere corretto tramite il rapporto $\sin(\delta(\lambda))/\sin(\delta(\SI{633}{\nano\meter}))$, come descritto nel \cref{ch:analisi}.
 
 
 \section{Attività ottica}
@@ -197,7 +190,6 @@ dove $[\alpha]_T^\lambda$ è la \textbf{rotazione specifica} (che dipende dalla 
 
 Nel formalismo di Mueller, l'attività ottica corrisponde all'azione di un rotatore, la cui matrice è data dall'\cref{eq:mueller_rotatore}. L'effetto è una rotazione dei parametri $S_1$ e $S_2$ senza alterazione di $S_3$: il punto rappresentativo sulla sfera di Poincaré ruota attorno all'asse polare.
 
-L'attività ottica è rilevante per il polarimetro di questa tesi nella misura di soluzioni zuccherine: la rotazione del piano di polarizzazione indotta dal saccarosio in soluzione può essere rilevata come variazione dell'orientazione dell'asse di polarizzazione nelle mappe spaziali del vettore di Stokes.
 
 
 \section{Fotoelasticità}
@@ -225,4 +217,3 @@ Il ritardo di fase introdotto dal campione fotoelastico è dato dalla combinazio
 \end{equation}
 dove $d$ è lo spessore del campione attraversato dalla luce.
 
-L'analisi fotoelastica è una delle applicazioni dirette del polarimetro a immagine sviluppato in questa tesi. La capacità di ricostruire mappe bidimensionali di ritardanza e orientazione dell'asse veloce consente di visualizzare la distribuzione spaziale degli stress interni in campioni trasparenti, come discusso nel \cref{ch:risultati}.

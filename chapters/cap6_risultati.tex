@@ -27,22 +27,7 @@ La dispersione dei valori nella regione di sfondo fornisce una stima dell'incert
 \section{Mappe dei parametri di Stokes}
 \label{sec:mappe_stokes}
 
-Per ciascun campione, la pipeline di analisi descritta nel \cref{ch:analisi} produce le mappe bidimensionali dei quattro parametri di Stokes ($S_0$, $S_1$, $S_2$, $S_3$) e delle grandezze derivate (DoLP, AoLP, ritardanza $\delta$, asse veloce $\alpha$).
-
-\subsection{Intensit\`a totale \texorpdfstring{$S_0$}{S0}}
-\label{subsec:risultati_s0}
-
-La mappa di $S_0$ rappresenta l'intensit\`a totale trasmessa attraverso il campione, indipendentemente dallo stato di polarizzazione. Le variazioni spaziali di $S_0$ riflettono differenze di trasmittanza, spessore o assorbimento del campione. Nelle regioni esterne alla maschera, $S_0$ presenta un profilo gaussiano caratteristico dell'illuminazione LCD.
-
-\subsection{Parametri lineari \texorpdfstring{$S_1$}{S1} e \texorpdfstring{$S_2$}{S2}}
-\label{subsec:risultati_s1s2}
-
-Le mappe di $S_1$ e $S_2$ rivelano le variazioni spaziali della polarizzazione lineare introdotte dal campione. In un campione birifrangente uniforme, $S_1$ e $S_2$ presentano regioni con valori positivi e negativi ben definiti, la cui distribuzione dipende dall'orientazione dell'asse ottico rispetto all'analizzatore. Per campioni con orientazione variabile dell'asse ottico (come i provini fotoelastici sotto carico), le mappe mostrano strutture a bande caratteristiche delle isocline.
-
-\subsection{Parametro circolare \texorpdfstring{$S_3$}{S3}}
-\label{subsec:risultati_s3}
-
-La mappa di $S_3$ \`e limitata alla regione circolare della lamina quarto d'onda, pi\`u piccola del campo illuminato. Nei campioni birifrangenti, $S_3$ rivela la conversione di polarizzazione lineare in circolare, e viceversa, in funzione della ritardanza locale. La presenza di regioni con $S_3 > 0$ e $S_3 < 0$ indica variazioni spaziali della ritardanza o dell'orientazione dell'asse veloce.
+Per ciascun campione la pipeline produce le mappe bidimensionali di $S_0$, $S_1$, $S_2$, $S_3$ e delle grandezze derivate (DoLP, AoLP, $\delta$, $\alpha$), visualizzate nella griglia $3 \times 3$ descritta nella \cref{sec:visualizzazione}. I risultati sono discussi campione per campione nelle sezioni seguenti.
 
 % ---------------------------------------------------------------------------
 \section{Risultati per campione}
@@ -259,7 +244,7 @@ Sostituendo i valori noti ($[\alpha]_D = \SI{66.47}{\degree/(dm \cdot g/ml)}$, $
     c_\mathrm{ott} = \frac{\num{1420554}}{66.47 \times 589.3^2 \times 0.13} \approx \SI{0.47}{\gram\per\milli\liter}
     \label{eq:c_ott_risultato}
 \end{equation}
-Questo valore \`e significativamente inferiore alla concentrazione gravimetrica $c_\mathrm{grav} \approx \SI{1.22}{\gram\per\milli\liter}$. La discrepanza di un fattore $\sim 2.6$ pu\`o essere attribuita a diversi fattori: la concentrazione molto elevata della soluzione (prossima alla saturazione), per la quale il modello di Drude semplificato e il valore tabulato di $[\alpha]_D$ per soluzioni diluite potrebbero non essere direttamente applicabili; possibili contributi delle pareti in vetro della boccetta, che introducono un ulteriore cammino ottico non attivo; e l'incertezza sulla quantit\`a di saccarosio effettivamente disciolta. Nonostante la discrepanza quantitativa, il risultato conferma la capacit\`a del polarimetro di rilevare l'attivit\`a ottica e di riprodurre correttamente la legge di dispersione rotatoria.
+Questo valore \`e significativamente inferiore alla concentrazione gravimetrica $c_\mathrm{grav} \approx \SI{1.22}{\gram\per\milli\liter}$. La discrepanza di un fattore ${\sim}2.6$ merita un'analisi. La causa pi\`u probabile \`e la non applicabilit\`a del modello di Drude semplificato a concentrazioni cos\`i elevate: la soluzione preparata \`e prossima alla saturazione (${\sim}67\%$ in peso), regime in cui la relazione lineare tra rotazione e concentrazione (\cref{eq:biot}) perde validit\`a e il potere rotatorio specifico $[\alpha]$ diminuisce apprezzabilmente rispetto al valore tabulato per soluzioni diluite. Un contributo secondario potrebbe derivare dal cammino ottico attraverso le pareti in vetro della boccetta (${\sim}\SI{2}{\milli\meter}$ di vetro borosilicato), che non \`e otticamente attivo ma introduce una ritardanza da stress residuo che potrebbe interferire con la misura dell'AoLP. Nonostante la discrepanza quantitativa, la misura conferma la capacit\`a del sistema di rilevare l'attivit\`a ottica e di riprodurre la legge di dispersione rotatoria.
 
 \subsection{Righello in plastica trasparente}
 \label{subsec:risultati_righello}
@@ -304,13 +289,7 @@ Il gradiente di sfondo presente in entrambe le immagini (angolo superiore sinist
 \subsection{Capacit\`a del metodo}
 \label{subsec:capacita}
 
-I risultati dimostrano che il polarimetro a immagine basato su smartphone \`e in grado di:
-\begin{itemize}
-    \item ricostruire il vettore di Stokes completo ($S_0$, $S_1$, $S_2$, $S_3$) con risoluzione spaziale bidimensionale;
-    \item misurare ritardanza e orientazione dell'asse veloce su campioni macroscopici;
-    \item distinguere qualitativamente campioni con propriet\`a polarimetriche diverse (birifrangenza, attivit\`a ottica, fotoelasticit\`a);
-    \item produrre mappe polarimetriche interpretabili fisicamente con un apparato dal costo complessivo inferiore a quello di un singolo componente ottico di precisione.
-\end{itemize}
+I risultati dimostrano che il sistema ricostruisce il vettore di Stokes completo con risoluzione spaziale bidimensionale, misura ritardanza e asse veloce su campioni macroscopici, e distingue fenomeni polarimetrici di natura diversa. L'apparato produce mappe fisicamente interpretabili con un costo complessivo inferiore a quello di un singolo componente ottico di precisione di un polarimetro convenzionale.
 
 \subsection{Effetto del downsampling}
 \label{subsec:effetto_downsampling}
