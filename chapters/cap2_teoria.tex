@@ -1,34 +1,14 @@
 % Capitolo 2: Fondamenti teorici della polarimetria
 
-\section{Natura ondulatoria della luce e polarizzazione}
+\section{Polarizzazione della luce}
 \label{sec:polarizzazione}
 
-La luce è un'onda elettromagnetica trasversale: i campi elettrico e magnetico oscillano su piani perpendicolari alla direzione di propagazione. Per un'onda monocromatica che si propaga lungo l'asse $z$, il campo elettrico può essere decomposto in due componenti ortogonali~\cite{hecht2017optics}:
-\begin{equation}
-\label{eq:campo_E}
-\bm{E}(z,t) = E_{0x}\cos(\omega t - kz + \delta_x)\,\hat{\bm{x}} + E_{0y}\cos(\omega t - kz + \delta_y)\,\hat{\bm{y}},
-\end{equation}
-dove $E_{0x}$ e $E_{0y}$ sono le ampiezze, $\omega$ la frequenza angolare, $k = 2\pi/\lambda$ il numero d'onda e $\delta_x$, $\delta_y$ le fasi iniziali delle due componenti. La differenza di fase $\delta = \delta_y - \delta_x$ determina lo stato di polarizzazione dell'onda.
-
-Eliminando la dipendenza temporale dall'\cref{eq:campo_E}, si ottiene l'equazione dell'ellisse di polarizzazione:
-\begin{equation}
-\label{eq:ellisse}
-\frac{E_x^2}{E_{0x}^2} + \frac{E_y^2}{E_{0y}^2} - 2\frac{E_x E_y}{E_{0x}E_{0y}}\cos\delta = \sin^2\delta,
-\end{equation}
-che descrive la traiettoria tracciata dall'estremità del vettore campo elettrico nel piano trasversale. Questa è la forma più generale di polarizzazione: la \textbf{polarizzazione ellittica}.
-
-I casi particolari si ottengono per valori specifici di $\delta$ e del rapporto delle ampiezze:
-\begin{itemize}
-    \item \textbf{Polarizzazione lineare:} quando $\delta = 0$ o $\delta = \pi$, l'ellisse degenera in un segmento. Il campo oscilla lungo una direzione fissa nel piano trasversale, inclinata di un angolo $\psi = \arctan(E_{0y}/E_{0x})$ rispetto all'asse $x$.
-    \item \textbf{Polarizzazione circolare:} quando $\delta = \pm\pi/2$ e $E_{0x} = E_{0y}$, l'ellisse diventa un cerchio. Il segno di $\delta$ distingue la polarizzazione circolare destra ($\delta = -\pi/2$) da quella sinistra ($\delta = +\pi/2$).
-    \item \textbf{Polarizzazione ellittica:} il caso generale, in cui l'estremità del vettore campo elettrico descrive un'ellisse con semiassi e orientazione determinati da $E_{0x}$, $E_{0y}$ e $\delta$.
-\end{itemize}
-
-Nella realtà, le sorgenti comuni emettono luce \textbf{non polarizzata}, in cui la fase $\delta$ varia casualmente nel tempo. La sovrapposizione di una componente polarizzata e una non polarizzata produce \textbf{luce parzialmente polarizzata}, il cui grado di polarizzazione è definito formalmente nella \cref{sec:stokes}.
+La luce è un'onda elettromagnetica trasversale. Per un'onda monocromatica che si propaga lungo l'asse $z$, il campo elettrico può essere decomposto in due componenti ortogonali $E_x$ e $E_y$, ciascuna con ampiezza e fase proprie~\cite{hecht2017optics}. La differenza di fase $\delta = \delta_y - \delta_x$ tra le due componenti determina lo stato di polarizzazione: quando $\delta = 0$ o $\pi$ la polarizzazione è lineare, quando $\delta = \pm\pi/2$ con ampiezze uguali è circolare, e nel caso generale è ellittica. Le sorgenti comuni emettono luce non polarizzata, in cui $\delta$ varia casualmente nel tempo; la sovrapposizione di una componente polarizzata e una non polarizzata produce luce parzialmente polarizzata, situazione tipica in ambito sperimentale.
 
 
 \section{Formalismo di Stokes}
 \label{sec:stokes}
+
 Per descrivere la polarizzazione della luce esistono diversi formalismi. Il \emph{formalismo di Jones}, basato su un vettore complesso a due componenti, è efficace ma limitato alla luce completamente polarizzata. Per trattare anche la luce parzialmente polarizzata, situazione comune nella pratica sperimentale, è necessario un formalismo più generale: il \textbf{formalismo di Stokes}, introdotto da George Gabriel Stokes nel 1852~\cite{goldstein2011polarized}.
 
 \subsection{Definizione dei parametri di Stokes}
@@ -39,15 +19,7 @@ I quattro parametri di Stokes si definiscono a partire dalle componenti del camp
 \label{eq:stokes_campi}
 \Svec = \begin{pmatrix} S_0 \\ S_1 \\ S_2 \\ S_3 \end{pmatrix} = \begin{pmatrix} \langle E_{0x}^2 \rangle + \langle E_{0y}^2 \rangle \\ \langle E_{0x}^2 \rangle - \langle E_{0y}^2 \rangle \\ 2\langle E_{0x} E_{0y} \cos\delta \rangle \\ 2\langle E_{0x} E_{0y} \sin\delta \rangle \end{pmatrix},
 \end{equation}
-dove le parentesi angolari indicano la media temporale. Ciascun parametro ha un significato fisico diretto:
-\begin{itemize}
-    \item $S_0$: intensità totale del fascio;
-    \item $S_1$: prevalenza della polarizzazione orizzontale ($S_1 > 0$) o verticale ($S_1 < 0$);
-    \item $S_2$: prevalenza della polarizzazione a $+45^\circ$ ($S_2 > 0$) o $-45^\circ$ ($S_2 < 0$);
-    \item $S_3$: prevalenza della polarizzazione circolare destra ($S_3 > 0$) o sinistra ($S_3 < 0$).
-\end{itemize}
-
-I parametri di Stokes possono essere espressi equivalentemente in termini di intensità misurabili con combinazioni di polarizzatori e lamine a ritardo:
+dove le parentesi angolari indicano la media temporale. $S_0$ rappresenta l'intensità totale del fascio; $S_1$ quantifica la prevalenza della polarizzazione orizzontale ($S_1 > 0$) o verticale ($S_1 < 0$); $S_2$ la prevalenza della polarizzazione a $+45^\circ$ ($S_2 > 0$) o $-45^\circ$ ($S_2 < 0$); $S_3$ la prevalenza della polarizzazione circolare destra ($S_3 > 0$) o sinistra ($S_3 < 0$). I parametri di Stokes sono quantità misurabili, proporzionali alle intensità registrate da combinazioni appropriate di polarizzatori e lamine:
 \begin{equation}
 \label{eq:stokes_intensita}
 \Svec = \begin{pmatrix} I_H + I_V \\ I_H - I_V \\ I_{+45} - I_{-45} \\ I_{RCP} - I_{LCP} \end{pmatrix},
@@ -64,21 +36,15 @@ con l'uguaglianza valida esclusivamente per luce totalmente polarizzata. Il \tex
 \label{eq:DOP}
 \text{DOP} = \frac{\sqrt{S_1^2 + S_2^2 + S_3^2}}{S_0},
 \end{equation}
-Il DOP vale 1 per luce totalmente polarizzata e 0 per luce completamente non polarizzata.
+e vale 1 per luce totalmente polarizzata e 0 per luce completamente non polarizzata.
 
 Dal punto di vista sperimentale, $S_0$, $S_1$ e $S_2$ si ottengono da misure di intensità attraverso un analizzatore lineare a diversi angoli, come mostrato dalla legge di Malus generalizzata (\cref{sec:malus}). Il parametro $S_3$ richiede l'inserimento di una lamina $\lambda/4$ prima dell'analizzatore.
 
-\subsection{Sfera di Poincaré}
+\subsection{La sfera di Poincaré}
 \label{subsec:poincare}
 
-La \textbf{sfera di Poincaré} fornisce una rappresentazione geometrica degli stati di polarizzazione nello spazio tridimensionale definito dai parametri $S_1$, $S_2$ e $S_3$ normalizzati a $S_0$~\cite{goldstein2011polarized}. Ogni punto sulla superficie della sfera rappresenta uno stato totalmente polarizzato, mentre i punti interni corrispondono a stati parzialmente polarizzati. La distanza dal centro è pari al DOP.
+I parametri di Stokes normalizzati $s_1 = S_1/S_0$, $s_2 = S_2/S_0$, $s_3 = S_3/S_0$ definiscono un punto nello spazio tridimensionale. Gli stati totalmente polarizzati giacciono sulla superficie di una sfera unitaria --- la \textbf{sfera di Poincaré}~\cite{goldstein2011polarized} --- il cui equatore rappresenta la polarizzazione lineare e i cui poli rappresentano la polarizzazione circolare destra e sinistra. La distanza dal centro è pari al grado di polarizzazione. Questa rappresentazione geometrica sarà utile nell'interpretazione delle mappe di Stokes del \cref{ch:risultati}.
 
-La posizione sulla sfera è parametrizzata dagli angoli $2\psi$ (azimutale, legato all'orientazione dell'ellisse) e $2\chi$ (polare, legato all'ellitticità):
-\begin{equation}
-\label{eq:poincare}
-\frac{1}{S_0}\begin{pmatrix} S_1 \\ S_2 \\ S_3 \end{pmatrix} = \begin{pmatrix} \cos 2\chi \cos 2\psi \\ \cos 2\chi \sin 2\psi \\ \sin 2\chi \end{pmatrix}.
-\end{equation}
-L'\textbf{equatore} della sfera corrisponde alla polarizzazione lineare ($\chi = 0$), i \textbf{poli} alla polarizzazione circolare ($\chi = \pm\pi/4$), e tutti gli altri punti alla polarizzazione ellittica.
 
 \section{Legge di Malus generalizzata}
 \label{sec:malus}
@@ -145,75 +111,33 @@ Un rotatore ottico ruota il piano di polarizzazione di un angolo $\phi$ senza mo
 Il fattore $2\phi$ riflette la periodicità $\pi$ della polarizzazione lineare: una rotazione fisica di $\phi$ corrisponde a uno spostamento di $2\phi$ sulla sfera di Poincaré.
 
 
-\section{Birifrangenza e ritardo di fase}
-\label{sec:birifrangenza}
+\section{Fenomeni che influenzano la polarizzazione}
+\label{sec:fenomeni}
 
-\subsection{Anisotropia ottica}
-\label{subsec:anisotropia}
+I campioni analizzati in questa tesi interagiscono con la polarizzazione attraverso tre meccanismi distinti, ciascuno descritto da una specifica matrice di Mueller.
 
-Un materiale è \textbf{birifrangente} quando il suo indice di rifrazione dipende dalla direzione di polarizzazione della luce. Nei cristalli uniassici, che possiedono un unico asse ottico, si distinguono due indici di rifrazione: l'indice \textbf{ordinario} $n_o$, per la polarizzazione perpendicolare all'asse ottico, e l'indice \textbf{straordinario} $n_e$, per la polarizzazione parallela~\cite{hecht2017optics}. La differenza $\Delta n = n_e - n_o$ è la \textbf{birifrangenza} del materiale.
-
-\subsection{Ritardanza}
-\label{subsec:ritardanza}
-
-Quando un'onda polarizzata attraversa un mezzo birifrangente di spessore $d$, le due componenti del campo lungo gli assi ordinario e straordinario accumulano una differenza di fase detta \textbf{ritardanza} (o \textit{retardance}):
+\textbf{Birifrangenza.} Un materiale è birifrangente quando il suo indice di rifrazione dipende dalla direzione di polarizzazione. Nei cristalli uniassici si distinguono l'indice \textbf{ordinario} $n_o$ e l'indice \textbf{straordinario} $n_e$; la differenza $\Delta n = n_e - n_o$ è la birifrangenza del materiale~\cite{hecht2017optics}. Quando un'onda polarizzata attraversa un mezzo birifrangente di spessore $d$, le due componenti del campo accumulano una differenza di fase detta \textbf{ritardanza}:
 \begin{equation}
 \label{eq:ritardanza}
 \delta = \frac{2\pi}{\lambda}\,\Delta n\, d,
 \end{equation}
-dove $\lambda$ è la lunghezza d'onda nel vuoto. La ritardanza è il parametro fondamentale che caratterizza l'effetto di un elemento birifrangente sulla polarizzazione.
+dove $\lambda$ è la lunghezza d'onda nel vuoto. Le \textbf{lamine d'onda} sfruttano questo effetto: una lamina $\lambda/4$ ($\delta = \pi/2$) converte polarizzazione lineare a $45^\circ$ in circolare, una lamina $\lambda/2$ ($\delta = \pi$) ruota il piano di polarizzazione di un angolo doppio rispetto all'orientazione della lamina. Poiché $\delta$ dipende inversamente da $\lambda$, una lamina calibrata a una data lunghezza d'onda introduce ritardi diversi alle altre lunghezze d'onda --- un aspetto che avrà conseguenze dirette sulla misura di $S_3$ con il sensore a tre canali colore (\cref{ch:analisi}). Una lamina \textbf{zero-order}, il cui ritardo è ottenuto con un singolo passaggio attraverso un cristallo sottile, presenta una dipendenza dalla lunghezza d'onda più debole rispetto a una lamina \textbf{multi-order}.
 
-Le \textbf{lamine d'onda} sono componenti ottiche in materiale birifrangente realizzate con spessore $d$ controllato per ottenere una specifica ritardanza:
-\begin{itemize}
-    \item \textbf{Lamina $\lambda/4$:} $\delta = \pi/2$, converte polarizzazione lineare a $45^\circ$ in circolare e viceversa.
-    \item \textbf{Lamina $\lambda/2$:} $\delta = \pi$, ruota la direzione di polarizzazione lineare di un angolo doppio rispetto all'orientazione della lamina.
-\end{itemize}
-
-\subsection{Dipendenza dalla lunghezza d'onda}
-\label{subsec:lambda_dipendenza}
-
-Dall'\cref{eq:ritardanza} si osserva che la ritardanza dipende inversamente dalla lunghezza d'onda $\lambda$. Inoltre, la birifrangenza $\Delta n$ stessa varia con $\lambda$ per effetto della dispersione. Una lamina \textbf{zero-order}, il cui ritardo è ottenuto con un singolo passaggio attraverso un cristallo sottile, presenta una dipendenza dalla lunghezza d'onda più debole rispetto a una lamina \textbf{multi-order}, dove il ritardo è un multiplo intero di $2\pi$ più la frazione desiderata.
-
-
-
-\section{Attività ottica}
-\label{sec:attivita_ottica}
-
-Alcuni materiali, detti \textbf{otticamente attivi}, hanno la proprietà di ruotare il piano di polarizzazione della luce linearmente polarizzata che li attraversa. Questo fenomeno, scoperto da Arago nel 1811 e sistematizzato da Biot, è dovuto alla \textbf{chiralità} della struttura molecolare o cristallina del materiale~\cite{hecht2017optics}.
-
-La rotazione è classificata come \textbf{destrogira} (oraria, guardando verso la sorgente) o \textbf{levogira} (antioraria). Per soluzioni di sostanze otticamente attive, l'angolo di rotazione $\alpha_\text{rot}$ segue la legge di Biot:
+\textbf{Attività ottica.} Alcuni materiali chirali ruotano il piano di polarizzazione senza alterare l'ellitticità: nel formalismo di Mueller, l'effetto corrisponde a un rotatore (\cref{eq:mueller_rotatore}), con $S_1$ e $S_2$ che ruotano mentre $S_3$ resta invariato. Per soluzioni di sostanze otticamente attive, l'angolo di rotazione segue la \textbf{legge di Biot}~\cite{hecht2017optics}:
 \begin{equation}
 \label{eq:biot}
 \alpha_\text{rot} = [\alpha]_T^\lambda \, l \, c,
 \end{equation}
-dove $[\alpha]_T^\lambda$ è la \textbf{rotazione specifica} (che dipende dalla temperatura $T$ e dalla lunghezza d'onda $\lambda$), $l$ è il cammino ottico in decimetri e $c$ è la concentrazione in \si{\gram\per\milli\liter}.
+dove $[\alpha]_T^\lambda$ è la \textbf{rotazione specifica} (dipendente dalla temperatura $T$ e dalla lunghezza d'onda $\lambda$), $l$ è il cammino ottico in decimetri e $c$ la concentrazione in \si{\gram\per\milli\liter}. Il campione di saccarosio del \cref{ch:campioni} è stato scelto per verificare questa proprietà e la sua dispersione rotatoria, che in prima approssimazione segue il modello di Drude $[\alpha]_T^\lambda \propto 1/\lambda^2$.
 
-Nel formalismo di Mueller, l'attività ottica corrisponde all'azione di un rotatore, la cui matrice è data dall'\cref{eq:mueller_rotatore}. L'effetto è una rotazione dei parametri $S_1$ e $S_2$ senza alterazione di $S_3$: il punto rappresentativo sulla sfera di Poincaré ruota attorno all'asse polare.
-
-
-
-\section{Fotoelasticità}
-\label{sec:fotoelasticita}
-
-La \textbf{fotoelasticità} è il fenomeno per cui un materiale trasparente e normalmente isotropo diventa birifrangente quando è sottoposto a uno stato di sollecitazione meccanica~\cite{goldstein2011polarized}. Questo effetto, noto anche come \textbf{birifrangenza indotta da stress}, fu osservato per la prima volta da Brewster nel 1816.
-
-La relazione tra birifrangenza indotta e stato di tensione è espressa dalla \textbf{legge tensione-ottica}:
+\textbf{Fotoelasticità.} Un materiale trasparente e normalmente isotropo diventa birifrangente quando sottoposto a sollecitazione meccanica~\cite{goldstein2011polarized}. La birifrangenza indotta è proporzionale alla differenza delle tensioni principali attraverso la \textbf{legge tensione-ottica}:
 \begin{equation}
 \label{eq:fotoelastica}
 \Delta n = C\,(\sigma_1 - \sigma_2),
 \end{equation}
-dove $C$ è la \textbf{costante fotoelastica} del materiale (caratteristica del mezzo), e $\sigma_1$, $\sigma_2$ sono le tensioni principali nel piano perpendicolare alla direzione di propagazione della luce. Gli assi della birifrangenza indotta coincidono con le direzioni delle tensioni principali.
-
-Quando un campione fotoelastico è osservato in un polarimetro a campo pieno, si osservano due famiglie di frange caratteristiche~\cite{hecht2017optics}:
-\begin{itemize}
-    \item \textbf{Isocromatiche:} linee lungo le quali la differenza $\sigma_1 - \sigma_2$ è costante, e quindi la ritardanza è uniforme. In luce bianca appaiono come frange colorate.
-    \item \textbf{Isocline:} linee lungo le quali le direzioni delle tensioni principali sono parallele agli assi del polarizzatore e dell'analizzatore. Appaiono come bande scure, indipendenti dalla lunghezza d'onda.
-\end{itemize}
-
-Il ritardo di fase introdotto dal campione fotoelastico è dato dalla combinazione dell'\cref{eq:ritardanza} con l'\cref{eq:fotoelastica}:
+dove $C$ è la costante fotoelastica del materiale e $\sigma_1$, $\sigma_2$ sono le tensioni principali nel piano perpendicolare alla direzione di propagazione. La ritardanza del campione diventa quindi:
 \begin{equation}
 \label{eq:ritardanza_fotoelastica}
-\delta = \frac{2\pi}{\lambda}\,C\,(\sigma_1 - \sigma_2)\,d,
+\delta = \frac{2\pi}{\lambda}\,C\,(\sigma_1 - \sigma_2)\,d.
 \end{equation}
-dove $d$ è lo spessore del campione attraversato dalla luce.
-
+Quando un campione fotoelastico è osservato in un polarimetro a campo pieno, si osservano \textbf{frange isocromatiche} (loci a ritardanza costante) e \textbf{isocline} (loci in cui le direzioni principali sono allineate agli assi del polarimetro). Le mappe di ritardanza prodotte dal polarimetro a immagine rendono visibili entrambe le famiglie di frange, come si vedrà nel \cref{ch:risultati}.

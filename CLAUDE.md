@@ -76,7 +76,7 @@ Prima di generare testo per i capitoli teorici o discorsivi, valuta silenziosame
 Sembra scritto da un'IA? (frasi ruffiane, cliché linguistici, introduzioni e conclusioni ridondanti)
 Se la risposta è sì a una delle due, riscrivilo con lo stile severo e oggettivo di un paper di Fisica prima di salvarlo nel file .tex.
 
-# Regole per la bibliografia
+## Regole per la bibliografia
 
 * vedi CLAUDE\_bib\_section.md
 
