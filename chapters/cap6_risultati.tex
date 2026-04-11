@@ -1,47 +1,35 @@
 % Capitolo 6: Risultati e discussione
-% Autore: analista
 
-In questo capitolo si presentano i risultati ottenuti con il polarimetro a immagine descritto nei capitoli precedenti. Per ciascun campione analizzato si discutono le mappe dei parametri di Stokes, le grandezze polarimetriche derivate e la loro interpretazione fisica. Si conclude con una discussione critica delle capacit\`a e dei limiti del metodo.
+In questo capitolo si presentano i risultati ottenuti con il polarimetro a immagine. I campioni sono organizzati per tipo di validazione: prima i test di accuratezza su campioni a ritardanza nota, poi la verifica della linearità della risposta, infine la dimostrazione della versatilità del sistema su fenomeni di natura distinta.
 
 % ---------------------------------------------------------------------------
-\section{Validazione del sistema}
+\section{Validazione preliminare e presentazione delle mappe}
 \label{sec:validazione}
 
-Prima di analizzare campioni birifrangenti, il sistema \`e stato validato misurando la luce polarizzata di sfondo emessa dal display LCD senza alcun campione interposto. Dopo l'allineamento del reference frame descritto nella \cref{sec:allineamento}, ci si attende che la regione di sfondo presenti:
-\begin{itemize}
-    \item $\mathrm{DoLP} \approx 1$, poich\'e la luce del display LCD \`e fortemente polarizzata linearmente;
-    \item $\mathrm{AoLP} \approx 0^\circ$, per definizione della procedura di allineamento;
-    \item $S_3 \approx 0$, in assenza di componente circolare significativa.
-\end{itemize}
+Prima di analizzare campioni birifrangenti, il sistema è stato validato misurando la luce polarizzata di sfondo emessa dal display LCD senza alcun campione interposto. Dopo l'allineamento del sistema di riferimento descritto nella \cref{sec:allineamento}, la regione di sfondo presenta $\mathrm{DoLP} \approx 1$ (luce del display fortemente polarizzata linearmente), $\mathrm{AoLP} \approx 0^\circ$ per definizione della procedura di allineamento, e $S_3 \approx 0$ in assenza di componente circolare significativa. La dispersione dei valori in questa regione fornisce una stima dell'incertezza di misura del sistema: lo scarto interquartile del DoLP quantifica la ripetibilità su pixel equivalenti, mentre la deviazione standard dell'AoLP quantifica l'incertezza angolare.
 
-La dispersione dei valori nella regione di sfondo fornisce una stima dell'incertezza di misura del sistema. Lo scarto interquartile del DoLP nella maschera di sfondo indica la ripetibilit\`a della misura su pixel equivalenti, mentre la deviazione standard dell'AoLP quantifica l'incertezza angolare.
+Per ciascun campione la pipeline produce le mappe bidimensionali di $S_0$, $S_1$, $S_2$, $S_3$ e delle grandezze derivate (DoLP, AoLP, $\delta$, $\alpha$), visualizzate nella griglia $3 \times 3$ descritta nella \cref{sec:visualizzazione}.
 
 \begin{figure}[htbp]
     \centering
-    \fbox{\parbox{0.85\textwidth}{\centering\vspace{2cm}Figura: Mappa DoLP della regione di sfondo dopo allineamento. Il valore medio atteso \`e $\mathrm{DoLP} \approx 1$.\vspace{2cm}}}
+    \fbox{\parbox{0.85\textwidth}{\centering\vspace{2cm}Figura: Mappa DoLP della regione di sfondo dopo allineamento. Il valore medio atteso è $\mathrm{DoLP} \approx 1$.\vspace{2cm}}}
     \caption{Mappa del grado di polarizzazione lineare (DoLP) nella regione di sfondo, utilizzata per la validazione del sistema.}
     \label{fig:validazione_dolp}
 \end{figure}
 
 % ---------------------------------------------------------------------------
-\section{Mappe dei parametri di Stokes}
-\label{sec:mappe_stokes}
-
-Per ciascun campione la pipeline produce le mappe bidimensionali di $S_0$, $S_1$, $S_2$, $S_3$ e delle grandezze derivate (DoLP, AoLP, $\delta$, $\alpha$), visualizzate nella griglia $3 \times 3$ descritta nella \cref{sec:visualizzazione}. I risultati sono discussi campione per campione nelle sezioni seguenti.
-
-% ---------------------------------------------------------------------------
-\section{Risultati per campione}
-\label{sec:risultati_campioni}
+\section{Accuratezza della ricostruzione: lamine d'onda}
+\label{sec:risultati_lamine}
 
 \subsection{Lamina \texorpdfstring{$\lambda/4$}{lambda/4} zero-order}
 \label{subsec:risultati_qw}
 
-La lamina quarto d'onda zero-order ($\lambda_0 = \SI{633}{\nano\meter}$), orientata a circa \SI{50}{\degree}, \`e stata analizzata sui tre canali colore. Le mappe di ritardanza presentano una struttura a due zone concentriche: un cerchio interno con ritardanza prossima alla saturazione della scala e un anello esterno con ritardanza inferiore. Questa non-uniformit\`a radiale non \`e attesa per una lamina ideale; le cause probabili sono una variazione spaziale dello spessore del cristallo oppure un effetto di incidenza obliqua dei raggi periferici, che percorrono un cammino ottico maggiore nel materiale birifrangente. La rumorosit\`a delle mappe aumenta progressivamente dal canale rosso al canale blu, coerentemente con la maggiore correzione cromatica applicata al segnale di $S_3$ e con il minor rapporto segnale-rumore disponibile a lunghezze d'onda lontane dalla $\lambda_0$ della lamina $\lambda/4$ di misura.
+La lamina quarto d'onda zero-order ($\lambda_0 = \SI{633}{\nano\meter}$), orientata a circa \SI{50}{\degree}, è stata analizzata sui tre canali colore. Le mappe di ritardanza presentano una struttura a due zone concentriche: un cerchio interno con ritardanza prossima alla saturazione della scala e un anello esterno con ritardanza inferiore. Questa non-uniformità radiale non è attesa per una lamina ideale; le cause probabili sono una variazione spaziale dello spessore del cristallo oppure un effetto di incidenza obliqua dei raggi periferici. La rumorosità delle mappe aumenta progressivamente dal canale rosso al canale blu, coerentemente con la maggiore correzione cromatica applicata al segnale di $S_3$ e con il minor rapporto segnale-rumore a lunghezze d'onda lontane da $\lambda_0$.
 
 \begin{figure}[htbp]
     \centering
     \fbox{\parbox{0.85\textwidth}{\centering\vspace{2cm}Figura: Mappe di ritardanza $\delta$ della lamina $\lambda/4$ per i tre canali colore.\vspace{2cm}}}
-    \caption{Mappe di ritardanza della lamina $\lambda/4$ zero-order sui canali rosso, verde e blu. Si osserva la struttura a due zone concentriche e l'aumento della rumorosit\`a verso il blu.}
+    \caption{Mappe di ritardanza della lamina $\lambda/4$ zero-order sui canali rosso, verde e blu. Si osserva la struttura a due zone concentriche e l'aumento della rumorosità verso il blu.}
     \label{fig:qw_retardance}
 \end{figure}
 
@@ -67,26 +55,12 @@ I valori misurati sono sistematicamente inferiori al teorico di $2$--$\SI{5}{\de
 \subsection{Lamina \texorpdfstring{$\lambda/2$}{lambda/2} zero-order}
 \label{subsec:risultati_hw}
 
-La lamina mezz'onda zero-order ($\lambda_0 = \SI{633}{\nano\meter}$), orientata a circa \SI{50}{\degree}, \`e stata analizzata con la stessa procedura.
-
-\subsubsection{Ripiegamento della ritardanza oltre \texorpdfstring{$180^\circ$}{180°}}
-\label{subsubsec:phase_wrapping}
-
-Un aspetto rilevante emerge dall'analisi multicanale delle lamine d'onda. Come discusso nella \cref{subsec:calcolo_ritardanza}, la ritardanza viene estratta tramite la funzione $\arccos$, il cui codominio \`e limitato all'intervallo $[0^\circ, 180^\circ]$. Per campioni la cui ritardanza reale non supera $180^\circ$ (come una lamina $\lambda/4$ analizzata a qualsiasi lunghezza d'onda visibile), questo non comporta alcuna ambiguit\`a.
-
-Il problema si manifesta con la lamina $\lambda/2$ analizzata a lunghezze d'onda inferiori a quella di progetto. Per una lamina zero-order calibrata a $\lambda_0 = \SI{633}{\nano\meter}$ con ritardanza nominale $\delta_0 = 180^\circ$, la ritardanza a una generica lunghezza d'onda scala come:
+La lamina mezz'onda zero-order ($\lambda_0 = \SI{633}{\nano\meter}$), orientata a circa \SI{50}{\degree}, è stata analizzata con la stessa procedura. Un aspetto rilevante emerge dall'analisi multicanale: la ritardanza viene estratta tramite la funzione $\arccos$, il cui codominio è limitato all'intervallo $[0^\circ, 180^\circ]$. Per la lamina $\lambda/2$ analizzata a lunghezze d'onda inferiori a quella di progetto, la ritardanza reale supera $180^\circ$ --- per il canale verde ($\lambda_\mathrm{eff} \approx \SI{536}{\nano\meter}$) e blu ($\lambda_\mathrm{eff} \approx \SI{466}{\nano\meter}$) si ottengono rispettivamente $\delta \approx 213^\circ$ e $\delta \approx 245^\circ$. In questo caso, poiché $\cos(\delta) = \cos(360^\circ - \delta)$, la funzione $\arccos$ restituisce il valore complementare:
 \begin{equation}
-    \delta(\lambda) = \delta_0 \cdot \frac{\lambda_0}{\lambda}
-    \label{eq:dispersione_ritardanza}
-\end{equation}
-Per i canali verde ($\lambda_\mathrm{eff} \approx \SI{536}{\nano\meter}$) e blu ($\lambda_\mathrm{eff} \approx \SI{466}{\nano\meter}$), si ottengono rispettivamente $\delta \approx 213^\circ$ e $\delta \approx 245^\circ$, entrambi superiori a $180^\circ$. In questo caso, poich\'e $\cos(\delta) = \cos(360^\circ - \delta)$, la funzione $\arccos$ restituisce il valore complementare:
-\begin{equation}
-    \delta_\mathrm{misurato} = 360^\circ - \delta_\mathrm{reale}
+    \delta_\mathrm{misurato} = 360^\circ - \delta_\mathrm{reale}.
     \label{eq:phase_folding}
 \end{equation}
-Questo fenomeno di \emph{phase wrapping} (o ripiegamento) \`e una conseguenza matematica inevitabile dell'uso di $\arccos$ e non rappresenta un errore di misura. La correzione \`e immediata una volta noto il regime di ritardanza del campione: i valori $\delta_\mathrm{reale} = 360^\circ - \delta_\mathrm{misurato}$ restituiscono la curva di dispersione monotona attesa dall'\cref{eq:dispersione_ritardanza}.
-
-La \cref{tab:wrapping_hw} riporta i valori misurati e corretti per la lamina $\lambda/2$ sui tre canali colore, confrontati con la previsione teorica.
+Questo fenomeno di \emph{phase wrapping} è una conseguenza matematica inevitabile dell'uso di $\arccos$, non un errore di misura. La correzione è immediata una volta noto il regime di ritardanza del campione.
 
 \begin{table}[htbp]
     \centering
@@ -103,12 +77,18 @@ La \cref{tab:wrapping_hw} riporta i valori misurati e corretti per la lamina $\l
     \end{tabular}
 \end{table}
 
-L'accordo tra i valori corretti e quelli teorici conferma sia la validit\`a della correzione sia la coerenza della risposta del polarimetro sui tre canali spettrali. Un fit della forma $\delta = \delta_0 \cdot \lambda_0 / \lambda$ sui valori corretti restituisce $R^2 = 0.989$.
+L'accordo tra i valori corretti e quelli teorici conferma sia la validità della correzione sia la coerenza della risposta del polarimetro sui tre canali spettrali. Un fit della forma $\delta = \delta_0 \cdot \lambda_0 / \lambda$ sui valori corretti restituisce $R^2 = 0.989$.
+
+% ---------------------------------------------------------------------------
+\section{Linearità e risoluzione spaziale: nastro adesivo}
+\label{sec:risultati_nastro}
+
+Le lamine d'onda, con ritardanza uniforme e nota, hanno confermato l'accuratezza puntuale della ricostruzione. Il campione seguente è stato scelto per verificare una proprietà diversa: la capacità del sistema di distinguere regioni con ritardanza crescente e di mantenere la linearità della risposta.
 
 \subsection{Nastro adesivo stratificato}
 \label{subsec:nastro_adesivo}
 
-Il campione consiste in un vetrino con strati sovrapposti di nastro adesivo trasparente in configurazione simmetrica $1$-$2$-$3$-$4$-$5$-$4$-$3$-$2$-$1$. La simmetria del campione \`e sfruttata come controllo interno di consistenza: i valori di ritardanza misurati nelle regioni sinistra e destra con lo stesso numero di strati concordano entro $\pm\SI{10}{\degree}$ su tutti i canali, confermando l'uniformit\`a degli strati e la correttezza dell'allineamento del reference frame.
+Il campione consiste in un vetrino con strati sovrapposti di nastro adesivo in configurazione simmetrica $1$-$2$-$3$-$4$-$5$-$4$-$3$-$2$-$1$. La simmetria è sfruttata come controllo interno di consistenza: i valori di ritardanza nelle regioni sinistra e destra con lo stesso numero di strati concordano entro $\pm\SI{10}{\degree}$ su tutti i canali.
 
 \begin{figure}[htbp]
     \centering
@@ -117,17 +97,7 @@ Il campione consiste in un vetrino con strati sovrapposti di nastro adesivo tras
     \label{fig:nastro_retardance}
 \end{figure}
 
-\subsubsection{Risoluzione dell'ambiguit\`a: \texorpdfstring{$120^\circ$}{120} o \texorpdfstring{$240^\circ$}{240} per strato?}
-\label{subsubsec:ambiguita_nastro}
-
-Il canale rosso mostra un pattern ciclico con periodo 3~strati: la ritardanza misurata si annulla per $N = 3$, torna a circa $\SI{120}{\degree}$ per $N = 4$ e $N = 5$. Questo comportamento \`e compatibile con due valori di ritardanza per singolo strato: $\delta_\mathrm{singolo} = \SI{120}{\degree}$ oppure $\SI{240}{\degree}$, poich\'e in entrambi i casi il prodotto $3 \cdot \delta_\mathrm{singolo}$ \`e un multiplo di $\SI{360}{\degree}$ e quindi $\arccos(\cos(3\delta_\mathrm{singolo})) = 0$.
-
-L'ambiguit\`a viene risolta dal canale verde: con $\delta_\mathrm{singolo} = \SI{120}{\degree}$ al rosso, lo scaling cromatico $1/\lambda$ prevedrebbe circa $\SI{140}{\degree}$/strato al verde, incompatibile con i dati misurati. Con $\delta_\mathrm{singolo} = \SI{240}{\degree}$, lo scaling prevede circa $\SI{280}{\degree}$/strato al verde, in accordo con le misure. La soluzione corretta \`e quindi $\delta_\mathrm{singolo} \approx \SI{240}{\degree}$/strato a $\SI{626}{\nano\meter}$.
-
-\subsubsection{Phase wrapping multistrato}
-\label{subsubsec:wrapping_nastro}
-
-La ritardanza vera cresce linearmente con il numero di strati: $\delta_\mathrm{vero}(N) = N \cdot \delta_\mathrm{singolo}$. Il polarimetro misura $\arccos(\cos(\delta_\mathrm{vero} \bmod 360^\circ))$, con il segno assegnato da $S_3$. La \cref{tab:nastro_rosso,tab:nastro_verde} riportano il confronto tra i valori attesi e misurati per i canali rosso e verde.
+Il canale rosso mostra un pattern ciclico con periodo 3~strati: la ritardanza si annulla per $N = 3$, torna a circa $\SI{120}{\degree}$ per $N = 4$ e $N = 5$. Questo comportamento è compatibile con due valori di ritardanza per singolo strato: $\delta_\mathrm{singolo} = \SI{120}{\degree}$ oppure $\SI{240}{\degree}$. L'ambiguità viene risolta dal canale verde: con $\delta_\mathrm{singolo} = \SI{240}{\degree}$, lo scaling cromatico $1/\lambda$ prevede circa $\SI{280}{\degree}$/strato al verde, in accordo con le misure; la soluzione $\SI{120}{\degree}$ è incompatibile. La ritardanza per singolo strato è quindi $\delta_\mathrm{singolo} \approx \SI{240}{\degree}$ a $\SI{626}{\nano\meter}$.
 
 \begin{table}[htbp]
     \centering
@@ -163,12 +133,7 @@ La ritardanza vera cresce linearmente con il numero di strati: $\delta_\mathrm{v
     \end{tabular}
 \end{table}
 
-L'accordo tra modello e dati \`e buono su entrambi i canali, con scarti tipici dell'ordine di $\SI{10}{\degree}$--$\SI{15}{\degree}$. Si osservano instabilit\`a di segno per le configurazioni in cui $\delta_\mathrm{vero} \bmod 360^\circ$ cade in prossimit\`a di $\SI{180}{\degree}$ (canale verde a $N = 2$, canale blu a $N = 4$): in queste condizioni, l'assegnazione del segno tramite $S_3 \cdot \sin(2\alpha)$ diverge, causando oscillazioni tra $+\delta$ e $-\delta$ che non sono difetti del sistema ma conseguenze matematiche della procedura.
-
-\subsubsection{Dispersione cromatica della birifrangenza}
-\label{subsubsec:dispersione_nastro}
-
-La \cref{tab:nastro_singolo} riassume la ritardanza per singolo strato sui tre canali.
+L'accordo tra modello e dati è buono su entrambi i canali, con scarti tipici dell'ordine di $\SI{10}{\degree}$--$\SI{15}{\degree}$. La \cref{tab:nastro_singolo} riassume la ritardanza per singolo strato sui tre canali: il rapporto $\delta_\mathrm{blu}/\delta_\mathrm{rosso} = 305/240 = 1.27$ è inferiore al rapporto geometrico $\lambda_\mathrm{rosso}/\lambda_\mathrm{blu} = 626/466 = 1.34$, quantificando la riduzione della birifrangenza $\Delta n$ nel blu coerente con la dispersione normale dei polimeri.
 
 \begin{table}[htbp]
     \centering
@@ -185,25 +150,25 @@ La \cref{tab:nastro_singolo} riassume la ritardanza per singolo strato sui tre c
     \end{tabular}
 \end{table}
 
-Il rapporto $\delta_\mathrm{blu}/\delta_\mathrm{rosso} = 305/240 = 1.27$ \`e inferiore al rapporto geometrico $\lambda_\mathrm{rosso}/\lambda_\mathrm{blu} = 626/466 = 1.34$. La differenza del $5$--$6\%$ quantifica la riduzione della birifrangenza $\Delta n$ nel blu, coerente con la dispersione normale dei polimeri. Il modello corretto per la ritardanza non \`e quindi $\delta \propto 1/\lambda$ ma $\delta \propto \Delta n(\lambda)/\lambda$, dove la birifrangenza stessa dipende dalla lunghezza d'onda.
+% ---------------------------------------------------------------------------
+\section{Versatilità del sistema}
+\label{sec:risultati_versatilita}
 
-Assumendo uno spessore per strato $d \approx \SI{50}{\micro\meter}$, dalla relazione $\delta = 2\pi \Delta n \cdot d / \lambda$ si stima per il canale rosso $\Delta n \approx 0.008$, valore plausibile per un film polimerico orientato.
+Dopo aver verificato che il polarimetro produce mappe coerenti per campioni birifrangenti, si passa a fenomeni fisicamente distinti per dimostrare la generalità del metodo.
 
 \subsection{Soluzione di saccarosio}
 \label{subsec:soluzione_zucchero}
 
-La mappa dell'AoLP sul canale blu mostra chiaramente l'effetto dell'attivit\`a ottica: la regione esterna alla boccetta \`e a $\sim\SI{0}{\degree}$ per costruzione (allineamento del reference frame), mentre l'interno della soluzione presenta una rotazione positiva uniforme, visibile come area calda nella colormap. All'interno della boccetta si distingue la cannuccia in plastica usata per la preparazione: essendo prodotta per stampaggio a iniezione, presenta birifrangenza da stress propria che si sovrappone al segnale dell'attivit\`a ottica e produce variazioni locali di AoLP.
+L'attività ottica agisce su $S_1$ e $S_2$ senza coinvolgere $S_3$, producendo una rotazione uniforme dell'AoLP. La mappa sul canale blu mostra chiaramente questo effetto: la regione esterna alla boccetta è a $\sim\SI{0}{\degree}$ per costruzione, mentre l'interno della soluzione presenta una rotazione positiva uniforme. All'interno della boccetta si distingue la cannuccia in plastica usata per la preparazione, che produce variazioni locali di AoLP per birifrangenza da stress propria.
 
 \begin{figure}[htbp]
     \centering
     \fbox{\parbox{0.85\textwidth}{\centering\vspace{2cm}Figura: Mappa AoLP (canale blu) per la soluzione di saccarosio.\vspace{2cm}}}
-    \caption{Angolo di polarizzazione lineare (AoLP) per la soluzione di saccarosio, canale blu. La differenza rispetto al valore di sfondo ($\SI{0}{\degree}$) corrisponde alla rotazione ottica indotta dall'attivit\`a ottica del saccarosio destrogiro.}
+    \caption{Angolo di polarizzazione lineare (AoLP) per la soluzione di saccarosio, canale blu. La differenza rispetto al valore di sfondo ($\SI{0}{\degree}$) corrisponde alla rotazione ottica indotta dall'attività ottica del saccarosio destrogiro.}
     \label{fig:zucchero_aolp}
 \end{figure}
 
-\subsubsection{Rotazione misurata e dispersione rotatoria}
-
-La \cref{tab:saccarosio_ord} riporta la rotazione ottica misurata sui tre canali colore, calcolata come differenza tra l'AoLP mediano nella regione della soluzione e quello dello sfondo. La rotazione aumenta al diminuire di $\lambda$, coerentemente con la dispersione rotatoria ottica (ORD) del saccarosio destrogiro.
+La \cref{tab:saccarosio_ord} riporta la rotazione ottica misurata sui tre canali colore. La rotazione aumenta al diminuire di $\lambda$, coerentemente con la dispersione rotatoria ottica del saccarosio destrogiro.
 
 \begin{table}[htbp]
     \centering
@@ -220,38 +185,12 @@ La \cref{tab:saccarosio_ord} riporta la rotazione ottica misurata sui tre canali
     \end{tabular}
 \end{table}
 
-Un fit con il modello di Drude semplificato $\alpha_\mathrm{rot} = a/\lambda^2$ restituisce:
-\begin{equation}
-    a = \SI{1420554}{\nano\meter\squared\degree}, \qquad R^2 = 0.986.
-    \label{eq:fit_drude}
-\end{equation}
-Con soli tre punti il fit \`e formalmente quasi esatto, ma la consistenza fisica \`e solida: l'andamento \`e monotono e nella direzione attesa dalla teoria della dispersione rotatoria.
-
-\subsubsection{Stima ottica della concentrazione}
-
-Combinando la legge di Biot (\cref{eq:biot}) con il modello di Drude per il potere rotatorio specifico (\cref{eq:drude-ord}), la rotazione attesa si esprime come:
-\begin{equation}
-    \alpha_\mathrm{rot}(\lambda) = [\alpha]_D \cdot \frac{\lambda_D^2}{\lambda^2} \cdot c \cdot l = \frac{[\alpha]_D \cdot \lambda_D^2 \cdot c \cdot l}{\lambda^2}
-    \label{eq:drude_biot}
-\end{equation}
-Confrontando con il fit $\alpha_\mathrm{rot} = a/\lambda^2$, si identifica $a = [\alpha]_D \cdot \lambda_D^2 \cdot c \cdot l$, da cui si ricava la concentrazione:
-\begin{equation}
-    c_\mathrm{ott} = \frac{a}{[\alpha]_D \cdot \lambda_D^2 \cdot l}
-    \label{eq:concentrazione_ottica}
-\end{equation}
-Sostituendo i valori noti ($[\alpha]_D = \SI{66.47}{\degree/(dm \cdot g/ml)}$, $\lambda_D = \SI{589.3}{\nano\meter}$, $l = \SI{0.13}{\deci\meter}$):
-\begin{equation}
-    c_\mathrm{ott} = \frac{\num{1420554}}{66.47 \times 589.3^2 \times 0.13} \approx \SI{0.47}{\gram\per\milli\liter}
-    \label{eq:c_ott_risultato}
-\end{equation}
-Questo valore \`e significativamente inferiore alla concentrazione gravimetrica $c_\mathrm{grav} \approx \SI{1.22}{\gram\per\milli\liter}$. La discrepanza di un fattore ${\sim}2.6$ merita un'analisi. La causa pi\`u probabile \`e la non applicabilit\`a del modello di Drude semplificato a concentrazioni cos\`i elevate: la soluzione preparata \`e prossima alla saturazione (${\sim}67\%$ in peso), regime in cui la relazione lineare tra rotazione e concentrazione (\cref{eq:biot}) perde validit\`a e il potere rotatorio specifico $[\alpha]$ diminuisce apprezzabilmente rispetto al valore tabulato per soluzioni diluite. Un contributo secondario potrebbe derivare dal cammino ottico attraverso le pareti in vetro della boccetta (${\sim}\SI{2}{\milli\meter}$ di vetro borosilicato), che non \`e otticamente attivo ma introduce una ritardanza da stress residuo che potrebbe interferire con la misura dell'AoLP. Nonostante la discrepanza quantitativa, la misura conferma la capacit\`a del sistema di rilevare l'attivit\`a ottica e di riprodurre la legge di dispersione rotatoria.
+Un fit con il modello di Drude semplificato $\alpha_\mathrm{rot} = a/\lambda^2$ restituisce $a = \SI{1420554}{\nano\meter\squared\degree}$ con $R^2 = 0.986$. La concentrazione ottica ricavata combinando la legge di Biot con il modello di Drude risulta $c_\mathrm{ott} \approx \SI{0.47}{\gram\per\milli\liter}$, significativamente inferiore alla concentrazione gravimetrica $c_\mathrm{grav} \approx \SI{1.22}{\gram\per\milli\liter}$. La discrepanza di un fattore ${\sim}2.6$ è attribuibile alla non applicabilità del modello di Drude semplificato a concentrazioni prossime alla saturazione, dove il potere rotatorio specifico $[\alpha]$ diminuisce apprezzabilmente rispetto al valore tabulato per soluzioni diluite. Nonostante la discrepanza quantitativa, la misura conferma la capacità del sistema di rilevare l'attività ottica e di riprodurre la legge di dispersione rotatoria.
 
 \subsection{Righello in plastica trasparente}
 \label{subsec:risultati_righello}
 
-Il righello in materiale polimerico trasparente \`e stato analizzato sul canale rosso con valutazione puramente qualitativa. Il campione \`e chiaramente visibile nella mappa di $S_0$ come regione a minor trasmittanza rispetto allo sfondo; il segnale polarimetrico \`e pulito e privo di artefatti rilevanti di intensit\`a.
-
-Le mappe di $S_1$ e $S_2$ mostrano un pattern a striature alternate (valori positivi e negativi) all'interno del righello, con orientazioni leggermente diverse tra i due parametri, coerente con la rotazione dell'asse delle tensioni principali lungo il corpo del campione. Le frange sono le isocrome tipiche di un materiale birifrangente sotto stress residuo di stampaggio.
+Il righello in materiale polimerico trasparente è stato analizzato sul canale rosso. Le mappe di $S_1$ e $S_2$ mostrano un pattern a striature alternate all'interno del righello, coerente con la rotazione dell'asse delle tensioni principali lungo il corpo del campione. Il DoLP è il parametro più leggibile: le bande scure ($\mathrm{DoLP} \approx 0$) corrispondono ai punti in cui la ritardanza è un multiplo intero di $\pi$. La frequenza spaziale delle frange aumenta verso la sommità del righello, coerentemente con la concentrazione degli sforzi residui in prossimità del punto di iniezione dello stampaggio.
 
 \begin{figure}[htbp]
     \centering
@@ -260,14 +199,10 @@ Le mappe di $S_1$ e $S_2$ mostrano un pattern a striature alternate (valori posi
     \label{fig:righello_stokes}
 \end{figure}
 
-Il DoLP \`e il parametro pi\`u leggibile: le bande scure ($\mathrm{DoLP} \approx 0$) corrispondono ai punti in cui la ritardanza \`e un multiplo intero di $\pi$. La frequenza spaziale delle frange aumenta verso la sommit\`a del righello, coerentemente con la concentrazione degli sforzi residui in prossimit\`a del punto di iniezione dello stampaggio.
-
-La mappa di $S_3$ mostra le frange sovrapposte al pattern circolare della lamina $\lambda/4$. L'AoLP \`e quasi uniformemente a $\SI{0}{\degree}$ nella regione di sfondo, mentre varia bruscamente all'interno del righello in corrispondenza delle frange, segnalando la rotazione locale delle direzioni principali di tensione (isocline).
-
 \subsection{Trave a sbalzo}
 \label{subsec:risultati_cantilever}
 
-La trave in materiale trasparente, vincolata a un'estremit\`a, \`e stata analizzata sul canale rosso in due condizioni: scarica e sotto carico.
+La trave in materiale trasparente è stata analizzata sul canale rosso in due condizioni: scarica e sotto carico.
 
 \begin{figure}[htbp]
     \centering
@@ -276,40 +211,21 @@ La trave in materiale trasparente, vincolata a un'estremit\`a, \`e stata analizz
     \label{fig:cantilever_s3}
 \end{figure}
 
-\textbf{Sotto carico.} L'interno della trave mostra un segnale $S_3$ positivo significativo e uniforme lungo tutto il corpo. In prossimit\`a del vincolo si osservano variazioni brusche e frange che cambiano segno rapidamente, coerenti con la concentrazione degli sforzi alla base del cantilever. La comparsa di $S_3$ finito indica che la birifrangenza indotta dallo stress converte parte della polarizzazione lineare in componente circolare, effetto atteso per un ritardatore con asse a $\SI{45}{\degree}$ rispetto alla polarizzazione incidente.
-
-\textbf{Senza carico.} La trave appare quasi neutra, con segnale $S_3$ residuo compatibile con tensioni di stampaggio preesistenti o con il rumore del sensore. La distribuzione spaziale del segnale \`e assente, confermando che l'effetto osservato sotto carico \`e genuinamente legato allo stress applicato.
-
-Il gradiente di sfondo presente in entrambe le immagini (angolo superiore sinistro verso inferiore destro) \`e un artefatto sistematico, attribuibile a non-uniformit\`a spaziale della lamina $\lambda/4$ o del display LCD, non al campione.
+Sotto carico, l'interno della trave mostra un segnale $S_3$ positivo significativo e uniforme lungo tutto il corpo; in prossimità del vincolo si osservano variazioni brusche e frange che cambiano segno rapidamente, coerenti con la concentrazione degli sforzi alla base. La comparsa di $S_3$ finito indica che la birifrangenza indotta dallo stress converte parte della polarizzazione lineare in componente circolare, effetto atteso per un ritardatore con asse a $\SI{45}{\degree}$ rispetto alla polarizzazione incidente. Senza carico, la trave appare quasi neutra, con segnale $S_3$ residuo compatibile con tensioni di stampaggio preesistenti o con il rumore del sensore. Il gradiente di sfondo presente in entrambe le immagini è un artefatto sistematico attribuibile a non-uniformità spaziale della lamina $\lambda/4$ o del display LCD, non al campione.
 
 % ---------------------------------------------------------------------------
 \section{Discussione}
 \label{sec:discussione}
 
-\subsection{Capacit\`a del metodo}
-\label{subsec:capacita}
+I risultati presentati nelle sezioni precedenti dimostrano che il sistema è in grado di ricostruire il vettore di Stokes completo con risoluzione spaziale bidimensionale, di misurare ritardanza e asse veloce su campioni macroscopici, e di distinguere fenomeni polarimetrici di natura diversa --- birifrangenza, attività ottica, fotoelasticità --- con un apparato il cui costo complessivo, escluso lo smartphone, è inferiore a 100\,\texteuro.
 
-I risultati dimostrano che il sistema ricostruisce il vettore di Stokes completo con risoluzione spaziale bidimensionale, misura ritardanza e asse veloce su campioni macroscopici, e distingue fenomeni polarimetrici di natura diversa. L'apparato produce mappe fisicamente interpretabili con un costo complessivo inferiore a quello di un singolo componente ottico di precisione di un polarimetro convenzionale.
+Il principale compromesso è introdotto dal downsampling: con fattori tipici tra 10 e 20, la risoluzione scende da 12 megapixel a $10^4$--$10^5$ pixel, rendendo irrisolvibili strutture più piccole di qualche centinaio di micrometri. Per i campioni macroscopici analizzati questa limitazione non è stata rilevante, ma applicazioni su scala microscopica richiederebbero un'elaborazione a blocchi o su GPU.
 
-\subsection{Effetto del downsampling}
-\label{subsec:effetto_downsampling}
+Un secondo limite è l'approssimazione monocromatica: l'assegnazione di una singola lunghezza d'onda effettiva a ciascun canale colore ignora la larghezza di banda dei filtri Bayer, che si estende su diverse decine di nanometri. Per campioni con forte dispersione, la misura rappresenta una media pesata sulla banda; una caratterizzazione più fine richiederebbe filtri passa-banda stretti o una sorgente monocromatica.
 
-Il fattore di downsampling $f$, scelto tipicamente tra 10 e 20 a seconda del campione, riduce la risoluzione spaziale da circa $12$~megapixel a un ordine di $10^4$--$10^5$~pixel. Strutture con dimensioni caratteristiche inferiori a $f$~pixel nativi non sono risolvibili. Per i campioni macroscopici analizzati, questa limitazione non ha impedito l'osservazione delle strutture di interesse. Un fattore di downsampling inferiore consentirebbe maggior dettaglio spaziale a costo di tempi di calcolo significativamente superiori. % TODO: riportare il valore di f usato per ciascun campione
+La sensibilità alla calibrazione della lamina $\lambda/4$ è un terzo fattore: la correzione cromatica $1/\sin\delta(\lambda)$ assume un modello di dispersione lineare che diventa meno accurato allontanandosi da $\lambda_0 = \SI{633}{\nano\meter}$. Questo spiega la scelta del canale rosso come canale predefinito per l'analisi.
 
-\subsection{Approssimazione monocromatica}
-\label{subsec:approssimazione_mono}
-
-L'assegnazione di una singola lunghezza d'onda effettiva a ciascun canale colore \`e un'approssimazione: il segnale reale integra la risposta del campione su una banda spettrale di diverse decine di nanometri. Per campioni con dispersione cromatica della birifrangenza (ritardanza dipendente da $\lambda$), la misura rappresenta una media pesata sulla banda del canale. Il metodo del baricentro con soglia attenua questo effetto, ma non lo elimina. Una caratterizzazione pi\`u accurata richiederebbe l'uso di filtri passa-banda stretti o di una sorgente monocromatica.
-
-\subsection{Sensibilit\`a alla calibrazione della lamina \texorpdfstring{$\lambda/4$}{lambda/4}}
-\label{subsec:sensibilita_calibrazione}
-
-La correzione $1/\sin\delta(\lambda)$ per la dispersione della lamina quarto d'onda assume un modello di dispersione lineare (\cref{eq:dispersione_lamina}). Per il canale rosso, il fattore correttivo \`e modesto (circa il $5\%$); per il canale blu, dove $\lambda$ si discosta maggiormente da $\lambda_0 = \SI{633}{\nano\meter}$, la correzione diventa pi\`u significativa e l'approssimazione meno accurata. L'uso del canale rosso come canale predefinito per l'analisi \`e motivato anche da questa considerazione.
-
-\subsection{Confronto con approcci tradizionali}
-\label{subsec:confronto}
-
-Rispetto ai polarimetri di laboratorio convenzionali, il sistema proposto presenta vantaggi in termini di costo, portabilit\`a e accessibilit\`a, a fronte di limitazioni in accuratezza, risoluzione spettrale e ripetibilit\`a. La \cref{tab:confronto} riassume il confronto.
+Rispetto ai polarimetri di laboratorio convenzionali, il sistema scambia accuratezza assoluta e risoluzione spettrale con costo, portabilità e accessibilità (\cref{tab:confronto}). È particolarmente adatto a contesti didattici e a misure esplorative, dove la rapidità di setup e il basso costo compensano le limitazioni in precisione.
 
 \begin{table}[htbp]
     \centering
@@ -320,13 +236,11 @@ Rispetto ai polarimetri di laboratorio convenzionali, il sistema proposto presen
         \textbf{Caratteristica} & \textbf{Sistema proposto} & \textbf{Laboratorio} \\
         \hline
         Costo & $<$ 100\,\texteuro\ (escluso smartphone) & $>$ 10\,000\,\texteuro \\
-        Portabilit\`a & Elevata (tascabile) & Limitata (banco ottico) \\
+        Portabilità & Elevata (tascabile) & Limitata (banco ottico) \\
         Risoluzione spaziale & $\sim 10^4$--$10^5$~px (post-binning) & Variabile (CCD/CMOS dedicato) \\
         Risoluzione spettrale & Banda larga (filtro Bayer) & Monocromatica o iperspettrale \\
-        Misura di $S_3$ & S\`i (con lamina $\lambda/4$ esterna) & S\`i \\
+        Misura di $S_3$ & Sì (con lamina $\lambda/4$ esterna) & Sì \\
         Automazione & Manuale (rotazione analizzatore) & Motorizzata \\
         \hline
     \end{tabularx}
 \end{table}
-
-Il sistema \`e particolarmente adatto a contesti didattici e a misure esplorative, dove la rapidit\`a di setup e il basso costo compensano le limitazioni in precisione assoluta.

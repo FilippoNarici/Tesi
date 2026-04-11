@@ -1,221 +1,122 @@
 % Capitolo 5: Analisi dei dati
-% Autore: analista
 
-In questo capitolo si descrive in dettaglio la pipeline di elaborazione sviluppata per ricostruire i parametri di Stokes e le grandezze polarimetriche derivate a partire dalle immagini RAW acquisite con lo smartphone. L'intera catena di analisi \`e stata implementata in Python, sfruttando le librerie \texttt{numpy}, \texttt{rawpy} e \texttt{scipy}.
+Le 38 immagini RAW acquisite per ogni campione vengono elaborate in sequenza per ricavare i parametri di Stokes e le grandezze polarimetriche derivate. L'intera catena di analisi è stata implementata in Python, sfruttando le librerie \texttt{numpy}, \texttt{rawpy} e \texttt{scipy}.
 
 % ---------------------------------------------------------------------------
-\section{Pre-elaborazione delle immagini RAW}
+\section{Dalla immagine grezza alla matrice di intensità}
 \label{sec:preelaborazione}
 
-Il primo passo della pipeline consiste nel caricamento di ciascun file DNG e nella conversione in matrice numerica. La demosaicizzazione viene eseguita tramite \texttt{rawpy} con bilanciamento del bianco della fotocamera e curva di trasferimento lineare, producendo un array $H \times W \times 3$ in RGB a 16~bit. Si estrae poi il singolo canale colore di interesse come matrice $H \times W$ in virgola mobile a 32~bit.
+Il primo passo consiste nel caricamento di ciascun file DNG e nella conversione in matrice numerica. La demosaicizzazione viene eseguita tramite \texttt{rawpy} con bilanciamento del bianco della fotocamera e curva di trasferimento lineare, producendo un array $H \times W \times 3$ in RGB a 16~bit. Si estrae poi il singolo canale colore di interesse come matrice $H \times W$ in virgola mobile a 32~bit.
 
-\subsection{Downsampling}
+\subsection{Riduzione della risoluzione spaziale}
 \label{subsec:downsampling}
 
-Le immagini del sensore hanno una risoluzione nativa dell'ordine di $4000 \times 3000$~pixel. Poich\'e la pipeline richiede l'elaborazione simultanea di 36 immagini per la ricostruzione dei parametri di Stokes lineari, pi\`u ulteriori immagini per $S_3$, il carico computazionale e il consumo di memoria risulterebbero proibitivi senza una riduzione della risoluzione.
-
-Si applica pertanto un downsampling con fattore $f$ configurabile: l'immagine viene suddivisa in blocchi non sovrapposti di $f \times f$~pixel, e ciascun blocco viene sostituito dal valore medio delle intensit\`a contenute. Prima della suddivisione, le dimensioni dell'immagine vengono ritagliate al pi\`u grande multiplo di $f$, in modo da garantire blocchi uniformi. Il fattore viene scelto di volta in volta in base al compromesso tra risoluzione spaziale e sostenibilit\`a computazionale: valori tipici sono compresi tra $f = 10$ e $f = 20$, corrispondenti a risoluzioni risultanti dell'ordine di $400 \times 300$ e $200 \times 150$~pixel rispettivamente. % TODO: fissare il valore definitivo di f usato per le figure in tesi
-
-Il trade-off introdotto dal downsampling \`e la perdita di dettagli spaziali fini: strutture con dimensioni inferiori a $f$~pixel nativi non sono risolvibili. Tuttavia, per i campioni macroscopici utilizzati in questo lavoro (lamine d'onda, nastro adesivo, provini fotoelastici), questa risoluzione \`e ampiamente adeguata.
+Le immagini del sensore hanno una risoluzione nativa dell'ordine di $4000 \times 3000$~pixel. Poiché l'elaborazione richiede lo stack simultaneo di 38 immagini, si applica un downsampling con fattore $f$ configurabile: l'immagine viene suddivisa in blocchi non sovrapposti di $f \times f$~pixel, ciascuno sostituito dal valor medio delle intensità contenute. Valori tipici sono $f = 10$--$20$, corrispondenti a risoluzioni risultanti dell'ordine di $400 \times 300$ e $200 \times 150$~pixel rispettivamente. Il compromesso introdotto è la perdita di dettagli spaziali fini, irrilevante per i campioni macroscopici analizzati in questo lavoro.
 
 % ---------------------------------------------------------------------------
-\section{Stima delle lunghezze d'onda centroide RGB}
+\section{Lunghezze d'onda effettive dei canali colore}
 \label{sec:centroide}
 
-Il sensore CMOS non \`e un rivelatore monocromatico: ciascun canale colore (R, G, B) ha una risposta spettrale estesa su un intervallo di diverse decine di nanometri. Poich\'e la ritardanza introdotta dalla lamina quarto d'onda dipende dalla lunghezza d'onda (si veda la \cref{sec:misura_s3}), \`e necessario assegnare a ciascun canale una lunghezza d'onda effettiva rappresentativa.
+Il sensore CMOS non è un rivelatore monocromatico: ciascun canale colore ha una risposta spettrale estesa su diverse decine di nanometri. Poiché la ritardanza introdotta dalla lamina quarto d'onda dipende dalla lunghezza d'onda (\cref{sec:determinazione-s3}), è necessario assegnare a ciascun canale una lunghezza d'onda effettiva rappresentativa.
 
-Il metodo adottato \`e il \emph{baricentro con soglia} (thresholded centroid). Dati lo spettro di emissione della sorgente $I(\lambda)$ e la sensibilit\`a spettrale del canale $S_c(\lambda)$, il segnale effettivo registrato dal canale $c$ \`e:
+Il metodo adottato è il baricentro con soglia. Dati lo spettro di emissione della sorgente $I(\lambda)$ e la sensibilità spettrale del canale $S_c(\lambda)$, il segnale effettivo registrato è $E_c(\lambda) = S_c(\lambda) \cdot I(\lambda)$. La lunghezza d'onda centroide si calcola come media pesata, dopo aver applicato una soglia al $30\%$ del valore di picco per escludere le code a bassa intensità:
 \begin{equation}
-    E_c(\lambda) = S_c(\lambda) \cdot I(\lambda)
-    \label{eq:segnale_effettivo}
-\end{equation}
-La lunghezza d'onda centroide si calcola come media pesata, dopo aver applicato una soglia al $30\%$ del valore di picco per escludere le code a bassa intensit\`a:
-\begin{equation}
-    \lambda_{\mathrm{eff},c} = \frac{\displaystyle\sum_{\lambda:\,E_c(\lambda) \geq 0.3\,E_c^{\max}} \lambda \cdot E_c(\lambda)}{\displaystyle\sum_{\lambda:\,E_c(\lambda) \geq 0.3\,E_c^{\max}} E_c(\lambda)}
+    \lambda_{\mathrm{eff},c} = \frac{\displaystyle\sum_{\lambda:\,E_c(\lambda) \geq 0.3\,E_c^{\max}} \lambda \cdot E_c(\lambda)}{\displaystyle\sum_{\lambda:\,E_c(\lambda) \geq 0.3\,E_c^{\max}} E_c(\lambda)}.
     \label{eq:centroide}
 \end{equation}
-I dati di sensibilit\`a spettrale utilizzati sono quelli del Samsung Galaxy S22 Rear Telephoto, adottato come proxy per il sensore del Galaxy S24, ottenuti dal database pubblico Color Lab Eilat. Lo spettro della sorgente LCD \`e stato misurato separatamente e memorizzato in un file CSV.
-
-I valori centroide risultanti vengono salvati in un file CSV e richiamati automaticamente nella fase di correzione di $S_3$. La soglia al $30\%$ \`e stata scelta empiricamente come compromesso tra l'esclusione del rumore nelle ali dello spettro e la conservazione della forma del lobo principale.
+I dati di sensibilità spettrale utilizzati sono quelli del Samsung Galaxy S22 Rear Telephoto, adottato come proxy per il sensore del Galaxy S24, ottenuti dal database pubblico Color Lab Eilat. Lo spettro della sorgente LCD è stato misurato separatamente.
 
 % ---------------------------------------------------------------------------
-\section{Ricostruzione dei parametri di Stokes lineari}
+\section{Ricostruzione di \texorpdfstring{$S_0$, $S_1$, $S_2$}{S0, S1, S2}}
 \label{sec:stokes_lineari}
 
-\subsection{Modello fisico}
-\label{subsec:modello_malus}
-
-Quando luce parzialmente polarizzata attraversa un analizzatore lineare orientato ad angolo $\theta$ rispetto all'asse di riferimento, l'intensit\`a trasmessa segue la legge di Malus generalizzata:
+L'intensità trasmessa da un analizzatore lineare orientato ad angolo $\theta$ rispetto all'asse di riferimento segue la legge di Malus generalizzata (\cref{eq:malus_generalizzata}):
 \begin{equation}
-    I(\theta) = \frac{1}{2}\bigl(S_0 + S_1 \cos 2\theta + S_2 \sin 2\theta\bigr)
+    I(\theta) = \frac{1}{2}\bigl(S_0 + S_1 \cos 2\theta + S_2 \sin 2\theta\bigr).
     \label{eq:malus_generalizzata_analisi}
 \end{equation}
-dove $S_0$, $S_1$ e $S_2$ sono i primi tre parametri di Stokes. Per ogni pixel dell'immagine, le intensit\`a misurate a $N = 36$ angoli equispaziati ($\theta_i = 0^\circ, 10^\circ, 20^\circ, \ldots, 350^\circ$) forniscono un sistema di 36 equazioni in 3 incognite.
-
-\subsection{Formulazione matriciale e pseudo-inversa}
-\label{subsec:pseudoinversa}
-
-Il sistema sovradeterminato si esprime in forma matriciale come:
+Per ogni pixel, le intensità misurate ai 36 angoli equispaziati $\theta_i = 0^\circ, 10^\circ, \ldots, 350^\circ$ costituiscono un sistema di 36 equazioni in 3 incognite. In forma matriciale $\mathbf{I} = \mathbf{A}\,\mathbf{p}$, dove $\mathbf{p} = [S_0/2,\; S_1/2,\; S_2/2]^T$ e la matrice del sistema ha righe $[1,\; \cos 2\theta_i,\; \sin 2\theta_i]$. La soluzione ai minimi quadrati si ottiene tramite la pseudo-inversa di Moore-Penrose:
 \begin{equation}
-    \mathbf{I} = \mathbf{A} \, \mathbf{p}
-    \label{eq:sistema_matriciale}
-\end{equation}
-dove $\mathbf{I} = [I(\theta_1), \ldots, I(\theta_N)]^T$ \`e il vettore delle intensit\`a misurate, $\mathbf{p} = [S_0/2,\; S_1/2,\; S_2/2]^T$ \`e il vettore dei parametri incogniti, e la matrice del sistema \`e:
-\begin{equation}
-    \mathbf{A} = \begin{pmatrix}
-        1 & \cos 2\theta_1 & \sin 2\theta_1 \\
-        1 & \cos 2\theta_2 & \sin 2\theta_2 \\
-        \vdots & \vdots & \vdots \\
-        1 & \cos 2\theta_N & \sin 2\theta_N
-    \end{pmatrix}
-    \label{eq:matrice_A}
-\end{equation}
-La soluzione ai minimi quadrati si ottiene tramite la pseudo-inversa di Moore-Penrose:
-\begin{equation}
-    \mathbf{p} = \mathbf{A}^+ \, \mathbf{I} = (\mathbf{A}^T \mathbf{A})^{-1} \mathbf{A}^T \, \mathbf{I}
+    \mathbf{p} = (\mathbf{A}^T \mathbf{A})^{-1} \mathbf{A}^T \, \mathbf{I}.
     \label{eq:pseudoinversa}
 \end{equation}
-I parametri di Stokes si recuperano come $S_0 = 2p_0$, $S_1 = 2p_1$, $S_2 = 2p_2$.
-
-\subsection{Implementazione vettorializzata}
-\label{subsec:implementazione_vettorializzata}
-
-Per evitare cicli espliciti sui pixel, lo stack di $N$ immagini viene riorganizzato in una matrice $N \times (H \cdot W)$. La pseudo-inversa, calcolata una sola volta, viene moltiplicata per l'intera matrice dei dati con un singolo prodotto matriciale, restituendo le tre mappe $S_0$, $S_1$, $S_2$.
-
-\subsection{Convenzione degli angoli}
-\label{subsec:convenzione_angoli}
-
-Gli angoli nominali dell'analizzatore $\theta_{\mathrm{nom}}$ corrispondono alla rotazione meccanica effettuata durante l'acquisizione. Per garantire coerenza con la convenzione destrorsa adottata nel formalismo di Stokes, gli angoli vengono invertiti: $\theta = (360^\circ - \theta_{\mathrm{nom}}) \bmod 360^\circ$. Questa trasformazione \`e necessaria perch\'e la rotazione del polarizzatore avviene in verso opposto rispetto alla convenzione standard di osservazione lungo la direzione di propagazione.
+Poiché la matrice $\mathbf{A}$ non dipende dal pixel, la pseudo-inversa viene calcolata una sola volta e applicata all'intero stack di immagini con un singolo prodotto matriciale, restituendo le tre mappe $S_0$, $S_1$, $S_2$. Gli angoli nominali dell'analizzatore vengono invertiti ($\theta = 360^\circ - \theta_{\mathrm{nom}}$) per garantire coerenza con la convenzione destrorsa del formalismo di Stokes.
 
 % ---------------------------------------------------------------------------
-\section{Misura del parametro di Stokes \texorpdfstring{$S_3$}{S3}}
-\label{sec:misura_s3}
+\section{Determinazione della componente circolare \texorpdfstring{$S_3$}{S3}}
+\label{sec:determinazione-s3}
 
-Il parametro $S_3$, che quantifica la componente di polarizzazione circolare, non \`e accessibile tramite il solo analizzatore lineare. La sua misura richiede l'inserimento di una lamina quarto d'onda ($\lambda/4$) nel cammino ottico, che converte la polarizzazione circolare in polarizzazione lineare analizzabile.
-
-\subsection{Configurazione di misura}
-\label{subsec:config_s3}
-
-Si acquisiscono due immagini con la lamina $\lambda/4$ orientata a $+45^\circ$ e $-45^\circ$ rispetto all'asse dell'analizzatore. Le intensit\`a corrispondenti, $I_{+45}$ e $I_{-45}$, sono legate a $S_3$ dalla relazione:
+Il parametro $S_3$, che quantifica la componente di polarizzazione circolare, non è accessibile tramite il solo analizzatore lineare. La sua misura richiede l'inserimento della lamina $\lambda/4$ nel cammino ottico, che converte la polarizzazione circolare in polarizzazione lineare analizzabile. Le due immagini acquisite con la lamina a $+45^\circ$ e $-45^\circ$ forniscono le intensità $I_{+45}$ e $I_{-45}$, legate a $S_3$ dalla relazione:
 \begin{equation}
-    S_3 = \frac{I_{+45} - I_{-45}}{\sin\delta}
+    S_3 = \frac{I_{+45} - I_{-45}}{\sin\delta(\lambda)},
     \label{eq:s3_formula}
 \end{equation}
-dove $\delta$ \`e il ritardo di fase effettivo della lamina alla lunghezza d'onda di lavoro.
-
-Come per gli angoli del polarizzatore, anche l'orientazione della lamina viene invertita per coerenza con la convenzione destrorsa: l'immagine acquisita alla posizione nominale $-45^\circ$ corrisponde a $I_{+45}$ e viceversa.
-
-\subsection{Correzione per dispersione cromatica}
-\label{subsec:correzione_dispersione}
-
-La lamina quarto d'onda utilizzata \`e di tipo \emph{zero-order}, calibrata per introdurre un ritardo esatto di $\pi/2$~radianti alla lunghezza d'onda $\lambda_0 = \SI{633}{\nano\meter}$. Per lunghezze d'onda diverse, il ritardo scala approssimativamente come:
-\begin{equation}
-    \delta(\lambda) = \frac{\pi}{2} \cdot \frac{\lambda_0}{\lambda}
-    \label{eq:dispersione_lamina}
-\end{equation}
-Il fattore correttivo $1/\sin\delta(\lambda)$ nell'\cref{eq:s3_formula} compensa questa dipendenza cromatica. La lunghezza d'onda $\lambda$ utilizzata nel calcolo \`e la lunghezza d'onda centroide del canale selezionato, determinata nella \cref{sec:centroide}. Per il canale rosso, ad esempio, $\lambda_{\mathrm{eff}} \approx \SI{600}{\nano\meter}$, il che comporta un fattore correttivo $1/\sin\delta \approx 1.05$, modesto ma non trascurabile per misure quantitative.
+dove $\delta(\lambda)$ è il ritardo di fase effettivo della lamina alla lunghezza d'onda di lavoro, calcolato secondo la \cref{eq:dispersione-qwp}. Anche l'orientazione della lamina viene invertita per coerenza con la convenzione destrorsa. Il fattore correttivo $1/\sin\delta(\lambda)$ compensa la dipendenza cromatica della lamina zero-order; per il canale rosso ($\lambda_{\mathrm{eff}} \approx \SI{600}{\nano\meter}$) il fattore è circa $1.05$, modesto ma non trascurabile per misure quantitative.
 
 % ---------------------------------------------------------------------------
-\section{Mascheramento dell'area illuminata}
+\section{Selezione della regione utile}
 \label{sec:mascheramento}
 
-Solo una porzione del campo visivo del sensore \`e effettivamente illuminata dal fascio che attraversa l'apparato ottico. Le regioni non illuminate contengono rumore di fondo che, se incluso nell'analisi, introdurrebbe artefatti nelle mappe dei parametri di Stokes normalizzati. \`E pertanto necessario generare una maschera binaria che isoli l'area utile.
+Solo una porzione del campo visivo è effettivamente illuminata dal fascio che attraversa l'apparato. Le regioni non illuminate contengono rumore di fondo che, se incluso nell'analisi, introdurrebbe artefatti nelle mappe dei parametri normalizzati. È pertanto necessaria una maschera binaria che isoli l'area utile.
 
-\subsection{Pipeline morfologica}
-\label{subsec:pipeline_morfologica}
-
-La procedura di mascheramento, denominata \emph{smart mask}, opera sulla mappa di intensit\`a totale $S_0$. Si calcola un profilo di illuminazione locale tramite filtro gaussiano e si identificano come bordi i pixel con intensit\`a inferiore al $95\%$ del profilo locale. I bordi vengono dilatati per chiudere eventuali discontinuit\`a, le cavit\`a interne riempite, e si conserva unicamente la componente connessa di area maggiore. Un margine di sicurezza dilata leggermente la regione individuata. Il complemento di questa regione costituisce la maschera di sfondo.
-
-\subsection{Raffinamento con \texorpdfstring{$S_3$}{S3}}
-\label{subsec:raffinamento_s3}
-
-Quando \`e disponibile la mappa di $S_3$, la maschera viene ulteriormente raffinata per includere solo l'area effettivamente coperta dalla lamina quarto d'onda, che ha un'apertura circolare pi\`u piccola del campo illuminato. Si calcola $|S_3|$ filtrato con gaussiana, si applica una soglia al $25\%$ della media, si riempiono le cavit\`a (inclusa la linea di zero-crossing centrale), si seleziona la componente connessa maggiore e si applica un'erosione conservativa ($0.5\%$ della dimensione). La maschera finale \`e l'intersezione tra la maschera di sfondo e l'area attiva della lamina.
+La maschera viene generata a partire dalla mappa di intensità $S_0$. Si calcola un profilo di illuminazione locale tramite filtro gaussiano e si identificano come bordi i pixel con intensità inferiore al $95\%$ del profilo locale. I bordi vengono dilatati morfologicamente per chiudere eventuali discontinuità, le cavità interne riempite, e si conserva la componente connessa di area maggiore con un margine di sicurezza. Quando è disponibile anche la mappa di $S_3$, la maschera viene ulteriormente ristretta all'area effettivamente coperta dall'apertura circolare della lamina $\lambda/4$, che è più piccola del campo illuminato: il risultato è l'intersezione delle due regioni.
 
 % ---------------------------------------------------------------------------
-\section{Allineamento del reference frame}
+\section{Allineamento del sistema di riferimento}
 \label{sec:allineamento}
 
-La sorgente di luce polarizzata \`e costituita da un display LCD, il cui asse di polarizzazione di uscita non \`e necessariamente allineato con l'asse di riferimento del polarizzatore analizzatore. Questo offset angolare si manifesta come una rotazione sistematica delle mappe di $S_1$ e $S_2$ rispetto al sistema di coordinate atteso.
-
-La correzione viene effettuata misurando l'angolo di polarizzazione mediano nella regione di sfondo (identificata dalla maschera):
+L'asse di polarizzazione di uscita del display LCD non è necessariamente allineato con l'asse di riferimento dell'analizzatore. Questo offset angolare si manifesta come una rotazione sistematica delle mappe di $S_1$ e $S_2$. La correzione viene effettuata misurando l'angolo di polarizzazione mediano nella regione di sfondo:
 \begin{equation}
-    \alpha_{\mathrm{bg}} = \frac{1}{2} \arctan\!\left(\frac{\langle S_2 \rangle_{\mathrm{bg}}}{\langle S_1 \rangle_{\mathrm{bg}}}\right)
+    \alpha_{\mathrm{bg}} = \frac{1}{2} \arctan\!\left(\frac{\langle S_2 \rangle_{\mathrm{bg}}}{\langle S_1 \rangle_{\mathrm{bg}}}\right),
     \label{eq:angolo_offset}
 \end{equation}
-dove $\langle \cdot \rangle_{\mathrm{bg}}$ indica la mediana sui pixel della maschera di sfondo. I parametri $S_1$ e $S_2$ vengono quindi ruotati matematicamente di $-\alpha_{\mathrm{bg}}$ tramite la matrice di rotazione nel piano $(S_1, S_2)$:
+dove $\langle \cdot \rangle_{\mathrm{bg}}$ indica la mediana sui pixel della maschera di sfondo. I parametri $S_1$ e $S_2$ vengono quindi ruotati di $-\alpha_{\mathrm{bg}}$ tramite la matrice di rotazione nel piano $(S_1, S_2)$:
 \begin{equation}
-    \begin{pmatrix} S_1' \\ S_2' \end{pmatrix} = \begin{pmatrix} \cos 2\alpha_{\mathrm{bg}} & \sin 2\alpha_{\mathrm{bg}} \\ -\sin 2\alpha_{\mathrm{bg}} & \cos 2\alpha_{\mathrm{bg}} \end{pmatrix} \begin{pmatrix} S_1 \\ S_2 \end{pmatrix}
+    \begin{pmatrix} S_1' \\ S_2' \end{pmatrix} = \begin{pmatrix} \cos 2\alpha_{\mathrm{bg}} & \sin 2\alpha_{\mathrm{bg}} \\ -\sin 2\alpha_{\mathrm{bg}} & \cos 2\alpha_{\mathrm{bg}} \end{pmatrix} \begin{pmatrix} S_1 \\ S_2 \end{pmatrix}.
     \label{eq:rotazione_stokes}
 \end{equation}
-Dopo la correzione, la luce di sfondo risulta polarizzata orizzontalmente ($S_1' > 0$, $S_2' \approx 0$), e l'angolo di polarizzazione lineare (\emph{AoLP}) \`e riferito all'asse dell'analizzatore.
+Dopo la correzione, la luce di sfondo risulta polarizzata orizzontalmente ($S_1' > 0$, $S_2' \approx 0$) e l'angolo di polarizzazione lineare è riferito all'asse dell'analizzatore.
 
 % ---------------------------------------------------------------------------
-\section{Grado di polarizzazione lineare e angolo}
+\section{Grandezze polarimetriche derivate}
 \label{sec:dolp_aolp}
 
 Dai parametri di Stokes allineati si calcolano il grado di polarizzazione lineare (DoLP) e l'angolo di polarizzazione lineare (AoLP):
 \begin{equation}
-    \mathrm{DoLP} = \frac{\sqrt{S_1'^2 + S_2'^2}}{S_0}, \qquad \mathrm{AoLP} = \frac{1}{2}\arctan\!\left(\frac{S_2'}{S_1'}\right)
+    \mathrm{DoLP} = \frac{\sqrt{S_1'^2 + S_2'^2}}{S_0}, \qquad \mathrm{AoLP} = \frac{1}{2}\arctan\!\left(\frac{S_2'}{S_1'}\right).
     \label{eq:dolp_aolp}
 \end{equation}
-Il DoLP \`e limitato per definizione all'intervallo $[0, 1]$: valori prossimi a $1$ indicano luce completamente polarizzata linearmente, valori prossimi a $0$ indicano luce non polarizzata o polarizzata circolarmente. Per prevenire divergenze numeriche, $S_0$ viene sostituito con un valore minimo di $10^{-8}$ dove nullo, e il DoLP viene successivamente limitato (clipping) all'intervallo $[0, 1]$.
-
-L'AoLP \`e calcolato in gradi e varia nell'intervallo $[-90^\circ, +90^\circ]$, rappresentando la direzione dell'asse di polarizzazione lineare predominante in ciascun pixel.
+Il DoLP è limitato all'intervallo $[0, 1]$: valori prossimi a $1$ indicano luce completamente polarizzata linearmente, valori prossimi a $0$ indicano luce non polarizzata o polarizzata circolarmente. L'AoLP è calcolato in gradi nell'intervallo $[-90^\circ, +90^\circ]$ e rappresenta la direzione dell'asse di polarizzazione lineare predominante in ciascun pixel.
 
 % ---------------------------------------------------------------------------
-\section{Calcolo della ritardanza e dell'asse veloce}
+\section{Estrazione della ritardanza e dell'asse veloce}
 \label{sec:retardance}
 
-La ritardanza $\delta$ e l'orientazione dell'asse veloce $\alpha$ del campione vengono estratte combinando tutti e quattro i parametri di Stokes. Questa analisi richiede la conoscenza dello stato di polarizzazione in ingresso, che viene caratterizzato dalla regione di sfondo.
+La ritardanza $\delta$ e l'orientazione dell'asse veloce $\alpha$ vengono estratte combinando tutti e quattro i parametri di Stokes, con lo stato di polarizzazione in ingresso caratterizzato dai valori mediani nella regione di sfondo ($s_{1,\mathrm{in}}$, $s_{3,\mathrm{in}}$). I parametri vengono normalizzati rispetto all'intensità totale: $s_i = S_i / S_0$; un eventuale offset circolare sistematico viene compensato sottraendo $s_{3,\mathrm{in}}$.
 
-\subsection{Normalizzazione e stato di ingresso}
-\label{subsec:normalizzazione}
+\subsection{Modello di estrazione}
+\label{subsec:modello_retardance}
 
-I parametri di Stokes vengono normalizzati rispetto all'intensit\`a totale: $s_i = S_i / S_0$ per $i = 1, 2, 3$. Lo stato di polarizzazione in ingresso \`e caratterizzato dai valori mediani nella regione di sfondo: $s_{1,\mathrm{in}}$ e $s_{3,\mathrm{in}}$. L'eventuale offset circolare sistematico viene compensato sottraendo: $s_{3,\mathrm{corr}} = s_3 - s_{3,\mathrm{in}}$.
-
-\subsection{Asse veloce}
-\label{subsec:asse_veloce}
-
-L'angolo dell'asse veloce del campione birifrangente \`e dato da:
+L'angolo dell'asse veloce e la ritardanza si ricavano dalle relazioni:
 \begin{equation}
-    \alpha = \frac{1}{2} \arctan\!\left(\frac{s_{1,\mathrm{in}} - s_1}{s_2}\right)
+    \alpha = \frac{1}{2} \arctan\!\left(\frac{s_{1,\mathrm{in}} - s_1}{s_2}\right),
     \label{eq:asse_veloce}
 \end{equation}
-dove $s_{1,\mathrm{in}} - s_1$ rappresenta la variazione del parametro di Stokes normalizzato rispetto allo stato di ingresso. L'uso di $\arctan$ a due argomenti garantisce la corretta determinazione del quadrante.
-
-\subsection{Ritardanza}
-\label{subsec:calcolo_ritardanza}
-
-La ritardanza si ottiene dalla relazione:
 \begin{equation}
-    \cos\delta = 1 - \frac{s_{1,\mathrm{in}} - s_1}{s_{1,\mathrm{in}} \cdot \sin^2\!2\alpha}
+    \cos\delta = 1 - \frac{s_{1,\mathrm{in}} - s_1}{s_{1,\mathrm{in}} \cdot \sin^2\!2\alpha}.
     \label{eq:ritardanza_analisi}
 \end{equation}
-dove il denominatore $\sin^2\!2\alpha$ pu\`o diventare molto piccolo quando l'asse veloce \`e prossimo a $0^\circ$ o $90^\circ$, generando instabilit\`a numeriche. Per questo motivo, il calcolo viene eseguito solo sui pixel in cui $\sin^2\!2\alpha > 0.02$; nei pixel rimanenti si assegna $\delta = 0$.
+Il segno di $\delta$ viene determinato dal prodotto $s_{3,\mathrm{corr}} \cdot \sin 2\alpha$: se negativo, la ritardanza è assegnata con segno negativo, preservando l'informazione sulla chiralità del campione.
 
-L'argomento della funzione $\arccos$ viene inoltre limitato all'intervallo $[-1, 1]$ (clipping) prima del calcolo, per prevenire valori NaN dovuti a piccole eccedenze numeriche.
+\subsection{Trattamento delle ambiguità numeriche}
+\label{subsec:ambiguita_numeriche}
 
-\subsection{Segno della ritardanza}
-\label{subsec:segno_ritardanza}
-
-Il segno di $\delta$ viene determinato dal prodotto $s_{3,\mathrm{corr}} \cdot \sin 2\alpha$: se negativo, la ritardanza \`e assegnata con segno negativo. Questa convenzione distingue ritardanze positive (asse veloce ``avanti'') da ritardanze negative, e preserva l'informazione sulla chiralit\`a del campione.
+Il denominatore $\sin^2\!2\alpha$ in \cref{eq:ritardanza_analisi} può diventare molto piccolo quando l'asse veloce è prossimo a $0^\circ$ o $90^\circ$, generando instabilità numeriche. Il calcolo viene pertanto eseguito solo sui pixel in cui $\sin^2\!2\alpha > 0.02$; nei pixel rimanenti si assegna $\delta = 0$. L'argomento della funzione $\arccos$ viene inoltre limitato all'intervallo $[-1, 1]$ prima del calcolo, per prevenire valori NaN dovuti a piccole eccedenze numeriche. A supporto dell'analisi è stato sviluppato uno strumento interattivo che consente di sovrapporre, per qualsiasi pixel selezionato, i 36 valori misurati alla curva di Malus teorica e di visualizzare l'ellisse di polarizzazione corrispondente.
 
 % ---------------------------------------------------------------------------
-\section{Strumento di validazione interattivo}
-\label{sec:debugger}
-
-A supporto della pipeline \`e stato sviluppato un debugger interattivo per la verifica pixel-per-pixel della qualit\`a del fit. Lo strumento consente di sovrapporre i 36 valori misurati alla curva teorica e di visualizzare l'ellisse di polarizzazione per qualsiasi pixel selezionato.
-
-% ---------------------------------------------------------------------------
-\section{Visualizzazione dei risultati}
+\section{Rappresentazione delle mappe}
 \label{sec:visualizzazione}
 
-La pipeline produce una visualizzazione sintetica in formato griglia $3 \times 3$, che presenta simultaneamente tutti i parametri polarimetrici calcolati:
+La pipeline produce una visualizzazione sintetica in formato griglia $3 \times 3$, che presenta simultaneamente tutti i parametri polarimetrici calcolati: $S_0$, $S_1$, $S_2$ nella prima riga; $S_3$, DoLP, AoLP nella seconda; asse veloce $\alpha$, ritardanza $\delta$, e maschera sovrapposta a $S_0$ per verifica visiva nella terza. La scelta delle colormap segue le convenzioni della letteratura polarimetrica: colormap divergenti per grandezze con segno ($S_1$, $S_2$, $S_3$), colormap cicliche per angoli (AoLP, $\alpha$, $\delta$), e colormap sequenziali per grandezze positive ($S_0$, DoLP). La normalizzazione al percentile $99$ anzichè al valore massimo rende la visualizzazione robusta rispetto a pixel anomali isolati.
 
-\begin{itemize}
-    \item \textbf{Riga 1}: $S_0$ (colormap monocromatica dal nero al colore del canale selezionato: rosso, verde o blu), $S_1$ e $S_2$ (colormap divergente \texttt{bwr}, normalizzata al percentile $99$ del valore assoluto per robustezza agli outlier).
-    \item \textbf{Riga 2}: $S_3$ (colormap \texttt{bwr}), DoLP (colormap \texttt{viridis}, intervallo $[0, 1]$), AoLP (colormap ciclica \texttt{twilight}, intervallo $[-90^\circ, +90^\circ]$).
-    \item \textbf{Riga 3}: asse veloce $\alpha$ (colormap \texttt{twilight}), ritardanza $\delta$ (colormap \texttt{twilight}, intervallo $[-180^\circ, +180^\circ]$), maschera di sfondo sovrapposta a $S_0$ normalizzato per verifica visiva.
-\end{itemize}
-
-La scelta delle colormap segue le convenzioni della letteratura polarimetrica: colormap divergenti per grandezze con segno ($S_1$, $S_2$, $S_3$), colormap cicliche per angoli ($\mathrm{AoLP}$, $\alpha$, $\delta$), e colormap sequenziali per grandezze positive ($S_0$, DoLP). La normalizzazione al percentile $99$ anzich\'e al valore massimo rende la visualizzazione robusta rispetto a pixel anomali isolati.
+Le grandezze polarimetriche così calcolate --- $S_0$, $S_1$, $S_2$, $S_3$, DoLP, AoLP, ritardanza $\delta$ e asse veloce $\alpha$ --- vengono presentate per ciascun campione nel capitolo seguente sotto forma di mappe bidimensionali, organizzate nella griglia sinottica $3\times 3$ con colormap scelte secondo le convenzioni della letteratura polarimetrica.

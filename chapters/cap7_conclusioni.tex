@@ -1,27 +1,15 @@
 % Capitolo 7: Conclusioni e sviluppi futuri
-% Autore: architetto
 
-\section{Riepilogo del lavoro svolto}
-\label{sec:riepilogo}
-
-In questo lavoro è stato realizzato un polarimetro a immagine bidimensionale che utilizza il sensore CMOS di uno smartphone come rivelatore. Il vettore di Stokes completo viene ricostruito pixel per pixel da 36 immagini RAW per i parametri lineari e 2 immagini aggiuntive con lamina $\lambda/4$ per il parametro circolare. L'intera pipeline di analisi è stata implementata in Python e validata su campioni con proprietà polarimetriche note.
+Questa tesi ha dimostrato che un polarimetro a immagine bidimensionale basato su smartphone è in grado di produrre mappe polarimetriche quantitative comparabili, per le applicazioni considerate, ai risultati ottenibili con strumentazione di laboratorio di costo due ordini di grandezza superiore. Il vettore di Stokes completo è stato ricostruito pixel per pixel su sei campioni rappresentativi di birifrangenza, attività ottica e fotoelasticità, con scarti rispetto ai valori nominali dell'ordine di $2$--$5^\circ$ per le ritardanze sulle lamine d'onda e con dispersione rotatoria consistente con il modello di Drude per il saccarosio. Il campione a strati di nastro adesivo ha verificato la linearità della risposta, mentre i provini fotoelastici hanno prodotto frange isocromatiche chiaramente risolte. Il limite principale dell'approccio è il compromesso tra risoluzione spaziale e sostenibilità computazionale imposto dal downsampling, seguito dall'approssimazione a banda larga intrinseca nei filtri Bayer e dalla sensibilità alla calibrazione cromatica della lamina $\lambda/4$.
 
 
-\section{Risultati principali}
-\label{sec:risultati_principali}
+\section{Sviluppi a breve termine}
+\label{sec:sviluppi_breve}
 
-Le lamine d'onda commerciali hanno restituito valori di ritardanza coerenti con i nominali (scarti di $2$--$\SI{5}{\degree}$), confermando l'accuratezza della ricostruzione. Il campione a strati di nastro adesivo ha verificato la linearità della risposta, con ritardanza proporzionale al numero di strati. La soluzione di saccarosio ha mostrato la rotazione del piano di polarizzazione attesa per l'attività ottica, con dispersione rotatoria consistente con il modello di Drude. I provini fotoelastici hanno prodotto frange isocromatiche chiaramente risolte, dimostrando la capacità del sistema di mappare la distribuzione spaziale degli sforzi interni.
-
-
-\section{Limiti dell'approccio}
-\label{sec:limiti}
-
-Il fattore di downsampling $f$ (tipicamente tra 10 e 20), necessario per la sostenibilità computazionale, riduce la risoluzione spaziale di uno o due ordini di grandezza rispetto al sensore nativo; strutture con dimensioni inferiori a $f$ pixel non sono risolvibili. L'assegnazione di una singola lunghezza d'onda effettiva a ciascun canale colore tramite il metodo del centroide è un'approssimazione: la risposta spettrale dei filtri Bayer ha una larghezza di banda di diverse decine di nanometri, e per campioni con forte dispersione cromatica la misura rappresenta una media pesata sulla banda del canale. La lamina $\lambda/4$ zero-order, calibrata a $\SI{633}{\nano\meter}$, introduce una correzione cromatica crescente al diminuire della lunghezza d'onda: per il canale rosso il fattore correttivo è modesto, per il canale blu l'approssimazione diventa meno accurata. La rotazione manuale dell'analizzatore introduce un'incertezza sulla posizione angolare e limita la velocità di acquisizione a qualche minuto per sequenza completa. L'uso di un display LCD come sorgente a banda larga non consente un'analisi spettrale fine: il sistema opera di fatto in tre bande spettrali larghe (R, G, B).
+L'integrazione di un motore passo-passo per la rotazione dell'analizzatore eliminerebbe l'incertezza angolare manuale e ridurrebbe il tempo di acquisizione a pochi secondi. L'elaborazione su GPU o a blocchi consentirebbe di lavorare a risoluzione piena senza il compromesso del downsampling. La sostituzione del display LCD con LED monocromatici a banda stretta migliorerebbe l'accuratezza della correzione cromatica della lamina $\lambda/4$ e permetterebbe di sfruttare appieno la dinamica a 12~bit del sensore su sorgenti quasi monocromatiche.
 
 
-\section{Sviluppi futuri}
-\label{sec:sviluppi_futuri}
+\section{Prospettive a lungo termine}
+\label{sec:sviluppi_lungo}
 
-L'integrazione di un motore passo-passo per la rotazione dell'analizzatore eliminerebbe l'incertezza angolare manuale e consentirebbe acquisizioni più rapide e ripetibili. L'implementazione della pipeline su GPU o l'adozione di un'elaborazione a blocchi permetterebbero di lavorare a risoluzioni significativamente superiori. La sostituzione del display LCD con LED monocromatici a banda stretta migliorerebbe l'accuratezza della correzione per la dispersione della lamina $\lambda/4$. L'acquisizione sistematica con sorgenti a diverse lunghezze d'onda consentirebbe di misurare la dispersione della birifrangenza, estendendo le capacità del sistema alla polarimetria spettro-spaziale. Il basso costo e la riproducibilità dell'apparato ne fanno un candidato per l'inserimento in corsi di laboratorio di ottica, dove gli studenti potrebbero affiancare l'esperimento puntuale classico con un'analisi a immagine.
-
-Un'ulteriore direzione di sviluppo riguarda l'estensione alla polarimetria in riflessione, che consentirebbe l'analisi di campioni opachi (metalli, tessuti biologici) e aprirebbe applicazioni in diagnostica dermatologica e controllo qualità di superfici. In prospettiva, l'impiego di tecniche di deep learning per la ricostruzione dei parametri di Stokes da un numero ridotto di immagini potrebbe abbreviare significativamente i tempi di acquisizione, avvicinando il sistema alla misura in tempo reale.
+L'acquisizione con sorgenti a diverse lunghezze d'onda aprirebbe la strada alla polarimetria spettro-spaziale, consentendo la misura della dispersione della birifrangenza su più canali indipendenti. L'estensione alla configurazione in riflessione consentirebbe l'analisi di campioni opachi, con potenziali applicazioni in diagnostica biomedica e controllo qualità di superfici. L'impiego di tecniche di deep learning per la ricostruzione dei parametri di Stokes da un numero ridotto di immagini potrebbe avvicinare il sistema alla misura in tempo reale. Il basso costo e la riproducibilità dell'apparato ne fanno infine un candidato naturale per l'inserimento nei corsi di laboratorio di ottica, dove gli studenti potrebbero affiancare l'esperimento puntuale classico con un'analisi a immagine.

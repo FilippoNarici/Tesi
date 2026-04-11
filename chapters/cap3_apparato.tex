@@ -1,15 +1,14 @@
 % Capitolo 3: Apparato sperimentale
-% Autore: sperimentale
 
 \section{Panoramica del setup}
 \label{sec:panoramica-setup}
 
-L'apparato opera in configurazione di trasmissione su rotaia ottica. Lo schema generale \`e:
+L'apparato opera in configurazione di trasmissione su rotaia ottica. Lo schema generale è:
 \begin{equation}
 \text{Sorgente} \;\longrightarrow\; \text{Campione} \;\longrightarrow\; \left[\,\lambda/4\,\right] \;\longrightarrow\; \text{Analizzatore} \;\longrightarrow\; \text{Sensore}
 \label{eq:schema-ottico}
 \end{equation}
-dove la lamina $\lambda/4$ viene inserita solo per la determinazione di $S_3$. La \cref{fig:setup-foto} mostra due viste dell'apparato assemblato. Le sezioni seguenti descrivono ciascun componente.
+dove la lamina $\lambda/4$ viene inserita solo per la determinazione di $S_3$. La \cref{fig:setup-foto} mostra due viste dell'apparato assemblato.
 
 \begin{figure}[htbp]
     \centering
@@ -21,69 +20,28 @@ dove la lamina $\lambda/4$ viene inserita solo per la determinazione di $S_3$. L
 \end{figure}
 
 
-
 \section{Componenti ottici}
 \label{sec:componenti-ottici}
 
-\subsection{Rotaia ottica}
-\label{subsec:rotaia}
-
-L'apparato \`e montato su una rotaia ottica Optosci con cavalieri scorrevoli, che garantisce l'allineamento dei componenti lungo un asse ottico comune e la riproducibilit\`a del posizionamento tra sessioni di misura.
-
-\subsection{Sorgente luminosa}
-\label{subsec:sorgente}
-
-La sorgente \`e un tablet Samsung Galaxy Tab S7 FE con display impostato su schermata bianca alla massima luminosit\`a. Il pannello LCD emette luce bianca a banda larga attraverso un polarizzatore integrato: la luce in uscita \`e quindi gi\`a polarizzata linearmente, con asse orientato approssimativamente in verticale in configurazione landscape. Questa caratteristica rende il display una sorgente estesa a stato di polarizzazione ben definito e relativamente uniforme, ideale per illuminare l'intero campo visivo del sensore.
-
-\subsection{Analizzatore}
-\label{subsec:analizzatore}
-L'analizzatore \`e costituito da un polarizzatore lineare circolare Optosci, montato su un supporto rotante calibrato solidale alla rotaia ottica. Il polarizzatore pu\`o essere ruotato manualmente con una risoluzione angolare sufficiente per i passi di \SI{10}{\degree} previsti dal protocollo di acquisizione.
-
-La qualit\`a del polarizzatore \`e critica per l'accuratezza delle misure: un rapporto di estinzione elevato garantisce che la modulazione dell'intensit\`a trasmessa in funzione dell'angolo segua fedelmente la legge di Malus, minimizzando errori sistematici nell'estrazione dei parametri di Stokes.
+L'apparato è montato su una rotaia ottica Optosci con cavalieri scorrevoli, che garantisce l'allineamento dei componenti lungo un asse ottico comune e la riproducibilità del posizionamento tra sessioni di misura. La sorgente luminosa è il display di un tablet Samsung Galaxy Tab S7 FE, impostato su schermata bianca alla massima luminosità. Il pannello LCD emette luce bianca a banda larga attraverso un polarizzatore integrato: la luce in uscita è già polarizzata linearmente con asse orientato approssimativamente in verticale in configurazione landscape, il che rende il display una sorgente estesa a stato di polarizzazione ben definito. L'analizzatore è un polarizzatore lineare circolare Optosci, montato su supporto rotante calibrato con risoluzione angolare sufficiente per i passi di \SI{10}{\degree} previsti dal protocollo; un rapporto di estinzione elevato garantisce che la modulazione dell'intensità trasmessa segua fedelmente la legge di Malus. Per integrare i dispositivi nella rotaia sono stati realizzati supporti personalizzati mediante stampa 3D in PLA.
 
 \subsection{Lamina \texorpdfstring{$\lambda/4$}{lambda/4} zero-order}
 \label{subsec:lamina-qwp}
-Per la determinazione del parametro $S_3$ viene utilizzata una lamina quarto d'onda (\emph{quarter-wave plate}, QWP) Optosci di tipo \emph{zero-order}, progettata per la lunghezza d'onda di $\SI{633}{\nano\meter}$ (He-Ne), disponibile nella dotazione del laboratorio didattico. Rispetto a una lamina multi-ordine, una lamina zero-order presenta una minore sensibilit\`a alla lunghezza d'onda e alla temperatura, garantendo prestazioni pi\`u stabili e prevedibili.
 
-Poich\'e il sensore CMOS opera simultaneamente sui tre canali colore (rosso, verde, blu), ciascuno con una diversa lunghezza d'onda effettiva, il ritardo di fase introdotto dalla lamina varia con il canale spettrale. La correzione per questo effetto cromatico \`e descritta nel \cref{ch:analisi}: il ritardo effettivo $\delta$ della lamina alla lunghezza d'onda $\lambda$ del canale in esame viene calcolato come
+Per la determinazione del parametro $S_3$ viene utilizzata una lamina quarto d'onda Optosci di tipo \emph{zero-order}, progettata per la lunghezza d'onda di $\SI{633}{\nano\meter}$. Rispetto a una lamina multi-ordine, la dipendenza dalla lunghezza d'onda è più debole --- proprietà importante dato che il sensore opera simultaneamente sui tre canali colore. Il ritardo effettivo alla lunghezza d'onda $\lambda$ del canale in esame è:
 \begin{equation}
 \delta(\lambda) = \frac{\pi}{2} \cdot \frac{\SI{633}{\nano\meter}}{\lambda}
 \label{eq:dispersione-qwp}
 \end{equation}
-e il parametro $S_3$ viene corretto dividendo per il fattore $\sin\delta(\lambda)$.
-
-\subsection{Supporti meccanici stampati in 3D}
-\label{subsec:supporti-3d}
-Per integrare il tablet e lo smartphone nella rotaia ottica Optosci sono stati progettati e realizzati supporti personalizzati mediante stampa 3D a deposizione di filamento fuso (FDM) in PLA (acido polilattico). Questi supporti garantiscono:
-\begin{itemize}
-    \item il posizionamento stabile e ripetibile dei dispositivi sulla rotaia;
-    \item l'allineamento del centro del display (sorgente) e del sensore (rivelatore) con l'asse ottico;
-    \item la perpendicolarit\`a della superficie del sensore rispetto alla direzione di propagazione della luce.
-\end{itemize}
-
-Il porta-campione, anch'esso montato sulla rotaia, consente l'inserimento e la rimozione dei campioni senza alterare l'allineamento complessivo del sistema.
+La correzione per questo effetto cromatico è descritta nel \cref{ch:analisi}.
 
 
-\section{Sensore di imaging}
+\section{Sensore e acquisizione RAW}
 \label{sec:sensore}
 
-\subsection{Smartphone Samsung Galaxy S24}
-\label{subsec:smartphone}
+Il rivelatore è la fotocamera principale di uno smartphone Samsung Galaxy S24, con sensore CMOS da circa 10 megapixel effettivi, obiettivo a focale $\SI{7.0}{\milli\meter}$ (equivalente $\SI{69}{\milli\meter}$), apertura $f/2.4$ e profondità di acquisizione fino a 12~bit per canale.
 
-Il rivelatore \`e la fotocamera principale di uno smartphone Samsung Galaxy S24, con sensore CMOS da circa 10 megapixel effettivi, obiettivo a focale $\SI{7.0}{\milli\meter}$ (equivalente $\SI{69}{\milli\meter}$), apertura $f/2.4$, e profondit\`a di acquisizione fino a 12~bit per canale in modalit\`a RAW.
-
-\subsection{Matrice di Bayer e acquisizione RAW}
-\label{subsec:bayer-raw}
-
-Il sensore CMOS \`e ricoperto da un mosaico di filtri colore noto come \emph{matrice di Bayer}, con disposizione RGGB (un filtro rosso, due filtri verdi e un filtro blu per ogni gruppo di $2 \times 2$ pixel). In condizioni normali di utilizzo, il processore di immagini dello smartphone (ISP, \emph{Image Signal Processor}) applica automaticamente algoritmi di demosaicizzazione, bilanciamento del bianco, correzione della gamma e compressione, producendo un'immagine JPEG ottimizzata per la percezione visiva ma inadatta all'analisi quantitativa.
-
-Per questo motivo, tutte le acquisizioni vengono effettuate in formato RAW (DNG, \emph{Digital Negative}), che fornisce il segnale grezzo del sensore senza elaborazioni. I vantaggi dell'acquisizione RAW per la polarimetria sono:
-\begin{itemize}
-    \item \textbf{Risposta lineare:} il segnale \`e proporzionale all'intensit\`a luminosa incidente, condizione necessaria per l'applicazione della legge di Malus;
-    \item \textbf{Profondit\`a a 12~bit:} una dinamica di $2^{12} = 4096$ livelli per canale, che garantisce una risoluzione sufficiente per distinguere variazioni sottili nell'intensit\`a polarizzata;
-    \item \textbf{Accesso ai canali colore separati:} ciascun canale (R, G, B) pu\`o essere estratto e analizzato indipendentemente, consentendo un'analisi multi-lunghezza d'onda.
-\end{itemize}
-L'acquisizione in modalit\`a RAW manuale viene effettuata tramite l'applicazione fotocamera nativa dello smartphone, che consente il controllo completo dei parametri di esposizione, disabilitando l'ISP automatico. Per minimizzare le vibrazioni indotte dal contatto con il dispositivo, lo smartphone \`e stato collegato via cavo USB a un computer e controllato da remoto tramite il software \texttt{scrcpy}, che replica lo schermo del telefono e ne consente l'operazione senza toccarlo.
+Il sensore è ricoperto da una matrice di Bayer con disposizione RGGB. In condizioni normali di utilizzo, il processore di immagini dello smartphone applicherebbe demosaicizzazione, bilanciamento del bianco, correzione della gamma e compressione --- elaborazioni che distruggono la linearità del segnale. Per questo motivo, tutte le acquisizioni sono effettuate in formato RAW (DNG, \emph{Digital Negative}), che fornisce il segnale grezzo a 12~bit con risposta proporzionale all'intensità incidente, condizione necessaria per l'applicazione della legge di Malus. La dinamica di $2^{12} = 4096$ livelli per canale garantisce una risoluzione sufficiente per distinguere variazioni sottili nell'intensità polarizzata, e ciascun canale colore (R, G, B) può essere estratto e analizzato indipendentemente, consentendo di fatto un'analisi polarimetrica a tre lunghezze d'onda con un singolo sensore. L'acquisizione viene controllata da remoto via USB tramite il software \texttt{scrcpy}, per evitare vibrazioni indotte dal contatto con il dispositivo.
 
 
 \section{Protocollo di acquisizione}
@@ -92,33 +50,14 @@ L'acquisizione in modalit\`a RAW manuale viene effettuata tramite l'applicazione
 \subsection{Acquisizione per i parametri di Stokes lineari (\texorpdfstring{$S_0$, $S_1$, $S_2$}{S0, S1, S2})}
 \label{subsec:acquisizione-lineari}
 
-La determinazione dei parametri di Stokes lineari $S_0$, $S_1$ e $S_2$ si basa sull'acquisizione di una sequenza di 36 immagini RAW, corrispondenti a 36 posizioni angolari dell'analizzatore distribuite uniformemente tra \SI{0}{\degree} e \SI{350}{\degree} con passo di \SI{10}{\degree}.
-
-L'intensit\`a misurata in funzione dell'angolo dell'analizzatore $\theta$ segue la legge di Malus generalizzata:
-\begin{equation}
-I(\theta) = \frac{1}{2}\left(S_0 + S_1 \cos 2\theta + S_2 \sin 2\theta\right)
-\label{eq:malus-generalizzata}
-\end{equation}
-Con 36 misure per 3 incognite, il sistema \`e fortemente sovradeterminato. I parametri di Stokes vengono estratti risolvendo il sistema lineare mediante la matrice pseudo-inversa di Moore-Penrose, come descritto nel \cref{ch:analisi}. La sovradeterminazione migliora la robustezza statistica del fit, riducendo l'effetto del rumore del sensore sulle stime dei parametri.
-
-\textbf{Convenzione degli angoli.} Nel software di analisi, la convenzione del segno dell'angolo di rotazione viene invertita ($\theta \rightarrow 360^\circ - \theta$) per mantenere la coerenza con un sistema di riferimento destrorso rispetto alla direzione di propagazione del fascio luminoso uscente dalla sorgente.
+La determinazione dei parametri di Stokes lineari $S_0$, $S_1$ e $S_2$ si basa sull'acquisizione di una sequenza di 36 immagini RAW, corrispondenti a 36 posizioni angolari dell'analizzatore distribuite uniformemente tra \SI{0}{\degree} e \SI{350}{\degree} con passo di \SI{10}{\degree}. Con 36 misure per 3 incognite, il sistema è fortemente sovradeterminato: i parametri di Stokes vengono estratti mediante la matrice pseudo-inversa di Moore-Penrose, come descritto nel \cref{ch:analisi}. La sovradeterminazione migliora la robustezza statistica del fit, riducendo l'effetto del rumore del sensore. Nel software di analisi, la convenzione del segno dell'angolo di rotazione viene invertita ($\theta \rightarrow 360^\circ - \theta$) per mantenere la coerenza con un sistema di riferimento destrorso rispetto alla direzione di propagazione del fascio.
 
 \subsection{Acquisizione per il parametro di Stokes circolare (\texorpdfstring{$S_3$}{S3})}
 \label{subsec:acquisizione-s3}
 
-Per la determinazione di $S_3$ si acquisiscono due immagini aggiuntive inserendo la lamina $\lambda/4$ nel percorso ottico tra il campione e l'analizzatore:
-\begin{itemize}
-    \item un'immagine con l'asse veloce della lamina orientato a $+45^\circ$ rispetto all'asse dell'analizzatore;
-    \item un'immagine con l'asse veloce orientato a $-45^\circ$.
-\end{itemize}
-Il parametro $S_3$ viene calcolato dalla differenza delle intensit\`a misurate nelle due configurazioni, con la correzione per la dispersione cromatica della lamina descritta nella \cref{subsec:lamina-qwp}.
+Per la determinazione di $S_3$ si acquisiscono due immagini aggiuntive inserendo la lamina $\lambda/4$ nel percorso ottico tra il campione e l'analizzatore: una con l'asse veloce orientato a $+45^\circ$ rispetto all'asse dell'analizzatore, e una a $-45^\circ$. Il parametro $S_3$ viene calcolato dalla differenza delle intensità misurate nelle due configurazioni, con la correzione per la dispersione cromatica della lamina descritta nella \cref{subsec:lamina-qwp}. Anche per le immagini della lamina $\lambda/4$ si applica l'inversione della convenzione degli angoli.
 
-L'inversione della convenzione degli angoli si applica anche alle immagini della lamina $\lambda/4$: nel software, l'immagine acquisita con l'etichetta $+45^\circ$ viene assegnata alla configurazione $-45^\circ$ e viceversa.
-
-\subsection{Costanti radiometriche}
-\label{subsec:costanti-radiometriche}
-
-Per garantire la linearit\`a della risposta del sensore e la riproducibilit\`a delle misure, tutti i parametri di esposizione vengono fissati manualmente e mantenuti costanti durante l'intera sessione di acquisizione. I valori utilizzati sono riportati nella \cref{tab:costanti-radiometriche}.
+Tutti i parametri di esposizione vengono fissati manualmente e mantenuti costanti per l'intera sessione (\cref{tab:costanti-radiometriche}). Le acquisizioni avvengono in oscurità ambientale, con la sola illuminazione del display del tablet, per eliminare contributi di luce parassita. I parametri di Stokes normalizzati ($s_i = S_i/S_0$) sono per definizione indipendenti dall'intensità assoluta della sorgente, eliminando la necessità di una calibrazione assoluta; la variabilità residua è dominata dal rumore del sensore, ridotto dal downsampling e dalla sovradeterminazione del sistema lineare.
 
 \begin{table}[H]
     \centering
@@ -132,21 +71,10 @@ Per garantire la linearit\`a della risposta del sensore e la riproducibilit\`a d
         Lunghezza focale & $\SI{7.0}{\milli\meter}$ ($\SI{69}{\milli\meter}$ eq.\ 35~mm) \\
         Apertura & $f/2.4$ (fissa) \\
         Tempo di esposizione & $1/\SI{90}{\second}$ \\
-        Sensibilit\`a ISO & 50 \\
+        Sensibilità ISO & 50 \\
         Bilanciamento del bianco & D65 / Standard Illuminant A \\
         \hline
     \end{tabular}
 \end{table}
 
-La scelta di ISO~50 e di un tempo di esposizione breve minimizza il rumore termico e il rumore di lettura. Il bilanciamento del bianco viene fissato per evitare che il software dello smartphone applichi correzioni cromatiche automatiche che altererebbero le intensit\`a relative dei canali R, G, B.
-
-\subsection{Condizioni ambientali}
-\label{subsec:condizioni-ambientali}
-
-Le acquisizioni vengono effettuate in condizioni di oscurit\`a ambientale, con la sola illuminazione fornita dal display del tablet, per eliminare contributi di luce parassita. La stabilit\`a meccanica del sistema sulla rotaia ottica \`e verificata prima di ogni sessione di misura, assicurando che nessun componente si sposti durante la sequenza di 38 acquisizioni (36 per la polarizzazione lineare e 2 per $S_3$).
-
-
-\section{Calibrazione e riproducibilit\`a}
-\label{sec:calibrazione}
-
-I parametri di Stokes normalizzati ($s_i = S_i/S_0$) sono per definizione indipendenti dall'intensit\`a assoluta della sorgente, eliminando la necessit\`a di una calibrazione assoluta. L'accuratezza \`e garantita da tre accorgimenti: acquisizione in formato RAW con parametri manuali (per preservare la linearit\`a della risposta), downsampling spaziale (per ridurre il rumore, \cref{sec:preelaborazione}), e allineamento software del sistema di riferimento (per compensare l'offset angolare della sorgente, \cref{sec:allineamento}). La variabilit\`a residua \`e dominata dal rumore del sensore, ridotto dal binning e dalla sovradeterminazione del sistema lineare.
+Il protocollo produce, per ogni sessione di misura, un dataset di 38 immagini RAW: 36 per la ricostruzione dei parametri di Stokes lineari e 2 per il parametro circolare. Il capitolo seguente presenta i campioni selezionati per la validazione dell'apparato, scelti per coprire i tre fenomeni polarimetrici descritti nel \cref{ch:teoria}.

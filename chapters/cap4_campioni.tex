@@ -1,71 +1,48 @@
-% Capitolo 4: Raccolta dati e campioni
-% Autore: sperimentale
+% Capitolo 4: Campioni
 
-\section{Criteri di selezione dei campioni}
-\label{sec:criteri-selezione}
+I campioni sono stati scelti per coprire i tre fenomeni polarimetrici di interesse --- birifrangenza, attività ottica e fotoelasticità --- privilegiando materiali trasparenti compatibili con la configurazione in trasmissione. Alcuni possiedono parametri nominali noti, utili per una validazione quantitativa; altri offrono strutture spaziali che mettono alla prova la capacità di imaging del sistema. La \cref{tab:campioni} ne riassume le caratteristiche principali; tutti sono inseriti nel porta-campione sulla rotaia, tra sorgente e analizzatore, e le superfici vengono pulite prima dell'acquisizione.
 
-I campioni sono stati scelti per coprire fenomeni ottici distinti (birifrangenza, attivit\`a ottica, fotoelasticit\`a), privilegiando materiali trasparenti compatibili con la configurazione in trasmissione. Alcuni campioni --- le lamine d'onda commerciali --- possiedono parametri nominali noti, utili per una validazione quantitativa; altri --- nastro adesivo, righello, trave a sbalzo --- offrono strutture spaziali interessanti per verificare la capacit\`a di imaging del sistema.
+\begin{table}[htbp]
+    \centering
+    \caption{Campioni analizzati con il polarimetro a immagine.}
+    \label{tab:campioni}
+    \begin{tabularx}{0.95\textwidth}{llX}
+        \hline
+        \textbf{Campione} & \textbf{Fenomeno} & \textbf{Validazione attesa} \\
+        \hline
+        Lamina $\lambda/2$ zero-order & Birifrangenza & $\delta \approx 180^\circ$, AoLP ruotato \\
+        Lamina $\lambda/4$ zero-order & Birifrangenza & $|S_3/S_0| \approx 1$ a $45^\circ$ \\
+        Nastro adesivo (1--5 strati) & Birifrangenza incrementale & $\delta \propto N$ \\
+        Soluzione di saccarosio & Attività ottica & $\alpha_\text{rot} \propto 1/\lambda^2$ \\
+        Righello in plastica & Fotoelasticità (stress residuo) & Frange isocromatiche \\
+        Trave a sbalzo & Fotoelasticità (stress applicato) & Frange sotto carico \\
+        \hline
+    \end{tabularx}
+\end{table}
 
 
-\section{Campioni analizzati}
-\label{sec:campioni-analizzati}
+\section{Campioni birifrangenti}
+\label{sec:campioni-birifrangenti}
 
-\subsection{Lamina \texorpdfstring{$\lambda/2$}{lambda/2}}
-\label{subsec:lamina-hw}
-La lamina mezz'onda (\emph{half-wave plate}, HWP) \`e un elemento ottico birifrangente che introduce un ritardo di fase di $\pi$ radianti (\SI{180}{\degree}) tra le componenti del campo elettrico parallela e perpendicolare al suo asse veloce. L'effetto macroscopico \`e una rotazione del piano di polarizzazione della luce linearmente polarizzata incidente di un angolo pari al doppio dell'angolo tra la direzione di polarizzazione e l'asse veloce della lamina.
+Le lamine d'onda commerciali ($\lambda/2$ e $\lambda/4$, entrambe zero-order a $\SI{633}{\nano\meter}$, cfr.\ \cref{sec:fenomeni}) costituiscono il primo test di validazione: la ritardanza è nota con precisione e la risposta è spazialmente uniforme, il che consente un confronto diretto tra valore misurato e valore atteso. La lamina $\lambda/4$, orientata a $\SI{45}{\degree}$ rispetto alla polarizzazione incidente, produce luce circolarmente polarizzata con $|S_3/S_0| \approx 1$; la lamina $\lambda/2$ ruota il piano di polarizzazione di un angolo pari al doppio della sua orientazione, con ritardanza nominale $\delta \approx 180^\circ$.
 
-Questo campione \`e stato utilizzato come primo test di validazione del polarimetro: la mappa dell'angolo di polarizzazione lineare (AoLP) deve mostrare una rotazione uniforme e quantitativamente coerente con la posizione angolare della lamina, mentre il grado di polarizzazione lineare (DoLP) deve rimanere prossimo all'unit\`a. La ritardanza misurata $\delta$ deve risultare circa \SI{180}{\degree}.
-
-\subsection{Lamina \texorpdfstring{$\lambda/4$}{lambda/4}}
-\label{subsec:lamina-qw-campione}
-
-La lamina quarto d'onda (\emph{quarter-wave plate}, QWP), con ritardo nominale di $\pi/2$ radianti (\SI{90}{\degree}), converte luce linearmente polarizzata in luce ellitticamente o circolarmente polarizzata (e viceversa), a seconda dell'orientazione relativa dell'asse veloce rispetto alla polarizzazione incidente.
-
-Questo campione permette di validare la capacit\`a del sistema di misurare il parametro $S_3$ e la polarizzazione circolare. In particolare, con l'asse veloce della lamina orientato a \SI{45}{\degree} rispetto alla polarizzazione incidente, la luce trasmessa deve risultare circolarmente polarizzata, con $|S_3/S_0| \approx 1$.
-
-\subsection{Soluzione di acqua e zucchero}
-\label{subsec:saccarosio}
-
-Il potere rotatorio specifico del saccarosio segue in prima approssimazione il modello di Drude (\cref{eq:mueller_rotatore}), con $[\alpha]_D = \SI{66.47}{\degree\per(\deci\meter\cdot\gram\per\milli\liter)}$ alla riga D del sodio. La soluzione \`e stata preparata sciogliendo $\SI{8.4}{\gram}$ di zucchero in una boccetta a base quadrata da $\SI{6.9}{\milli\liter}$, con cammino ottico $l = \SI{13}{\milli\meter}$ ($\SI{0.13}{\deci\meter}$), per una concentrazione gravimetrica $c_\mathrm{grav} \approx \SI{1.22}{\gram\per\milli\liter}$.
-
-Il campione consente di verificare due aspetti: la rotazione uniforme del piano di polarizzazione, osservabile come variazione omogenea dell'AoLP; e la legge di dispersione $\alpha_\mathrm{rot} \propto 1/\lambda^2$, sfruttando i tre canali colore del sensore.
-
-\subsection{Righello di plastica trasparente}
-\label{subsec:righello}
-
-Un comune righello in plastica trasparente (policarbonato o polistirene) costituisce un esempio di campione fotoelastico: le tensioni residue introdotte durante il processo di stampaggio a iniezione generano una birifrangenza non uniforme nel materiale. Quando il righello viene posto tra polarizzatore e analizzatore, le regioni a diverso stato di tensione producono pattern cromatici e frange caratteristiche.
-
-L'analisi con il polarimetro a immagine consente di mappare spazialmente la distribuzione delle tensioni interne, evidenziando le zone di concentrazione degli sforzi. Le mappe di ritardanza $\delta$ e di orientazione dell'asse veloce $\alpha$ forniscono un'immagine diretta della distribuzione tensoriale delle deformazioni nel materiale.
-
-\subsection{Vetrino con nastro adesivo stratificato}
-\label{subsec:nastro-adesivo}
-
-Un vetrino da microscopio su cui sono stati applicati da 0 a 5 strati sovrapposti di nastro adesivo trasparente rappresenta un campione a birifrangenza incrementale controllata. Il nastro adesivo, costituito da un film polimerico orientato, presenta una birifrangenza intrinseca dovuta all'allineamento preferenziale delle catene polimeriche introdotto durante il processo di produzione.
-
-Aggiungendo strati successivi, il ritardo di fase complessivo aumenta in modo approssimativamente lineare:
+Il vetrino con strati di nastro adesivo trasparente (da 1 a 5 strati, in configurazione simmetrica $1$-$2$-$3$-$4$-$5$-$4$-$3$-$2$-$1$) è un campione a birifrangenza incrementale controllata: il film polimerico orientato del nastro presenta una birifrangenza intrinseca, e la ritardanza totale cresce approssimativamente come
 \begin{equation}
-\delta_{\text{tot}} \approx N \cdot \delta_{\text{singolo}}
+\delta_{\text{tot}} \approx N \cdot \delta_{\text{singolo}},
 \label{eq:ritardo-strati}
 \end{equation}
-dove $N$ \`e il numero di strati e $\delta_{\text{singolo}}$ il ritardo introdotto da un singolo strato.
-
-Questo campione consente una verifica quantitativa della linearit\`a della risposta del polarimetro: la ritardanza misurata deve crescere proporzionalmente al numero di strati, e le regioni con diverso numero di strati devono essere chiaramente distinguibili nelle mappe spaziali. L'asse veloce $\theta$ deve risultare uniforme e parallelo alla direzione di orientamento del nastro.
-
-\subsection{Trave birifrangente a sbalzo}
-\label{subsec:cantilever}
-
-Una trave in materiale trasparente birifrangente (resina epossidica o policarbonato), vincolata a un'estremit\`a e libera all'altra (\emph{cantilever}), costituisce il campione pi\`u avanzato dal punto di vista della fotoelasticit\`a. La trave \`e stata analizzata in due condizioni:
-\begin{enumerate}
-    \item \textbf{Scarica:} senza carichi applicati, per verificare l'eventuale presenza di tensioni residue;
-    \item \textbf{Sotto carico:} con un peso applicato all'estremit\`a libera, per generare un campo di sforzi noto.
-\end{enumerate}
-
-Sotto carico, la distribuzione degli sforzi in una trave a sbalzo segue un profilo teorico ben definito dalla meccanica dei solidi: lo sforzo di flessione varia linearmente lungo lo spessore della trave e inversamente con la distanza dal vincolo. Questa distribuzione di sforzi genera, per effetto fotoelastico, un pattern di frange isocromatiche, ovvero linee lungo le quali il ritardo di fase \`e costante, che \`e direttamente osservabile nelle mappe di ritardanza $\delta$.
-
-L'analisi quantitativa delle frange isocromatiche permette di risalire alla distribuzione degli sforzi interni e di confrontare i risultati sperimentali con le previsioni teoriche della teoria delle travi di Eulero-Bernoulli. Questo campione rappresenta quindi un test significativo della capacit\`a del polarimetro di produrre informazioni quantitative utili per applicazioni ingegneristiche.
+dove $N$ è il numero di strati e $\delta_{\text{singolo}}$ il ritardo introdotto da un singolo strato. La simmetria del campione fornisce un controllo interno di consistenza: le regioni con lo stesso numero di strati ai due lati del vetrino devono restituire ritardanze concordanti.
 
 
-\section{Preparazione e montaggio dei campioni}
-\label{sec:preparazione-campioni}
+\section{Attività ottica}
+\label{sec:campione-attivita-ottica}
 
-Tutti i campioni sono inseriti nel porta-campione sulla rotaia, tra sorgente e analizzatore. Le superfici ottiche vengono pulite prima dell'acquisizione; il campione \`e centrato nel campo visivo e mantenuto stabile per l'intera sequenza di 38 immagini. Le acquisizioni avvengono in oscurit\`a ambientale, con la sola illuminazione del display. Le immagini sono salvate con nomenclatura standardizzata (\texttt{pol000.dng}\ldots\texttt{pol350.dng} per la sequenza lineare; \texttt{wav45.dng} e \texttt{wav-45.dng} per la lamina $\lambda/4$).
+Una soluzione satura di saccarosio ($\SI{8.4}{\gram}$ in una boccetta da $\SI{6.9}{\milli\liter}$, cammino ottico $l = \SI{13}{\milli\meter}$, concentrazione gravimetrica $c_\text{grav} \approx \SI{1.22}{\gram\per\milli\liter}$) consente di verificare due aspetti: la rotazione uniforme del piano di polarizzazione, osservabile come variazione omogenea dell'AoLP, e la legge di dispersione $\alpha_\text{rot} \propto 1/\lambda^2$ (modello di Drude), sfruttando i tre canali colore del sensore. Il saccarosio destrogiro ha rotazione specifica $[\alpha]_D = \SI{66.47}{\degree\per(\deci\meter\cdot\gram\per\milli\liter)}$ alla riga D del sodio.
+
+
+\section{Campioni fotoelastici}
+\label{sec:campioni-fotoelastici}
+
+Un righello in plastica trasparente presenta tensioni residue da stampaggio a iniezione che generano birifrangenza non uniforme nel materiale. Quando posto tra polarizzatore e analizzatore, le regioni a diverso stato di tensione producono le frange isocromatiche e isocline tipiche dei materiali fotoelastici (cfr.\ \cref{sec:fenomeni}). L'analisi con il polarimetro a immagine consente di mappare spazialmente la distribuzione delle tensioni interne.
+
+Una trave in materiale trasparente, vincolata a un'estremità, è stata analizzata in due condizioni: scarica, per verificare l'eventuale presenza di tensioni residue, e sotto carico, con un peso applicato all'estremità libera. Il campo di sforzi in una trave a sbalzo è noto dalla teoria di Eulero-Bernoulli: lo sforzo di flessione varia linearmente lungo lo spessore e inversamente con la distanza dal vincolo. Questa distribuzione genera, per effetto fotoelastico, un pattern di frange isocromatiche direttamente confrontabile con le previsioni teoriche, e costituisce il test più esigente delle capacità quantitative del polarimetro.
