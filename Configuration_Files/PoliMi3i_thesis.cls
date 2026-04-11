@@ -117,22 +117,22 @@
 			\\
 			{{\color{bluepoli} \singlespacing \huge \bfseries \thesistitle \par}}	
 			\vspace{1.5cm}
-			{\color{bluepoli} \bfseries \large{\textsc{Tesi di Laurea Magistrale in\\ \course}}\par}
+			{\color{bluepoli} \bfseries \large{\textsc{Tesi di Laurea Triennale in\\ \course}}\par}
 			\vspace{1.5 cm}
-			{\color{black} \Large {Author:} \bfseries{\name}}
+			{\color{black} \Large {Autore:} \bfseries{\name}}
 			\end{minipage}
 			\\
 			\vspace*{\fill}
 			\\
 			\begin{minipage}{0.85\textwidth}
 			\normalsize{
-			Student ID: {\ID}
+			Matricola: {\ID}
 			\\
-			Advisor: {\advisor}
+			Relatore: {\advisor}
 			\\
-			Co-advisors: {\coadvisor}
+			Correlatori: {\coadvisor}
 			\\
-			Academic Year: {\academicyear}
+			Anno Accademico: {\academicyear}
 			}
 			\end{minipage}
 	\end{titlepage}

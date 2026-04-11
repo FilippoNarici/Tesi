@@ -87,7 +87,7 @@ La lamina mezz'onda zero-order ($\lambda_0 = \SI{633}{\nano\meter}$), orientata 
 \subsubsection{Ripiegamento della ritardanza oltre \texorpdfstring{$180^\circ$}{180°}}
 \label{subsubsec:phase_wrapping}
 
-Un aspetto rilevante emerge dall'analisi multicanale delle lamine d'onda. Come discusso nella \cref{subsec:calcolo_ritardanza}, la ritardanza viene estratta tramite la funzione $\arccos$, il cui codominio \`e limitato all'intervallo $[0^\circ, 180^\circ]$. Per campioni la cui ritardanza reale non supera $180^\circ$ --- come una lamina $\lambda/4$ analizzata a qualsiasi lunghezza d'onda visibile --- questo non comporta alcuna ambiguit\`a.
+Un aspetto rilevante emerge dall'analisi multicanale delle lamine d'onda. Come discusso nella \cref{subsec:calcolo_ritardanza}, la ritardanza viene estratta tramite la funzione $\arccos$, il cui codominio \`e limitato all'intervallo $[0^\circ, 180^\circ]$. Per campioni la cui ritardanza reale non supera $180^\circ$ (come una lamina $\lambda/4$ analizzata a qualsiasi lunghezza d'onda visibile), questo non comporta alcuna ambiguit\`a.
 
 Il problema si manifesta con la lamina $\lambda/2$ analizzata a lunghezze d'onda inferiori a quella di progetto. Per una lamina zero-order calibrata a $\lambda_0 = \SI{633}{\nano\meter}$ con ritardanza nominale $\delta_0 = 180^\circ$, la ritardanza a una generica lunghezza d'onda scala come:
 \begin{equation}
@@ -193,7 +193,7 @@ La \cref{tab:nastro_singolo} riassume la ritardanza per singolo strato sui tre c
         \hline
         \textbf{Canale} & $\lambda_\mathrm{eff}$ [\si{\nano\meter}] & $\delta_\mathrm{singolo}$ [\si{\degree}] & $\delta$ da $1/\lambda$ [\si{\degree}] & Scostamento \\
         \hline
-        Rosso & 626 & $240 \pm 15$ & (riferimento)  & --- \\
+        Rosso & 626 & $240 \pm 15$ & (riferimento)  & -- \\
         Verde & 536 & $275 \pm 15$ & 280            & $-2\%$ \\
         Blu   & 466 & $305 \pm 20$ & 323            & $-6\%$ \\
         \hline
@@ -216,11 +216,13 @@ La mappa dell'AoLP sul canale blu mostra chiaramente l'effetto dell'attivit\`a o
     \label{fig:zucchero_aolp}
 \end{figure}
 
-La \cref{tab:saccarosio_ord} riporta la rotazione misurata sui tre canali colore. La rotazione aumenta al diminuire di $\lambda$, coerentemente con la dispersione rotatoria ottica (ORD) del saccarosio destrogiro.
+\subsubsection{Rotazione misurata e dispersione rotatoria}
+
+La \cref{tab:saccarosio_ord} riporta la rotazione ottica misurata sui tre canali colore, calcolata come differenza tra l'AoLP mediano nella regione della soluzione e quello dello sfondo. La rotazione aumenta al diminuire di $\lambda$, coerentemente con la dispersione rotatoria ottica (ORD) del saccarosio destrogiro.
 
 \begin{table}[htbp]
     \centering
-    \caption{Rotazione ottica misurata per la soluzione di saccarosio ($c \approx \SI{1.22}{\gram\per\milli\liter}$, $l = \SI{13}{\milli\meter}$) sui tre canali del sensore.}
+    \caption{Rotazione ottica misurata per la soluzione di saccarosio ($l = \SI{13}{\milli\meter}$) sui tre canali del sensore.}
     \label{tab:saccarosio_ord}
     \begin{tabular}{lcc}
         \hline
@@ -233,7 +235,31 @@ La \cref{tab:saccarosio_ord} riporta la rotazione misurata sui tre canali colore
     \end{tabular}
 \end{table}
 
-Un fit con il modello di Drude semplificato, $\alpha = a/\lambda^2$, restituisce $a = \SI{1420554}{\nano\meter\squared\degree}$ con $R^2 = 0.986$. Con soli tre punti il fit \`e formalmente quasi esatto, ma la consistenza fisica \`e solida: l'andamento \`e monotono e nella direzione attesa dalla teoria della dispersione rotatoria.
+Un fit con il modello di Drude semplificato $\alpha_\mathrm{rot} = a/\lambda^2$ restituisce:
+\begin{equation}
+    a = \SI{1420554}{\nano\meter\squared\degree}, \qquad R^2 = 0.986.
+    \label{eq:fit_drude}
+\end{equation}
+Con soli tre punti il fit \`e formalmente quasi esatto, ma la consistenza fisica \`e solida: l'andamento \`e monotono e nella direzione attesa dalla teoria della dispersione rotatoria.
+
+\subsubsection{Stima ottica della concentrazione}
+
+Combinando la legge di Biot (\cref{eq:biot}) con il modello di Drude per il potere rotatorio specifico (\cref{eq:drude-ord}), la rotazione attesa si esprime come:
+\begin{equation}
+    \alpha_\mathrm{rot}(\lambda) = [\alpha]_D \cdot \frac{\lambda_D^2}{\lambda^2} \cdot c \cdot l = \frac{[\alpha]_D \cdot \lambda_D^2 \cdot c \cdot l}{\lambda^2}
+    \label{eq:drude_biot}
+\end{equation}
+Confrontando con il fit $\alpha_\mathrm{rot} = a/\lambda^2$, si identifica $a = [\alpha]_D \cdot \lambda_D^2 \cdot c \cdot l$, da cui si ricava la concentrazione:
+\begin{equation}
+    c_\mathrm{ott} = \frac{a}{[\alpha]_D \cdot \lambda_D^2 \cdot l}
+    \label{eq:concentrazione_ottica}
+\end{equation}
+Sostituendo i valori noti ($[\alpha]_D = \SI{66.47}{\degree/(dm \cdot g/ml)}$, $\lambda_D = \SI{589.3}{\nano\meter}$, $l = \SI{0.13}{\deci\meter}$):
+\begin{equation}
+    c_\mathrm{ott} = \frac{\num{1420554}}{66.47 \times 589.3^2 \times 0.13} \approx \SI{0.47}{\gram\per\milli\liter}
+    \label{eq:c_ott_risultato}
+\end{equation}
+Questo valore \`e significativamente inferiore alla concentrazione gravimetrica $c_\mathrm{grav} \approx \SI{1.22}{\gram\per\milli\liter}$. La discrepanza di un fattore $\sim 2.6$ pu\`o essere attribuita a diversi fattori: la concentrazione molto elevata della soluzione (prossima alla saturazione), per la quale il modello di Drude semplificato e il valore tabulato di $[\alpha]_D$ per soluzioni diluite potrebbero non essere direttamente applicabili; possibili contributi delle pareti in vetro della boccetta, che introducono un ulteriore cammino ottico non attivo; e l'incertezza sulla quantit\`a di saccarosio effettivamente disciolta. Nonostante la discrepanza quantitativa, il risultato conferma la capacit\`a del polarimetro di rilevare l'attivit\`a ottica e di riprodurre correttamente la legge di dispersione rotatoria.
 
 \subsection{Righello in plastica trasparente}
 \label{subsec:risultati_righello}

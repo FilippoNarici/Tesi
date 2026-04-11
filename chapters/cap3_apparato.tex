@@ -4,20 +4,23 @@
 \section{Panoramica del setup}
 \label{sec:panoramica-setup}
 
-% TODO: Evitare gli em-dash come la peste, dead giveaway di uso di ai
-Il polarimetro a immagine sviluppato in questo lavoro di tesi si basa su una configurazione ottica in trasmissione, allestita su una rotaia ottica commerciale. L'idea fondamentale consiste nel sostituire il tradizionale rivelatore puntuale --- tipicamente un fotodiodo --- con il sensore CMOS di uno smartphone, ottenendo cos\`i una misura spazialmente risolta dello stato di polarizzazione della luce trasmessa attraverso un campione.
+Il polarimetro a immagine sviluppato in questo lavoro di tesi si basa su una configurazione ottica in trasmissione, allestita su una rotaia ottica commerciale. L'idea fondamentale consiste nel sostituire il tradizionale rivelatore puntuale, tipicamente un fotodiodo, con il sensore CMOS di uno smartphone, ottenendo cos\`i una misura spazialmente risolta dello stato di polarizzazione della luce trasmessa attraverso un campione.
 
-% TODO: Sistemare questa cosa al momento è trattata come figura ma non è una figura vera e propria, dovrebbe essere tipo un equazione inoltre aggiungerei da qualche parte le due figure vere che abbiamo del sistema (Vista 1 e Vista 2 .png)
 Lo schema ottico generale del setup \`e il seguente:
-\begin{figure}[H]
+\begin{equation}
+\text{Sorgente} \;\longrightarrow\; \text{Campione} \;\longrightarrow\; \left[\,\lambda/4\,\right] \;\longrightarrow\; \text{Analizzatore} \;\longrightarrow\; \text{Sensore}
+\label{eq:schema-ottico}
+\end{equation}
+dove la lamina $\lambda/4$ (tra parentesi quadre) viene inserita nel percorso ottico solamente durante le acquisizioni destinate alla determinazione del parametro di Stokes $S_3$, relativo alla polarizzazione circolare. La \cref{fig:setup-foto} mostra due viste dell'apparato assemblato sulla rotaia ottica.
+
+\begin{figure}[htbp]
     \centering
-    \begin{tabular}{ccccccccc}
-        Sorgente & $\longrightarrow$ & Campione & $\longrightarrow$ & $\left[\text{Lamina } \lambda/4\right]$ & $\longrightarrow$ & Analizzatore & $\longrightarrow$ & Sensore
-    \end{tabular}
-    \caption{Schema ottico del polarimetro a immagine. La lamina $\lambda/4$ (tra parentesi quadre) viene inserita solo per la misura di $S_3$.}
-    \label{fig:schema-ottico}
+    \subfloat[Vista laterale]{\includegraphics[width=0.48\textwidth]{Vista 1.png}\label{fig:vista1}}
+    \hfill
+    \subfloat[Vista dall'alto]{\includegraphics[width=0.48\textwidth]{Vista 2.png}\label{fig:vista2}}
+    \caption{Fotografie dell'apparato sperimentale assemblato sulla rotaia ottica Optosci. Si riconoscono, da sinistra a destra: il tablet (sorgente), il porta-campione, il polarizzatore rotante (analizzatore) e lo smartphone (sensore).}
+    \label{fig:setup-foto}
 \end{figure}
-dove la lamina $\lambda/4$ viene inserita nel percorso ottico solamente durante le acquisizioni destinate alla determinazione del parametro di Stokes $S_3$, relativo alla polarizzazione circolare.
 
 La filosofia progettuale che ha guidato la realizzazione dell'apparato \`e quella di un sistema \emph{low-cost}: tutti i componenti utilizzati sono commerciali e facilmente reperibili, i supporti meccanici personalizzati sono stati realizzati mediante stampa 3D, e il rivelatore \`e uno smartphone di uso comune. Questo approccio rende il sistema riproducibile e accessibile anche in contesti didattici, pur mantenendo la capacit\`a di produrre mappe di polarizzazione quantitative.
 

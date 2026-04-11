@@ -8,7 +8,7 @@ I campioni analizzati in questo lavoro sono stati selezionati con l'obiettivo di
 
 \begin{itemize}
     \item \textbf{Trasparenza:} essendo il polarimetro configurato in trasmissione, tutti i campioni devono essere almeno parzialmente trasparenti alla luce visibile emessa dalla sorgente.
-    \item \textbf{Variet\`a dei fenomeni ottici:} i campioni sono stati scelti per manifestare fenomeni diversi --- birifrangenza, attivit\`a ottica, fotoelasticit\`a --- in modo da verificare la capacit\`a del sistema di rilevare e distinguere differenti modifiche dello stato di polarizzazione.
+    \item \textbf{Variet\`a dei fenomeni ottici:} i campioni sono stati scelti per manifestare fenomeni diversi (birifrangenza, attivit\`a ottica, fotoelasticit\`a) in modo da verificare la capacit\`a del sistema di rilevare e distinguere differenti modifiche dello stato di polarizzazione.
     \item \textbf{Interesse fisico e didattico:} ogni campione \`e rappresentativo di una classe di materiali o fenomeni rilevanti in ottica, offrendo al contempo un riscontro visivo immediato nelle mappe di polarizzazione.
     \item \textbf{Disponibilit\`a di riferimenti noti:} alcuni campioni (lamine d'onda commerciali) possiedono parametri nominali che consentono una validazione quantitativa del sistema.
 \end{itemize}
@@ -33,19 +33,14 @@ Questo campione permette di validare la capacit\`a del sistema di misurare il pa
 \subsection{Soluzione di acqua e zucchero}
 \label{subsec:saccarosio}
 
-Una soluzione acquosa di saccarosio rappresenta un campione classico per lo studio dell'attivit\`a ottica: le molecole di zucchero, chirali, ruotano il piano di polarizzazione della luce linearmente polarizzata che attraversa la soluzione. L'angolo di rotazione $\alpha_\mathrm{rot}$ segue la legge di Biot (\cref{eq:biot}):
-\begin{equation}
-\alpha_\mathrm{rot} = [\alpha]_\lambda^T \cdot c \cdot l
-\label{eq:rotazione-ottica}
-\end{equation}
-dove $[\alpha]_\lambda^T$ \`e il potere rotatorio specifico (dipendente da temperatura $T$ e lunghezza d'onda $\lambda$), $c$ la concentrazione in \si{\gram\per\milli\liter} e $l$ il cammino ottico in decimetri.
+Una soluzione acquosa di saccarosio rappresenta un campione classico per lo studio dell'attivit\`a ottica: le molecole di zucchero, chirali, ruotano il piano di polarizzazione della luce linearmente polarizzata che attraversa la soluzione. L'angolo di rotazione $\alpha_\mathrm{rot}$ segue la legge di Biot (\cref{eq:biot}), dove il potere rotatorio specifico $[\alpha]_\lambda^T$ dipende dalla temperatura $T$ e dalla lunghezza d'onda $\lambda$, $c$ \`e la concentrazione in \si{\gram\per\milli\liter} e $l$ il cammino ottico in decimetri.
 
 Il potere rotatorio specifico del saccarosio dipende dalla lunghezza d'onda secondo la \emph{dispersione rotatoria ottica} (ORD). In prima approssimazione, la dipendenza segue il modello di Drude semplificato:
 \begin{equation}
 [\alpha]_\lambda \approx [\alpha]_D \cdot \frac{\lambda_D^2}{\lambda^2}
 \label{eq:drude-ord}
 \end{equation}
-dove $[\alpha]_D = \SI{66.47}{\degree\per(\deci\meter\cdot\gram\per\milli\liter)}$ \`e il potere rotatorio specifico alla riga D del sodio ($\lambda_D = \SI{589.3}{\nano\meter}$) a \SI{20}{\celsius}. Combinando l'\cref{eq:rotazione-ottica} con l'\cref{eq:drude-ord}, la rotazione attesa varia come $\alpha_\mathrm{rot} \propto 1/\lambda^2$: la rotazione \`e pi\`u intensa alle lunghezze d'onda corte.
+dove $[\alpha]_D = \SI{66.47}{\degree\per(\deci\meter\cdot\gram\per\milli\liter)}$ \`e il potere rotatorio specifico alla riga D del sodio ($\lambda_D = \SI{589.3}{\nano\meter}$) a \SI{20}{\celsius}. Combinando l'\cref{eq:biot} con l'\cref{eq:drude-ord}, la rotazione attesa varia come $\alpha_\mathrm{rot} \propto 1/\lambda^2$: la rotazione \`e pi\`u intensa alle lunghezze d'onda corte.
 
 La soluzione \`e stata preparata sciogliendo $\SI{8.4}{\gram}$ di zucchero in acqua all'interno di una boccetta a base quadrata con volume di $\SI{6.9}{\milli\liter}$ e spessore di attraversamento pari a $l = \SI{13}{\milli\meter} = \SI{0.13}{\deci\meter}$. La concentrazione gravimetrica risultante \`e $c_\mathrm{grav} = 8.4/6.9 \approx \SI{1.22}{\gram\per\milli\liter}$.
 
@@ -81,7 +76,7 @@ Una trave in materiale trasparente birifrangente (resina epossidica o policarbon
     \item \textbf{Sotto carico:} con un peso applicato all'estremit\`a libera, per generare un campo di sforzi noto.
 \end{enumerate}
 
-Sotto carico, la distribuzione degli sforzi in una trave a sbalzo segue un profilo teorico ben definito dalla meccanica dei solidi: lo sforzo di flessione varia linearmente lungo lo spessore della trave e inversamente con la distanza dal vincolo. Questa distribuzione di sforzi genera, per effetto fotoelastico, un pattern di frange isocromatiche --- linee lungo le quali il ritardo di fase \`e costante --- che \`e direttamente osservabile nelle mappe di ritardanza $\delta$.
+Sotto carico, la distribuzione degli sforzi in una trave a sbalzo segue un profilo teorico ben definito dalla meccanica dei solidi: lo sforzo di flessione varia linearmente lungo lo spessore della trave e inversamente con la distanza dal vincolo. Questa distribuzione di sforzi genera, per effetto fotoelastico, un pattern di frange isocromatiche, ovvero linee lungo le quali il ritardo di fase \`e costante, che \`e direttamente osservabile nelle mappe di ritardanza $\delta$.
 
 L'analisi quantitativa delle frange isocromatiche permette di risalire alla distribuzione degli sforzi interni e di confrontare i risultati sperimentali con le previsioni teoriche della teoria delle travi di Eulero-Bernoulli. Questo campione rappresenta quindi un test significativo della capacit\`a del polarimetro di produrre informazioni quantitative utili per applicazioni ingegneristiche.
 
