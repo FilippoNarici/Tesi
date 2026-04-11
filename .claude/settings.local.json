@@ -5,7 +5,32 @@
       "Read(//usr/local/**)",
       "Read(//c//**)",
       "Read(//c/Users/filip/AppData/Local//**)",
-      "Bash(cmd.exe:*)"
+      "Bash(cmd.exe:*)",
+      "WebSearch",
+      "Bash(PYTHONIOENCODING=utf-8 python tools/search_refs.py \"imaging polarimetry review Stokes Mueller camera\" --limit 6)",
+      "Bash(PYTHONIOENCODING=utf-8 python tools/search_refs.py \"smartphone scientific instrument low-cost optical measurement polarimetry\" --limit 6)",
+      "Bash(PYTHONIOENCODING=utf-8 python tools/search_refs.py \"pseudoinverse polarimetry calibration least squares Stokes\" --limit 6)",
+      "Bash(PYTHONIOENCODING=utf-8 python tools/search_refs.py \"photoelasticity stress birefringence imaging polarimeter\" --limit 6)",
+      "Bash(PYTHONIOENCODING=utf-8 python tools/search_refs.py \"Bayer pattern demosaicing raw image CMOS sensor\" --limit 6)",
+      "Bash(PYTHONIOENCODING=utf-8 python tools/search_refs.py \"Tyo review imaging polarimeters design\" --limit 5 --ss)",
+      "Bash(PYTHONIOENCODING=utf-8 python tools/search_refs.py \"smartphone polarimeter portable polarization measurement\" --limit 5 --ss)",
+      "Bash(PYTHONIOENCODING=utf-8 python tools/search_refs.py \"rotating analyzer Stokes polarimeter measurement technique\" --limit 5 --ss)",
+      "Bash(PYTHONIOENCODING=utf-8 python tools/search_refs.py \"Bayer color filter array patent 1976 mosaic\" --limit 5 --ss)",
+      "Bash(PYTHONIOENCODING=utf-8 python tools/search_refs.py \"photoelasticity full field polarimetry fringe analysis\" --limit 5 --ss)",
+      "Bash(PYTHONIOENCODING=utf-8 python tools/search_refs.py --verify 10.1364/AO.45.005453)",
+      "Bash(PYTHONIOENCODING=utf-8 python tools/search_refs.py --verify 10.1117/12.2558562)",
+      "Bash(PYTHONIOENCODING=utf-8 python tools/search_refs.py --verify 10.1007/BF02319657)",
+      "Bash(PYTHONIOENCODING=utf-8 python tools/search_refs.py \"Sabatke optimal Stokes polarimeter condition number\" --limit 5 --ss)",
+      "Bash(PYTHONIOENCODING=utf-8 python tools/search_refs.py \"CMOS camera raw image scientific imaging smartphone sensor spectral\" --limit 5 --ss)",
+      "Bash(PYTHONIOENCODING=utf-8 python tools/search_refs.py --verify 10.1364/OL.25.000802)",
+      "Bash(PYTHONIOENCODING=utf-8 python tools/search_refs.py \"liquid crystal display polarization retardance birefringence\" --limit 5 --ss)",
+      "Bash(PYTHONIOENCODING=utf-8 python tools/search_refs.py \"Chipman Lam Young Polarized Light polarimetry handbook\" --limit 5 --ss)",
+      "Bash(PYTHONIOENCODING=utf-8 python tools/search_refs.py \"Stokes 1852 composition resolution polarized light\" --limit 5 --ss)",
+      "Bash(PYTHONIOENCODING=utf-8 python tools/search_refs.py --verify 10.1201/9781351129121)",
+      "Bash(PYTHONIOENCODING=utf-8 python tools/search_refs.py --verify 10.1017/CBO9780511702266.010)",
+      "Bash(git add:*)",
+      "Bash(git commit -m ':*)",
+      "Bash(git push:*)"
     ]
   }
 }
