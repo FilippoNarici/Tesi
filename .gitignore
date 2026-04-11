@@ -45,3 +45,6 @@ python/raw_input/
 *.fls
 *.fdb_latexmk
 *.synctex.gz
+
+# Variabili d'ambiente (chiavi API, ecc.)
+.env
