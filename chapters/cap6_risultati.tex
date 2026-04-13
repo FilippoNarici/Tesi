@@ -3,7 +3,7 @@
 In questo capitolo si presentano i risultati ottenuti con il polarimetro a immagine. I campioni sono organizzati per tipo di validazione: prima i test di accuratezza su campioni a ritardanza nota, poi la verifica della linearità della risposta, infine la dimostrazione della versatilità del sistema su fenomeni di natura distinta.
 
 % ---------------------------------------------------------------------------
-% TODO: Questa cosa assolutamente non vera, non ho mai fatto misurazioni senza nessun campione, le uniche due "validazioni" sono lambda / 4 e lambda / 2 che seguono
+% TODO: Questa cosa assolutamente non vera, non ho mai fatto misurazioni senza nessun campione, le uniche due "validazioni" sono lambda / 4 e lambda / 2 che seguono, ciò che è vero è che la regione di sfondo estratta via la maschera presenta all'incirca Dolp 1 e Aolp 0
 \section{Validazione preliminare e presentazione delle mappe}
 \label{sec:validazione}
 
@@ -26,6 +26,7 @@ Per ciascun campione la pipeline produce le mappe bidimensionali di $S_0$, $S_1$
 \label{subsec:risultati_qw}
 
 % TODO: non so se si dica da qualche altra parte ma sia lamine che polarizzatori hanno lungo il lato una scala graduata degli angoli ogni 10 gradi e potevano essere ruotate manualmente (ovviamente con la solita inversione di segno)
+% TODO: questa cosa sulla struttura ad anello secondo me è un artefatto della lettura di claude dell'immagine, l'immagine vera presenta un chiaro cerchio centrale con ritardanza uniforme (la lamina) la montatura della lamina e lo sfondo con circa 0 delta
 La lamina quarto d'onda zero-order ($\lambda_0 = \SI{633}{\nano\meter}$), orientata a circa \SI{50}{\degree}, è stata analizzata sui tre canali colore. Le mappe di ritardanza presentano una struttura a due zone concentriche: un cerchio interno con ritardanza prossima alla saturazione della scala e un anello esterno con ritardanza inferiore. Questa non-uniformità radiale non è attesa per una lamina ideale; le cause probabili sono una variazione spaziale dello spessore del cristallo oppure un effetto di incidenza obliqua dei raggi periferici. La rumorosità delle mappe aumenta progressivamente dal canale rosso al canale blu, coerentemente con la maggiore correzione cromatica applicata al segnale di $S_3$ e con il minor rapporto segnale-rumore a lunghezze d'onda lontane da $\lambda_0$.
 
 \begin{figure}[htbp]
