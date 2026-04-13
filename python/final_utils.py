@@ -15,7 +15,7 @@ from tqdm import tqdm
 # COMMON CONFIGURATION
 # =============================================================================
 
-TARGET_FOLDER = './raw/strati_v2'
+TARGET_FOLDER = './raw/lambdamezzi_50deg'
 POL_SUBFOLDER = os.path.join(TARGET_FOLDER, 'pol')
 WAV_SUBFOLDER = os.path.join(TARGET_FOLDER, 'wav')
 WAVELENGTHS_CSV = './outputs/rgb_wavelengths.csv'
@@ -350,6 +350,10 @@ def calculate_retardance_and_fast_axis(S0, S1, S2, S3, bg_mask, smooth_sigma=1.0
     if abs(s2_in) > 0.05 * abs(s1_in):
         print(f"  WARNING: s2_in is {abs(s2_in/s1_in)*100:.1f}% of s1_in — alignment may be imperfect. "
               f"Retardance accuracy degrades as s2_in departs from 0.")
+    if abs(s3_in) > 0.1:
+        print(f"  WARNING: |s3_in| = {abs(s3_in):.3f} is large (expected ~0 for linear LCD input). "
+              f"Background mask may be sampling inside the sample aperture. "
+              f"Sign of sin(delta) — and thus retardance in (180°,360°) — may be unreliable.")
 
     # STEP 3: Spatial smoothing — trades spatial resolution for noise robustness
     if smooth_sigma > 0:

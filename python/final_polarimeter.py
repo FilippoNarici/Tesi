@@ -135,19 +135,26 @@ def main():
     # 3. Circular Stokes Parameter (S3) with Wavelength Correction
     S3 = utils.calculate_s3(utils.WAV_SUBFOLDER, utils.TARGET_CHANNEL_IDX, utils.DOWNSAMPLE_FACTOR, wavelength)
 
-    # 4. Generate Mask and Correct Math
-    # Dynamically find the background by expanding an object mask based on S0 and the S3 waveplate circle
-    bg_mask = utils.generate_background_mask(S0, S3)
+    # 4. Generate Masks
+    # bg_mask_ref: true background (outside sample holder, S3≈0). Used for alignment
+    # and retardance reference state (s1_in, s3_in). The S3-refined intersection is
+    # intentionally NOT used here: for waveplate-as-sample the intersection catches
+    # only edge pixels of the aperture which carry wrong S3 values, contaminating s3_in.
+    bg_mask_ref = utils.generate_background_mask(S0)
 
-    # Align the reference frame to compensate for the input offset using the mask
-    S1_aligned, S2_aligned = utils.align_reference_frame(S1, S2, bg_mask)
+    # bg_mask_display: restricted to the active measurement-waveplate circle, used only
+    # for the debug overlay in the 3x3 plot.
+    bg_mask_display = utils.generate_background_mask(S0, S3)
 
-    # 5. Polarization & Retardance Math (using aligned data and background mask)
+    # Align the reference frame using the clean (unrefined) background
+    S1_aligned, S2_aligned = utils.align_reference_frame(S1, S2, bg_mask_ref)
+
+    # 5. Polarization & Retardance Math (reference state from clean background)
     DoLP, AoLP = utils.calculate_dolp_aolp(S0, S1_aligned, S2_aligned)
-    delta_degrees, theta_degrees = utils.calculate_retardance_and_fast_axis(S0, S1_aligned, S2_aligned, S3, bg_mask)
+    delta_degrees, theta_degrees = utils.calculate_retardance_and_fast_axis(S0, S1_aligned, S2_aligned, S3, bg_mask_ref)
 
-    # 6. Plotting - Pass the channel index for S0 coloring
-    plot_all_parameters(S0, S1_aligned, S2_aligned, S3, DoLP, AoLP, delta_degrees, theta_degrees, bg_mask, utils.TARGET_CHANNEL_IDX)
+    # 6. Plotting - debug mask uses the S3-refined region for visual clarity
+    plot_all_parameters(S0, S1_aligned, S2_aligned, S3, DoLP, AoLP, delta_degrees, theta_degrees, bg_mask_display, utils.TARGET_CHANNEL_IDX)
 
     print("--- Finished ---")
 

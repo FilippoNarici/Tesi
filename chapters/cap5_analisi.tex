@@ -90,31 +90,52 @@ Dai parametri di Stokes allineati si calcolano il grado di polarizzazione linear
 Il DoLP è limitato all'intervallo $[0, 1]$: valori prossimi a $1$ indicano luce completamente polarizzata linearmente, valori prossimi a $0$ indicano luce non polarizzata o polarizzata circolarmente. L'AoLP è calcolato in gradi nell'intervallo $[-90^\circ, +90^\circ]$ e rappresenta la direzione dell'asse di polarizzazione lineare predominante in ciascun pixel.
 
 % ---------------------------------------------------------------------------
-\section{Estrazione della ritardanza e dell'asse veloce}
+\section{Estrazione della ritardanza e dell’asse veloce}
 \label{sec:retardance}
 
-La ritardanza $\delta$ e l'orientazione dell'asse veloce $\alpha$ vengono estratte combinando tutti e quattro i parametri di Stokes, con lo stato di polarizzazione in ingresso caratterizzato dai valori mediani nella regione di sfondo ($s_{1,\mathrm{in}}$, $s_{3,\mathrm{in}}$). I parametri vengono normalizzati rispetto all'intensità totale: $s_i = S_i / S_0$; un eventuale offset circolare sistematico viene compensato sottraendo $s_{3,\mathrm{in}}$.
+La ritardanza $\delta$ e l’orientazione dell’asse veloce $\alpha$ vengono estratte combinando tutti e quattro i parametri di Stokes. Lo stato di polarizzazione in ingresso è caratterizzato dai valori mediani nella regione di sfondo: $s_{1,\mathrm{in}}$, $s_{2,\mathrm{in}}$ e $s_{3,\mathrm{in}}$, con $s_i = S_i/S_0$. Un eventuale offset circolare sistematico viene rimosso definendo $s_{3,\mathrm{corr}} = s_3 - s_{3,\mathrm{in}}$ prima del calcolo di $\sin\delta$. Per aumentare la robustezza al rumore a scapito del dettaglio spaziale, i parametri $s_1$, $s_2$, $s_3$ vengono convoluiti con un filtro gaussiano di deviazione standard $\sigma$ (in pixel dell’immagine ricampionata) prima di qualsiasi ulteriore elaborazione; il valore predefinito è $\sigma = 1$.
 
 \subsection{Modello di estrazione}
 \label{subsec:modello_retardance}
 
-L'angolo dell'asse veloce e la ritardanza si ricavano dalle relazioni:
+Per uno stato di ingresso a polarizzazione lineare prevalentemente orizzontale, la propagazione attraverso un ritardatore con asse veloce a $\alpha$ e ritardanza $\delta$ produce le componenti di Stokes uscenti:
+\begin{align}
+    s_1 &= s_{1,\mathrm{in}}\bigl[1 - \sin^2\!2\alpha\,(1-\cos\delta)\bigr], \label{eq:s1_ritardatore}\\
+    s_2 &= s_{1,\mathrm{in}}\,\sin 2\alpha\cos 2\alpha\,(1-\cos\delta), \label{eq:s2_ritardatore}\\
+    s_3 &= s_{1,\mathrm{in}}\,\sin 2\alpha\,\sin\delta + s_{3,\mathrm{in}}. \label{eq:s3_ritardatore}
+\end{align}
+Invertendo le \cref{eq:s1_ritardatore,eq:s2_ritardatore}, l’angolo dell’asse veloce si ricava tramite:
 \begin{equation}
-    \alpha = \frac{1}{2} \arctan\!\left(\frac{s_{1,\mathrm{in}} - s_1}{s_2}\right),
+    \alpha = \frac{1}{2} \arctan\!\left(\frac{A}{s_2}\right), \qquad A = \max(s_{1,\mathrm{in}} - s_1,\; 0),
     \label{eq:asse_veloce}
 \end{equation}
+dove $A$ è limitato a valori non negativi per imporre il vincolo fisico che un ritardatore passivo non può aumentare la componente $s_1$; l’uso di $\arctan2(A, s_2)$ garantisce la corretta risoluzione della quadrante rispetto all’$\arctan$ ordinario. Noti $\alpha$ e $A$, il coseno e il seno della ritardanza si ricavano separatamente dalle \cref{eq:s1_ritardatore,eq:s3_ritardatore}:
 \begin{equation}
-    \cos\delta = 1 - \frac{s_{1,\mathrm{in}} - s_1}{s_{1,\mathrm{in}} \cdot \sin^2\!2\alpha}.
-    \label{eq:ritardanza_analisi}
+    \cos\delta = 1 - \frac{A}{s_{1,\mathrm{in}} \cdot \sin^2\!2\alpha},
+    \label{eq:cos_delta}
 \end{equation}
-Il segno di $\delta$ viene determinato dal prodotto $s_{3,\mathrm{corr}} \cdot \sin 2\alpha$: se negativo, la ritardanza è assegnata con segno negativo, preservando l'informazione sulla chiralità del campione.
+\begin{equation}
+    \sin\delta = \frac{s_{3,\mathrm{corr}}}{s_{1,\mathrm{in}} \cdot \sin 2\alpha}.
+    \label{eq:sin_delta}
+\end{equation}
+La ritardanza viene ricostruita tramite $\delta = \arctan2(\sin\delta,\cos\delta)$ e mappata all’intervallo $[0^\circ, 360^\circ)$ sommando $360^\circ$ ai valori negativi. Questa scelta è preferita alla convenzione con segno $(-180^\circ, 180^\circ]$ perché elimina la discontinuità di avvolgimento a $\pm180^\circ$, la quale, in presenza di rumore, produce salti bruschi e artefatti nelle mappe.
 
 \subsection{Trattamento delle ambiguità numeriche}
 \label{subsec:ambiguita_numeriche}
 
 % TODO: utile dire che "A supporto dell’analisi è stato sviluppato uno strumento interattivo che consente di sovrapporre, per qualsiasi pixel selezionato, i 36 valori misurati alla curva di Malus teorica e di visualizzare l’ellisse di polarizzazione corrispondente." ma questa non mi sembra la sezione giusta, anche perchè non aiuta necessariamente qua
 
-Il denominatore $\sin^2\!2\alpha$ in \cref{eq:ritardanza_analisi} può diventare molto piccolo quando l'asse veloce è prossimo a $0^\circ$ o $90^\circ$, generando instabilità numeriche. Il calcolo viene pertanto eseguito solo sui pixel in cui $\sin^2\!2\alpha > 0.02$; nei pixel rimanenti si assegna $\delta = 0$. L'argomento della funzione $\arccos$ viene inoltre limitato all'intervallo $[-1, 1]$ prima del calcolo, per prevenire valori NaN dovuti a piccole eccedenze numeriche. A supporto dell'analisi è stato sviluppato uno strumento interattivo che consente di sovrapporre, per qualsiasi pixel selezionato, i 36 valori misurati alla curva di Malus teorica e di visualizzare l'ellisse di polarizzazione corrispondente.
+Quando l’asse veloce è prossimo a $0^\circ$ o $90^\circ$, $\sin^2\!2\alpha$ tende a zero e i denominatori delle \cref{eq:cos_delta,eq:sin_delta} diventano numericamente instabili. Una soglia binaria rigida risolverebbe il problema numerico ma introdurrebbe un anello visibile nelle mappe in corrispondenza della frontiera di esclusione, dove $\delta$ salterebbe bruscamente a zero. Si adotta invece un peso di transizione continua:
+\begin{equation}
+    w = \mathrm{clip}\!\left(\frac{\sin^2\!2\alpha - 0.02}{0.02},\; 0,\; 1\right),
+    \label{eq:peso_stabilita}
+\end{equation}
+che vale $0$ per $\sin^2\!2\alpha \leq 0.02$, $1$ per $\sin^2\!2\alpha \geq 0.04$, e varia linearmente tra questi estremi. I valori calcolati vengono quindi pesati verso il caso di assenza di ritardanza ($\cos\delta \to 1$, $\sin\delta \to 0$):
+\begin{equation}
+    \cos\delta \leftarrow w \cdot \cos\delta_{\mathrm{calc}} + (1-w), \qquad \sin\delta \leftarrow w \cdot \sin\delta_{\mathrm{calc}},
+    \label{eq:peso_applicato}
+\end{equation}
+in modo che i pixel a bassa affidabilità convergano gradualmente a $\delta \to 0$ senza discontinuità visibili. I denominatori in \cref{eq:cos_delta,eq:sin_delta} vengono ulteriormente regolarizzati imponendo un valore minimo assoluto prima della divisione per escludere overflow numerici. A supporto dell’analisi è stato sviluppato uno strumento interattivo che consente di sovrapporre, per qualsiasi pixel selezionato, i 36 valori misurati alla curva di Malus teorica e di visualizzare l’ellisse di polarizzazione corrispondente.
 
 % ---------------------------------------------------------------------------
 \section{Rappresentazione delle mappe}
