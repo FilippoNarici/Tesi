@@ -84,7 +84,7 @@ def plot_all_parameters(S0, S1, S2, S3, DoLP, AoLP, delta, theta, bg_mask, chann
         axes[2, 0].axis('off')
         fig.colorbar(im_theta, ax=axes[2, 0], fraction=0.046, pad=0.04, label='Degrees')
 
-        im_delta = axes[2, 1].imshow(delta, cmap='twilight', vmin=-180, vmax=180)
+        im_delta = axes[2, 1].imshow(delta, cmap='twilight', vmin=0, vmax=360)
         axes[2, 1].set_title('Retardance (Delta)')
         axes[2, 1].axis('off')
         fig.colorbar(im_delta, ax=axes[2, 1], fraction=0.046, pad=0.04, label='Degrees')

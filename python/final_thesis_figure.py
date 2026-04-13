@@ -92,8 +92,8 @@ PARAM_CONFIG = {
         'titolo': 'Ritardo di fase $\\delta$',
         'unita': '°',
         'cmap': 'twilight',
-        'vmin': -180,
-        'vmax': 180,
+        'vmin': 0,
+        'vmax': 360,
     },
     'theta': {
         'titolo': 'Asse veloce $\\theta$',

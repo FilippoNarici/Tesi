@@ -15,13 +15,13 @@ from tqdm import tqdm
 # COMMON CONFIGURATION
 # =============================================================================
 
-TARGET_FOLDER = './raw/righello_v2'
+TARGET_FOLDER = './raw/strati_v2'
 POL_SUBFOLDER = os.path.join(TARGET_FOLDER, 'pol')
 WAV_SUBFOLDER = os.path.join(TARGET_FOLDER, 'wav')
 WAVELENGTHS_CSV = './outputs/rgb_wavelengths.csv'
 
 # Sensor channels: 0: Red, 1: Green, 2: Blue
-TARGET_CHANNEL_IDX = 0
+TARGET_CHANNEL_IDX = 1
 
 # Default downsampling factor for the full polarimeter mapping
 DOWNSAMPLE_FACTOR = 20
@@ -303,9 +303,13 @@ def calculate_retardance_and_fast_axis(S0, S1, S2, S3, bg_mask, smooth_sigma=1.0
     Calculates Retardance (Delta) and Fast Axis (Theta) for a linear retarder.
 
     Uses spatial Gaussian smoothing on normalized Stokes components before computation
-    to maximise stability at the cost of spatial detail.  The signed retardance is
-    obtained via arctan2(sin_delta, cos_delta) instead of the fragile arccos + separate
-    sign-correction step, eliminating sign flips near delta=0 and theta=0/90.
+    to maximise stability at the cost of spatial detail.  The retardance is obtained
+    via arctan2(sin_delta, cos_delta) and mapped to [0°, 360°) to eliminate the
+    wrapping discontinuity at ±180° present in the signed [-180, 180] convention.
+
+    Pixels where sin²(2θ) is near zero (θ ≈ 0° or 90°) lack information about δ.
+    Instead of a hard binary mask, a smooth sigmoid weight fades these pixels toward
+    δ = 0, avoiding visible boundary artefacts.
 
     Parameters
     ----------
@@ -313,6 +317,13 @@ def calculate_retardance_and_fast_axis(S0, S1, S2, S3, bg_mask, smooth_sigma=1.0
         Standard deviation (pixels, in downsampled space) for the pre-smoothing
         Gaussian filter.  Higher values give smoother but less detailed maps.
         Default 1.  Set to 0 to disable smoothing.
+
+    Returns
+    -------
+    delta_degrees : ndarray
+        Retardance in degrees, range [0, 360).
+    theta_degrees : ndarray
+        Fast axis angle in degrees, range [0, 90].
     """
     print("Calculating Retardance and Fast Axis...")
     if S3 is None:
@@ -328,12 +339,17 @@ def calculate_retardance_and_fast_axis(S0, S1, S2, S3, bg_mask, smooth_sigma=1.0
     # STEP 2: Background input state from unobstructed (mask) region
     if np.any(bg_mask):
         s1_in = np.median(s1[bg_mask])
+        s2_in = np.median(s2[bg_mask])
         s3_in = np.median(s3[bg_mask])
     else:
         s1_in = 1.0
+        s2_in = 0.0
         s3_in = 0.0
 
-    print(f"  Background input: s1_in={s1_in:.4f}, s3_in={s3_in:.4f}")
+    print(f"  Background input: s1_in={s1_in:.4f}, s2_in={s2_in:.4f}, s3_in={s3_in:.4f}")
+    if abs(s2_in) > 0.05 * abs(s1_in):
+        print(f"  WARNING: s2_in is {abs(s2_in/s1_in)*100:.1f}% of s1_in — alignment may be imperfect. "
+              f"Retardance accuracy degrades as s2_in departs from 0.")
 
     # STEP 3: Spatial smoothing — trades spatial resolution for noise robustness
     if smooth_sigma > 0:
@@ -357,25 +373,38 @@ def calculate_retardance_and_fast_axis(S0, S1, S2, S3, bg_mask, smooth_sigma=1.0
     sin_2theta = np.sin(2 * theta)
     sin_2theta_sq = sin_2theta ** 2
 
-    # STEP 6: Numerically stable region (sin(2θ) not too small)
-    stable = sin_2theta_sq > 0.02
+    # STEP 6: Smooth stability weight instead of a hard cutoff.
+    # A hard mask (sin²2θ > threshold) creates a visible ring where δ snaps to 0.
+    # Instead, blend smoothly from 0 (unreliable, δ→0 fallback) to 1 (fully trusted)
+    # using a sigmoid-like ramp centred at sin²2θ = 0.02 with width ~0.02.
+    STABILITY_CENTRE = 0.02
+    STABILITY_WIDTH = 0.02
+    weight = np.clip((sin_2theta_sq - STABILITY_CENTRE) / STABILITY_WIDTH, 0.0, 1.0)
+
+    stable_frac = np.mean(weight > 0.5) * 100
+    print(f"  Stability: {stable_frac:.1f}% of pixels above half-weight threshold")
 
     # STEP 7: cos(δ) from S1
     # cos δ = 1 - (s1_in - s1) / (s1_in * sin²(2θ))
-    cos_delta = np.ones_like(s1)
-    cos_delta[stable] = 1.0 - A[stable] / (s1_in * sin_2theta_sq[stable])
-    cos_delta = np.clip(cos_delta, -1.0, 1.0)
+    # Regularise the denominator to avoid division by zero, then let the weight
+    # fade unreliable pixels toward the fallback (cos_delta = 1, i.e. δ = 0).
+    denom_cos = s1_in * np.maximum(sin_2theta_sq, 1e-6)
+    cos_delta_raw = 1.0 - A / denom_cos
+    cos_delta_raw = np.clip(cos_delta_raw, -1.0, 1.0)
+    cos_delta = weight * cos_delta_raw + (1.0 - weight) * 1.0  # fallback: cosδ=1
 
     # STEP 8: sin(δ) from S3
     # s3_corrected = s1_in * sin(2θ) * sin(δ)
     # => sin δ = s3_corrected / (s1_in * sin(2θ))
-    # In unstable pixels sin_2theta ~ 0, so sin_delta stays 0 (δ → 0, physically consistent).
-    sin_delta = np.zeros_like(s1)
-    sin_delta[stable] = s3_corrected[stable] / (s1_in * sin_2theta[stable])
-    sin_delta = np.clip(sin_delta, -1.0, 1.0)
+    denom_sin = s1_in * np.where(np.abs(sin_2theta) < 1e-4, np.sign(sin_2theta + 1e-12) * 1e-4, sin_2theta)
+    sin_delta_raw = s3_corrected / denom_sin
+    sin_delta_raw = np.clip(sin_delta_raw, -1.0, 1.0)
+    sin_delta = weight * sin_delta_raw  # fallback: sinδ=0
 
-    # STEP 9: Signed retardance via arctan2 — naturally resolves sign without a separate
-    # correction step, eliminating sign-flip artefacts near δ=0 and near θ=0/90°.
+    # STEP 9: Retardance via arctan2, mapped to [0°, 360°).
+    # The [0, 360) range eliminates the wrapping discontinuity at ±180° where
+    # noisy pixels jump between -180 and +180, producing cleaner maps.
     delta = np.arctan2(sin_delta, cos_delta)
+    delta = np.where(delta < 0, delta + 2.0 * np.pi, delta)
 
     return np.degrees(delta), np.degrees(theta)
