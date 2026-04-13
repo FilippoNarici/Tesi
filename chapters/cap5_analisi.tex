@@ -1,5 +1,6 @@
 % Capitolo 5: Analisi dei dati
 
+% TODO: Aggiornare con la versione più recente dello script
 Le 38 immagini RAW acquisite per ogni campione vengono elaborate in sequenza per ricavare i parametri di Stokes e le grandezze polarimetriche derivate. L'intera catena di analisi è stata implementata in Python, sfruttando le librerie \texttt{numpy}, \texttt{rawpy} e \texttt{scipy}.
 
 % ---------------------------------------------------------------------------
@@ -19,12 +20,24 @@ Le immagini del sensore hanno una risoluzione nativa dell'ordine di $4000 \times
 
 Il sensore CMOS non è un rivelatore monocromatico: ciascun canale colore ha una risposta spettrale estesa su diverse decine di nanometri. Poiché la ritardanza introdotta dalla lamina quarto d'onda dipende dalla lunghezza d'onda (\cref{sec:determinazione-s3}), è necessario assegnare a ciascun canale una lunghezza d'onda effettiva rappresentativa.
 
+% TODO: Approfondire come abbiamo lo spettro, così sembra piovuto dal cielo, misurato tramite AvaSpec 2048
 Il metodo adottato è il baricentro con soglia. Dati lo spettro di emissione della sorgente $I(\lambda)$ e la sensibilità spettrale del canale $S_c(\lambda)$, il segnale effettivo registrato è $E_c(\lambda) = S_c(\lambda) \cdot I(\lambda)$. La lunghezza d'onda centroide si calcola come media pesata, dopo aver applicato una soglia al $30\%$ del valore di picco per escludere le code a bassa intensità:
 \begin{equation}
     \lambda_{\mathrm{eff},c} = \frac{\displaystyle\sum_{\lambda:\,E_c(\lambda) \geq 0.3\,E_c^{\max}} \lambda \cdot E_c(\lambda)}{\displaystyle\sum_{\lambda:\,E_c(\lambda) \geq 0.3\,E_c^{\max}} E_c(\lambda)}.
     \label{eq:centroide}
 \end{equation}
-I dati di sensibilità spettrale utilizzati sono quelli del Samsung Galaxy S22 Rear Telephoto, adottato come proxy per il sensore del Galaxy S24, ottenuti dal database pubblico Color Lab Eilat. Lo spettro della sorgente LCD è stato misurato separatamente.
+% TODO: Aggiungere a bibliografia 
+
+%fonte: https://color-lab-eilat.github.io/Spectral-sensitivity-estimation-web/
+
+%  @inproceedings{Solomatov2023spectral,
+%  author = {Grigory Solomatov and Derya Akkaynak},
+%  title = {Spectral Sensitivity Estimation Without a Camera},
+%  booktitle = {IEEE International Conference on Computational Photography (ICCP)},
+%  year = {2023},
+%  month = {July}
+%  }
+I dati di sensibilità spettrale utilizzati sono quelli del Samsung Galaxy S22 Rear Telephoto, adottato come proxy per il sensore del Galaxy S24 per l'obiettivo telephoto, ottenuti dal database pubblico Color Lab Eilat. Lo spettro della sorgente LCD è stato misurato separatamente.
 
 % ---------------------------------------------------------------------------
 \section{Ricostruzione di \texorpdfstring{$S_0$, $S_1$, $S_2$}{S0, S1, S2}}
@@ -45,7 +58,7 @@ Poiché la matrice $\mathbf{A}$ non dipende dal pixel, la pseudo-inversa viene c
 % ---------------------------------------------------------------------------
 \section{Determinazione della componente circolare \texorpdfstring{$S_3$}{S3}}
 \label{sec:determinazione-s3}
-
+% TODO: Fonte è il manuale laboratorio polimi, eccetto correzione lambda, quella lho aggiunta io
 Il parametro $S_3$, che quantifica la componente di polarizzazione circolare, non è accessibile tramite il solo analizzatore lineare. La sua misura richiede l'inserimento della lamina $\lambda/4$ nel cammino ottico, che converte la polarizzazione circolare in polarizzazione lineare analizzabile. Le due immagini acquisite con la lamina a $+45^\circ$ e $-45^\circ$ forniscono le intensità $I_{+45}$ e $I_{-45}$, legate a $S_3$ dalla relazione:
 \begin{equation}
     S_3 = \frac{I_{+45} - I_{-45}}{\sin\delta(\lambda)},
@@ -56,7 +69,7 @@ dove $\delta(\lambda)$ è il ritardo di fase effettivo della lamina alla lunghez
 % ---------------------------------------------------------------------------
 \section{Selezione della regione utile}
 \label{sec:mascheramento}
-
+% TODO: Chiarire questo, rileggere codice per essere sicuri
 Solo una porzione del campo visivo è effettivamente illuminata dal fascio che attraversa l'apparato. Le regioni non illuminate contengono rumore di fondo che, se incluso nell'analisi, introdurrebbe artefatti nelle mappe dei parametri normalizzati. È pertanto necessaria una maschera binaria che isoli l'area utile.
 
 La maschera viene generata a partire dalla mappa di intensità $S_0$. Si calcola un profilo di illuminazione locale tramite filtro gaussiano e si identificano come bordi i pixel con intensità inferiore al $95\%$ del profilo locale. I bordi vengono dilatati morfologicamente per chiudere eventuali discontinuità, le cavità interne riempite, e si conserva la componente connessa di area maggiore con un margine di sicurezza. Quando è disponibile anche la mappa di $S_3$, la maschera viene ulteriormente ristretta all'area effettivamente coperta dall'apertura circolare della lamina $\lambda/4$, che è più piccola del campo illuminato: il risultato è l'intersezione delle due regioni.
@@ -65,7 +78,7 @@ La maschera viene generata a partire dalla mappa di intensità $S_0$. Si calcola
 \section{Allineamento del sistema di riferimento}
 \label{sec:allineamento}
 
-L'asse di polarizzazione di uscita del display LCD non è necessariamente allineato con l'asse di riferimento dell'analizzatore. Questo offset angolare si manifesta come una rotazione sistematica delle mappe di $S_1$ e $S_2$. La correzione viene effettuata misurando l'angolo di polarizzazione mediano nella regione di sfondo:
+L'asse di polarizzazione di uscita del display LCD non è perfettamente allineato con l'asse di riferimento dell'analizzatore. Questo offset angolare si manifesta come una rotazione sistematica delle mappe di $S_1$ e $S_2$. La correzione viene effettuata misurando l'angolo di polarizzazione mediano nella regione di sfondo:
 \begin{equation}
     \alpha_{\mathrm{bg}} = \frac{1}{2} \arctan\!\left(\frac{\langle S_2 \rangle_{\mathrm{bg}}}{\langle S_1 \rangle_{\mathrm{bg}}}\right),
     \label{eq:angolo_offset}
@@ -76,6 +89,7 @@ dove $\langle \cdot \rangle_{\mathrm{bg}}$ indica la mediana sui pixel della mas
     \label{eq:rotazione_stokes}
 \end{equation}
 Dopo la correzione, la luce di sfondo risulta polarizzata orizzontalmente ($S_1' > 0$, $S_2' \approx 0$) e l'angolo di polarizzazione lineare è riferito all'asse dell'analizzatore.
+% TODO: Che strano questo, ma ha senso? Se lo schermo emette in verticale non crea confusione? verificare anche cosa dice il codice per vedere
 
 % ---------------------------------------------------------------------------
 \section{Grandezze polarimetriche derivate}
@@ -110,6 +124,8 @@ Il segno di $\delta$ viene determinato dal prodotto $s_{3,\mathrm{corr}} \cdot \
 
 \subsection{Trattamento delle ambiguità numeriche}
 \label{subsec:ambiguita_numeriche}
+
+% TODO: utile dire che "A supporto dell’analisi è stato sviluppato uno strumento interattivo che consente di sovrapporre, per qualsiasi pixel selezionato, i 36 valori misurati alla curva di Malus teorica e di visualizzare l’ellisse di polarizzazione corrispondente." ma questa non mi sembra la sezione giusta, anche perchè non aiuta necessariamente qua
 
 Il denominatore $\sin^2\!2\alpha$ in \cref{eq:ritardanza_analisi} può diventare molto piccolo quando l'asse veloce è prossimo a $0^\circ$ o $90^\circ$, generando instabilità numeriche. Il calcolo viene pertanto eseguito solo sui pixel in cui $\sin^2\!2\alpha > 0.02$; nei pixel rimanenti si assegna $\delta = 0$. L'argomento della funzione $\arccos$ viene inoltre limitato all'intervallo $[-1, 1]$ prima del calcolo, per prevenire valori NaN dovuti a piccole eccedenze numeriche. A supporto dell'analisi è stato sviluppato uno strumento interattivo che consente di sovrapporre, per qualsiasi pixel selezionato, i 36 valori misurati alla curva di Malus teorica e di visualizzare l'ellisse di polarizzazione corrispondente.
 
