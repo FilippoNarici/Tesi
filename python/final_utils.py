@@ -15,13 +15,13 @@ from tqdm import tqdm
 # COMMON CONFIGURATION
 # =============================================================================
 
-TARGET_FOLDER = './raw/strati_v2'
+TARGET_FOLDER = './raw/righello_v2'
 POL_SUBFOLDER = os.path.join(TARGET_FOLDER, 'pol')
 WAV_SUBFOLDER = os.path.join(TARGET_FOLDER, 'wav')
 WAVELENGTHS_CSV = './outputs/rgb_wavelengths.csv'
 
 # Sensor channels: 0: Red, 1: Green, 2: Blue
-TARGET_CHANNEL_IDX = 2
+TARGET_CHANNEL_IDX = 0
 
 # Default downsampling factor for the full polarimeter mapping
 DOWNSAMPLE_FACTOR = 20
@@ -298,20 +298,34 @@ def calculate_dolp_aolp(S0, S1, S2):
 
     return DoLP, AoLP_deg
 
-def calculate_retardance_and_fast_axis(S0, S1, S2, S3, bg_mask):
-    """Calculates Retardance (Delta) and Fast Axis (Theta) using real input parameters."""
-    print("Calculating Retardance and Fast Axis (Corrected for true input)...")
+def calculate_retardance_and_fast_axis(S0, S1, S2, S3, bg_mask, smooth_sigma=1.0):
+    """
+    Calculates Retardance (Delta) and Fast Axis (Theta) for a linear retarder.
+
+    Uses spatial Gaussian smoothing on normalized Stokes components before computation
+    to maximise stability at the cost of spatial detail.  The signed retardance is
+    obtained via arctan2(sin_delta, cos_delta) instead of the fragile arccos + separate
+    sign-correction step, eliminating sign flips near delta=0 and theta=0/90.
+
+    Parameters
+    ----------
+    smooth_sigma : float
+        Standard deviation (pixels, in downsampled space) for the pre-smoothing
+        Gaussian filter.  Higher values give smoother but less detailed maps.
+        Default 1.  Set to 0 to disable smoothing.
+    """
+    print("Calculating Retardance and Fast Axis...")
     if S3 is None:
         print("Warning: S3 is required to calculate retardance. Returning None.")
         return None, None
 
-    # STEP 1: Normalize
+    # STEP 1: Normalize Stokes components
     S0_safe = np.where(S0 == 0, 1e-8, S0)
     s1 = S1 / S0_safe
     s2 = S2 / S0_safe
     s3 = S3 / S0_safe
 
-    # STEP 2: Extract real background input states
+    # STEP 2: Background input state from unobstructed (mask) region
     if np.any(bg_mask):
         s1_in = np.median(s1[bg_mask])
         s3_in = np.median(s3[bg_mask])
@@ -319,32 +333,49 @@ def calculate_retardance_and_fast_axis(S0, S1, S2, S3, bg_mask):
         s1_in = 1.0
         s3_in = 0.0
 
-    # Compensate for circular background offset
+    print(f"  Background input: s1_in={s1_in:.4f}, s3_in={s3_in:.4f}")
+
+    # STEP 3: Spatial smoothing — trades spatial resolution for noise robustness
+    if smooth_sigma > 0:
+        s1 = ndimage.gaussian_filter(s1, sigma=smooth_sigma)
+        s2 = ndimage.gaussian_filter(s2, sigma=smooth_sigma)
+        s3 = ndimage.gaussian_filter(s3, sigma=smooth_sigma)
+
+    # STEP 4: Background-corrected S3 (remove residual circular component from source)
     s3_corrected = s3 - s3_in
 
-    # STEP 3: Fast Axis Angle (Theta) - Use real s1_in
-    theta = 0.5 * np.arctan2(s1_in - s1, s2)
+    # STEP 5: Fast Axis Angle (Theta)
+    # For horizontally-polarised input (s2_in=0):
+    #   A = s1_in - s1 = s1_in * sin²(2θ) * (1 - cos δ)  >= 0 for a physical retarder
+    #   s2           = s1_in * sin(2θ) * cos(2θ) * (1 - cos δ)
+    # => arctan2(A, s2) = 2θ,  θ in [0°, 90°]
+    # Clamping A to [0, ∞) enforces the physics constraint and prevents noise-driven
+    # sign flips in arctan2 that would push theta into negative territory.
+    A = np.maximum(s1_in - s1, 0.0)
+    theta = 0.5 * np.arctan2(A, s2)
 
-    # STEP 4: Retardance Magnitude (Delta)
-    sin_2theta_sq = np.sin(2 * theta)**2
+    sin_2theta = np.sin(2 * theta)
+    sin_2theta_sq = sin_2theta ** 2
 
-    # Numerical Safety Check
-    safe_mask = sin_2theta_sq > 0.02
+    # STEP 6: Numerically stable region (sin(2θ) not too small)
+    stable = sin_2theta_sq > 0.02
 
+    # STEP 7: cos(δ) from S1
+    # cos δ = 1 - (s1_in - s1) / (s1_in * sin²(2θ))
     cos_delta = np.ones_like(s1)
-    # Use s1_in for the amplitude normalization
-    cos_delta[safe_mask] = 1 - ((s1_in - s1[safe_mask]) / (s1_in * sin_2theta_sq[safe_mask]))
-
-    # Clip to valid arccos range to prevent NaNs
+    cos_delta[stable] = 1.0 - A[stable] / (s1_in * sin_2theta_sq[stable])
     cos_delta = np.clip(cos_delta, -1.0, 1.0)
-    delta_magnitude = np.arccos(cos_delta)
 
-    # STEP 5: Apply Sign Correction using the corrected S3
-    sign_checker = s3_corrected * np.sin(2 * theta)
-    delta_signed = np.where(sign_checker < 0, -delta_magnitude, delta_magnitude)
+    # STEP 8: sin(δ) from S3
+    # s3_corrected = s1_in * sin(2θ) * sin(δ)
+    # => sin δ = s3_corrected / (s1_in * sin(2θ))
+    # In unstable pixels sin_2theta ~ 0, so sin_delta stays 0 (δ → 0, physically consistent).
+    sin_delta = np.zeros_like(s1)
+    sin_delta[stable] = s3_corrected[stable] / (s1_in * sin_2theta[stable])
+    sin_delta = np.clip(sin_delta, -1.0, 1.0)
 
-    # STEP 6: Convert to Degrees
-    delta_degrees = np.degrees(delta_signed)
-    theta_degrees = np.degrees(theta)
+    # STEP 9: Signed retardance via arctan2 — naturally resolves sign without a separate
+    # correction step, eliminating sign-flip artefacts near δ=0 and near θ=0/90°.
+    delta = np.arctan2(sin_delta, cos_delta)
 
-    return delta_degrees, theta_degrees
+    return np.degrees(delta), np.degrees(theta)

@@ -26,18 +26,7 @@ Il metodo adottato è il baricentro con soglia. Dati lo spettro di emissione del
     \lambda_{\mathrm{eff},c} = \frac{\displaystyle\sum_{\lambda:\,E_c(\lambda) \geq 0.3\,E_c^{\max}} \lambda \cdot E_c(\lambda)}{\displaystyle\sum_{\lambda:\,E_c(\lambda) \geq 0.3\,E_c^{\max}} E_c(\lambda)}.
     \label{eq:centroide}
 \end{equation}
-% TODO: Aggiungere a bibliografia 
-
-%fonte: https://color-lab-eilat.github.io/Spectral-sensitivity-estimation-web/
-
-%  @inproceedings{Solomatov2023spectral,
-%  author = {Grigory Solomatov and Derya Akkaynak},
-%  title = {Spectral Sensitivity Estimation Without a Camera},
-%  booktitle = {IEEE International Conference on Computational Photography (ICCP)},
-%  year = {2023},
-%  month = {July}
-%  }
-I dati di sensibilità spettrale utilizzati sono quelli del Samsung Galaxy S22 Rear Telephoto, adottato come proxy per il sensore del Galaxy S24 per l'obiettivo telephoto, ottenuti dal database pubblico Color Lab Eilat. Lo spettro della sorgente LCD è stato misurato separatamente.
+I dati di sensibilità spettrale utilizzati sono quelli del Samsung Galaxy S22 Rear Telephoto, adottato come proxy per il sensore del Galaxy S24 per l'obiettivo telephoto, ottenuti dal database pubblico Color Lab Eilat~\cite{Solomatov2023spectral}. Lo spettro della sorgente LCD è stato misurato separatamente.
 
 % ---------------------------------------------------------------------------
 \section{Ricostruzione di \texorpdfstring{$S_0$, $S_1$, $S_2$}{S0, S1, S2}}
@@ -58,8 +47,7 @@ Poiché la matrice $\mathbf{A}$ non dipende dal pixel, la pseudo-inversa viene c
 % ---------------------------------------------------------------------------
 \section{Determinazione della componente circolare \texorpdfstring{$S_3$}{S3}}
 \label{sec:determinazione-s3}
-% TODO: Fonte è il manuale laboratorio polimi, eccetto correzione lambda, quella lho aggiunta io
-Il parametro $S_3$, che quantifica la componente di polarizzazione circolare, non è accessibile tramite il solo analizzatore lineare. La sua misura richiede l'inserimento della lamina $\lambda/4$ nel cammino ottico, che converte la polarizzazione circolare in polarizzazione lineare analizzabile. Le due immagini acquisite con la lamina a $+45^\circ$ e $-45^\circ$ forniscono le intensità $I_{+45}$ e $I_{-45}$, legate a $S_3$ dalla relazione:
+Il parametro $S_3$, che quantifica la componente di polarizzazione circolare, non è accessibile tramite il solo analizzatore lineare. La sua misura richiede l'inserimento della lamina $\lambda/4$ nel cammino ottico, che converte la polarizzazione circolare in polarizzazione lineare analizzabile. Le due immagini acquisite con la lamina a $+45^\circ$ e $-45^\circ$ forniscono le intensità $I_{+45}$ e $I_{-45}$, legate a $S_3$ dalla relazione~\cite{manuale_polarizzazione}:
 \begin{equation}
     S_3 = \frac{I_{+45} - I_{-45}}{\sin\delta(\lambda)},
     \label{eq:s3_formula}
@@ -88,8 +76,7 @@ dove $\langle \cdot \rangle_{\mathrm{bg}}$ indica la mediana sui pixel della mas
     \begin{pmatrix} S_1' \\ S_2' \end{pmatrix} = \begin{pmatrix} \cos 2\alpha_{\mathrm{bg}} & \sin 2\alpha_{\mathrm{bg}} \\ -\sin 2\alpha_{\mathrm{bg}} & \cos 2\alpha_{\mathrm{bg}} \end{pmatrix} \begin{pmatrix} S_1 \\ S_2 \end{pmatrix}.
     \label{eq:rotazione_stokes}
 \end{equation}
-Dopo la correzione, la luce di sfondo risulta polarizzata orizzontalmente ($S_1' > 0$, $S_2' \approx 0$) e l'angolo di polarizzazione lineare è riferito all'asse dell'analizzatore.
-% TODO: Che strano questo, ma ha senso? Se lo schermo emette in verticale non crea confusione? verificare anche cosa dice il codice per vedere
+Dopo la correzione, la direzione di emissione del display LCD coincide per costruzione con l'asse zero del sistema di riferimento polarimetrico ($S_1' > 0$, $S_2' \approx 0$): tutti gli angoli polarimetrici derivati — AoLP, orientazione dell'asse veloce — sono misurati rispetto ad essa.
 
 % ---------------------------------------------------------------------------
 \section{Grandezze polarimetriche derivate}

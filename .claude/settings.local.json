@@ -30,7 +30,10 @@
       "Bash(PYTHONIOENCODING=utf-8 python tools/search_refs.py --verify 10.1017/CBO9780511702266.010)",
       "Bash(git add:*)",
       "Bash(git commit -m ':*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(python -c \"import final_utils; import final_polarimeter; import final_thesis_figure; print\\('OK'\\)\")",
+      "Bash(python -m py_compile final_utils.py final_polarimeter.py final_thesis_figure.py)",
+      "Bash(grep -roh --include=\"*.tex\" -E '\\\\\\\\cite\\\\{[^}]+\\\\}' \"/c/Users/filip/OneDrive - setupe06/Documenti/Script/GitHub/Tesi/\")"
     ]
   }
 }

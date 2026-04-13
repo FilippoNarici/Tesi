@@ -5,7 +5,7 @@
 
 ## 1. Soluzione di saccarosio (attività ottica)
 
-**Setup:** boccetta a base quadrata, spessore di attraversamento 13 mm, 8.4 g di zucchero in 6.9 ml d'acqua (concentrazione ≈ 1.22 g/ml).
+**Setup:** boccetta a base quadrata, spessore di attraversamento 13 mm, zucchero in acqua (concentrazione ignota).
 
 **Osservazione qualitativa (mappa AoLP, canale blu)**
 La regione esterna alla boccetta è a ~0° per costruzione (allineamento del reference frame). L'interno della soluzione presenta una rotazione positiva uniforme dell'AoLP, visibile come area calda nella colormap. La struttura curva più brillante all'interno della boccetta è la cannuccia in plastica: essendo injection-molded, presenta birifrangenza da stress propria, che si sovrappone al segnale dell'attività ottica e produce variazioni locali di AoLP nella regione corrispondente.
