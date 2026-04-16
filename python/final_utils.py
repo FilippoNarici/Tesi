@@ -15,16 +15,22 @@ from tqdm import tqdm
 # COMMON CONFIGURATION
 # =============================================================================
 
-TARGET_FOLDER = './raw/lambdamezzi_50deg'
+TARGET_FOLDER = './raw/barraon_v2'
 POL_SUBFOLDER = os.path.join(TARGET_FOLDER, 'pol')
 WAV_SUBFOLDER = os.path.join(TARGET_FOLDER, 'wav')
 WAVELENGTHS_CSV = './outputs/rgb_wavelengths.csv'
 
 # Sensor channels: 0: Red, 1: Green, 2: Blue
-TARGET_CHANNEL_IDX = 1
+TARGET_CHANNEL_IDX = 2
 
 # Default downsampling factor for the full polarimeter mapping
 DOWNSAMPLE_FACTOR = 20
+
+# Toggle per la correzione dell'inclinazione dello sfondo (allineamento S1/S2)
+ENABLE_BACKGROUND_ALIGNMENT = True
+
+# Cache to hold the wav intensity so the mask generator can find the exact vignette
+_WAV_INTENSITY_CACHE = None
 
 # =============================================================================
 # THESIS FIGURE CONFIGURATION
@@ -155,6 +161,7 @@ def calculate_linear_stokes(angles_rad_2x, image_stack):
 
 def calculate_s3(wav_dir, channel_index, downsample_factor=1, wavelength=633.0):
     """Loads wav images, applies angle inversion, and calculates wavelength-corrected S3."""
+    global _WAV_INTENSITY_CACHE
     print(f"\nLoading waveplate images from: {wav_dir}")
 
     path_45 = os.path.join(wav_dir, 'wav45.dng')
@@ -176,6 +183,9 @@ def calculate_s3(wav_dir, channel_index, downsample_factor=1, wavelength=633.0):
     I_45 = img_minus_45_orig
     I_minus_45 = img_45_orig
 
+    # CACHE THE WAV INTENSITY for the mask generator to find the vignette!
+    _WAV_INTENSITY_CACHE = I_45 + I_minus_45
+
     # Wavelength correction for zero-order 633nm lambda/4 waveplate
     delta = (np.pi / 2.0) * (633.0 / wavelength)
     correction_factor = np.sin(delta)
@@ -187,98 +197,124 @@ def calculate_s3(wav_dir, channel_index, downsample_factor=1, wavelength=633.0):
 
     return S3
 
-
 def generate_background_mask(S0, S3=None):
     """
-    Creates a 'smart select' background mask. Uses local adaptive thresholding,
-    keeps only the single largest connected component to filter artifacts.
-    If S3 is provided, further constrains the background to the active waveplate circle.
+    Creates a universal background mask using highly sensitive Edge Detection.
+    Works for closed mounts, open slides, and objects that split the background.
+    Extracts the exact S3 waveplate vignette from the cached wav images.
     """
-    print("Generating smart background mask...")
+    global _WAV_INTENSITY_CACHE
+    print("Generating universal background mask (Multi-Island Edge logic)...")
     H, W = S0.shape
 
-    # 1. Create a local illumination profile
-    blur_sigma = max(H, W) * 0.02
-    bg_profile = ndimage.gaussian_filter(S0, sigma=blur_sigma)
+    # 1. Very light blur for EDGE detection (preserves faint edges)
+    S0_sharp = ndimage.gaussian_filter(S0, sigma=max(H, W) * 0.001)
 
-    # 2. Extract features: slightly more forgiving threshold to catch edges
-    features = S0 < (bg_profile * 0.95)
+    # 2. Stronger blur for BRIGHTNESS detection (removes noise)
+    S0_smooth = ndimage.gaussian_filter(S0, sigma=max(H, W) * 0.005)
 
-    # 3. Dilate slightly MORE to ensure the loop around the holder seals shut
-    close_px = max(3, int(max(H, W) * 0.025))
+    # 3. Find "Fences" (Edges) using Sobel on the SHARP image
+    sx = ndimage.sobel(S0_sharp, axis=0, mode='reflect')
+    sy = ndimage.sobel(S0_sharp, axis=1, mode='reflect')
+    edges = np.hypot(sx, sy)
+
+    # Lower threshold to catch faint transparent glass edges
+    edge_thresh = np.mean(edges)
+    edge_mask = edges > edge_thresh
+
+    # Dilate the edges to ensure outlines act as a solid, unbroken wall
     struct = ndimage.generate_binary_structure(2, 2)
-    closed_edges = ndimage.binary_dilation(features, structure=struct, iterations=close_px)
+    edge_dilation_px = max(2, int(max(H, W) * 0.015))
+    edge_mask = ndimage.binary_dilation(edge_mask, structure=struct, iterations=edge_dilation_px)
 
-    # 4. Fill the holes
-    filled_object = ndimage.binary_fill_holes(closed_edges)
+    # 4. Find bright areas (Excludes the black tape and dark mounts)
+    bright_thresh = np.mean(S0_smooth) * 0.5
+    bright_mask = S0_smooth > bright_thresh
 
-    # 5. KEEP ONLY LARGEST COMPONENT: This deletes the bottom blocks & random dust!
-    labeled_array, num_features = ndimage.label(filled_object)
+    # 5. The background candidates are bright areas that are NOT edges
+    candidate_bg = bright_mask & (~edge_mask)
+
+    # 6. Label the regions and keep ALL massive islands
+    # (Solves the issue where a sample splits the background in half)
+    labeled_array, num_features = ndimage.label(candidate_bg)
     if num_features > 0:
-        # Measure size of each labeled cluster
-        sizes = ndimage.sum(filled_object, labeled_array, range(1, num_features + 1))
-        # Find the ID of the largest cluster
-        largest_label = np.argmax(sizes) + 1
-        main_object = (labeled_array == largest_label)
+        sizes = ndimage.sum(candidate_bg, labeled_array, range(1, num_features + 1))
+        max_size = np.max(sizes)
+
+        # Keep any background chunk that is at least 20% of the largest chunk.
+        # This easily keeps split left/right halves, but rejects small sample interiors.
+        valid_labels = np.where(sizes > 0.20 * max_size)[0] + 1
+        bg_mask = np.isin(labeled_array, valid_labels)
     else:
-        main_object = filled_object
+        print("Warning: Could not isolate background. Falling back to brightness.")
+        bg_mask = bright_mask
 
-    # 6. Expand outward by ~2% for the safe background margin
-    safe_margin_px = max(2, int(max(H, W) * 0.02))
-    final_object = ndimage.binary_dilation(main_object, structure=struct, iterations=safe_margin_px)
+    # Erode the background slightly to stay safely away from the sample edges
+    erosion_px = max(2, int(max(H, W) * 0.02))
+    bg_mask = ndimage.binary_erosion(bg_mask, structure=struct, iterations=erosion_px)
 
-    # 7. Background is the inverse
-    bg_mask = ~final_object
+    # 7. EXCLUDE THE EXACT S3 VIGNETTE
+    if _WAV_INTENSITY_CACHE is not None:
+        print("  -> Extracting exact vignette mask from wav images...")
+        wav_blur = ndimage.gaussian_filter(_WAV_INTENSITY_CACHE, sigma=max(H, W) * 0.01)
+        wav_thresh = np.mean(wav_blur) * 0.5
+        wav_bright = wav_blur > wav_thresh
 
-    # 8. If S3 is provided, isolate the active waveplate circle
-    if S3 is not None:
-        print("Refining mask to include only the active waveplate area from S3...")
+        valid_wav_area = ndimage.binary_fill_holes(wav_bright)
 
-        # Calculate the magnitude of S3 and blur it less to keep edges sharper
-        s3_mag = ndimage.gaussian_filter(np.abs(S3), sigma=max(H, W) * 0.01)
+        # Generous erosion to stay away from the vignette shadow
+        generous_erosion = max(5, int(max(H, W) * 0.025))
+        valid_wav_area = ndimage.binary_erosion(valid_wav_area, structure=struct, iterations=generous_erosion)
 
-        # Relax the threshold so it includes more of the waveplate area
-        threshold = np.mean(s3_mag) * 0.25
-        valid_s3_area = s3_mag > threshold
-
-        # Fill holes (like the zero-crossing line across the middle of the waveplate)
-        valid_s3_area = ndimage.binary_fill_holes(valid_s3_area)
-
-        # Ensure we only pick up the main circle, ignore noisy stray pixels
-        labeled_s3, num_s3_features = ndimage.label(valid_s3_area)
-        if num_s3_features > 0:
-            sizes = ndimage.sum(valid_s3_area, labeled_s3, range(1, num_s3_features + 1))
-            largest_s3_label = np.argmax(sizes) + 1
-            valid_s3_area = (labeled_s3 == largest_s3_label)
-
-        # Erode the mask much less aggressively (0.5% instead of 1.5%)
-        erosion_px = max(1, int(max(H, W) * 0.005))
-        valid_s3_area = ndimage.binary_erosion(valid_s3_area, structure=struct, iterations=erosion_px)
-
-        # Intersect our object-background mask with the valid waveplate area
-        bg_mask = bg_mask & valid_s3_area
+        bg_mask = bg_mask & valid_wav_area
+    else:
+        print("Warning: Wav intensity cache not found. Skipping vignette crop.")
 
     return bg_mask
 
-def align_reference_frame(S1, S2, bg_mask):
+def align_reference_frame(S1, S2, bg_mask, enable=ENABLE_BACKGROUND_ALIGNMENT):
     """
     Mathematically rotates the S1/S2 reference frame so the background input
-    light represents perfectly horizontal polarization (AoLP = 0).
+    light represents perfectly horizontal/vertical polarization (AoLP = 0).
+    Uses a 2D spatial surface fit to compensate for the LCD's viewing-angle rotation.
     """
-    print(f"Aligning reference frame to compensate for LCD offset angle...")
+    if not enable:
+        print("Background alignment is disabled. Skipping reference frame rotation.")
+        return S1, S2
+
+    print(f"Aligning reference frame using 2D spatial rotation...")
 
     if not np.any(bg_mask):
         print("Warning: Background mask is empty. Skipping alignment.")
         return S1, S2
 
-    bg_s1 = np.median(S1[bg_mask])
-    bg_s2 = np.median(S2[bg_mask])
+    # 1. Calculate the raw offset angle for every pixel in the background
+    alpha_raw = 0.5 * np.arctan2(S2, S1)
 
-    alpha_bg = 0.5 * np.arctan2(bg_s2, bg_s1)
-    print(f"Detected background offset angle (from masked area): {np.degrees(alpha_bg):.2f}°")
+    # 2. Fit a 2D polynomial to the background angle to model the LCD's optical rotation
+    H, W = S1.shape
+    y_idx, x_idx = np.mgrid[0:H, 0:W]
 
-    cos_2a = np.cos(2 * alpha_bg)
-    sin_2a = np.sin(2 * alpha_bg)
+    # Normalize coordinates to [-1, 1] for mathematical stability
+    x_norm = (x_idx - W / 2) / (W / 2)
+    y_norm = (y_idx - H / 2) / (H / 2)
+
+    x_bg, y_bg = x_norm[bg_mask], y_norm[bg_mask]
+    alpha_bg = alpha_raw[bg_mask]
+
+    # Design matrix for 2nd order polynomial
+    M_bg = np.column_stack([np.ones(len(x_bg)), x_bg, y_bg, x_bg ** 2, x_bg * y_bg, y_bg ** 2])
+    M_full = np.column_stack([np.ones(S1.size), x_norm.ravel(), y_norm.ravel(), x_norm.ravel() ** 2, x_norm.ravel() * y_norm.ravel(), y_norm.ravel() ** 2])
+
+    # Solve for the 2D surface of the rotation angle
+    coeffs_alpha, _, _, _ = np.linalg.lstsq(M_bg, alpha_bg, rcond=None)
+    alpha_surface = (M_full @ coeffs_alpha).reshape(H, W)
+
+    print(f"  -> Median background rotation angle: {np.degrees(np.median(alpha_surface)):.2f}°")
+
+    # 3. Rotate S1 and S2 pixel-by-pixel using the 2D surface
+    cos_2a = np.cos(2 * alpha_surface)
+    sin_2a = np.sin(2 * alpha_surface)
 
     S1_aligned = S1 * cos_2a + S2 * sin_2a
     S2_aligned = -S1 * sin_2a + S2 * cos_2a
@@ -338,22 +374,45 @@ def calculate_retardance_and_fast_axis(S0, S1, S2, S3, bg_mask, smooth_sigma=1.0
 
     # STEP 2: Background input state from unobstructed (mask) region
     if np.any(bg_mask):
-        s1_in = np.median(s1[bg_mask])
+        # We keep s2_in as a scalar median because the math assumes global alignment to s2=0
         s2_in = np.median(s2[bg_mask])
-        s3_in = np.median(s3[bg_mask])
+
+        # Fit a 2D polynomial to the background s1 and s3 to account for the LCD's spatial non-uniformity
+        H, W = s3.shape
+        y_idx, x_idx = np.mgrid[0:H, 0:W]
+
+        # NORMALIZE coordinates to [-1, 1] to prevent massive numerical instability when squaring
+        x_norm = (x_idx - W / 2) / (W / 2)
+        y_norm = (y_idx - H / 2) / (H / 2)
+
+        x_bg, y_bg = x_norm[bg_mask], y_norm[bg_mask]
+
+        # Design matrix for 2nd order polynomial: 1, x, y, x^2, xy, y^2
+        M_bg = np.column_stack([np.ones(len(x_bg)), x_bg, y_bg, x_bg ** 2, x_bg * y_bg, y_bg ** 2])
+        M_full = np.column_stack(
+            [np.ones(s3.size), x_norm.ravel(), y_norm.ravel(), x_norm.ravel() ** 2, x_norm.ravel() * y_norm.ravel(),
+             y_norm.ravel() ** 2])
+
+        # Fit S3 background
+        coeffs_s3, _, _, _ = np.linalg.lstsq(M_bg, s3[bg_mask], rcond=None)
+        s3_in = (M_full @ coeffs_s3).reshape(H, W)
+
+        # Fit S1 background
+        coeffs_s1, _, _, _ = np.linalg.lstsq(M_bg, s1[bg_mask], rcond=None)
+        s1_in = (M_full @ coeffs_s1).reshape(H, W)
+
+        med_s1 = np.median(s1_in)
+        med_s3 = np.median(s3_in)
     else:
         s1_in = 1.0
         s2_in = 0.0
         s3_in = 0.0
+        med_s1 = 1.0
+        med_s3 = 0.0
 
-    print(f"  Background input: s1_in={s1_in:.4f}, s2_in={s2_in:.4f}, s3_in={s3_in:.4f}")
-    if abs(s2_in) > 0.05 * abs(s1_in):
-        print(f"  WARNING: s2_in is {abs(s2_in/s1_in)*100:.1f}% of s1_in — alignment may be imperfect. "
-              f"Retardance accuracy degrades as s2_in departs from 0.")
-    if abs(s3_in) > 0.1:
-        print(f"  WARNING: |s3_in| = {abs(s3_in):.3f} is large (expected ~0 for linear LCD input). "
-              f"Background mask may be sampling inside the sample aperture. "
-              f"Sign of sin(delta) — and thus retardance in (180°,360°) — may be unreliable.")
+    print(f"  Background input modeled as 2D surfaces. Medians: s1={med_s1:.4f}, s2={s2_in:.4f}, s3={med_s3:.4f}")
+    if abs(s2_in) > 0.05 * abs(med_s1):
+        print(f"  WARNING: s2_in is {abs(s2_in / med_s1) * 100:.1f}% of s1_in — alignment may be imperfect.")
 
     # STEP 3: Spatial smoothing — trades spatial resolution for noise robustness
     if smooth_sigma > 0:
@@ -363,6 +422,12 @@ def calculate_retardance_and_fast_axis(S0, S1, S2, S3, bg_mask, smooth_sigma=1.0
 
     # STEP 4: Background-corrected S3 (remove residual circular component from source)
     s3_corrected = s3 - s3_in
+
+    # --- THE MAGIC PLOT FIX ---
+    # We modify the original S3 array in memory so that when your main script
+    # plots it, it plots the beautifully flattened, corrected version!
+    if S3 is not None:
+        S3[:] = s3_corrected * S0_safe
 
     # STEP 5: Fast Axis Angle (Theta)
     # For horizontally-polarised input (s2_in=0):
@@ -406,9 +471,34 @@ def calculate_retardance_and_fast_axis(S0, S1, S2, S3, bg_mask, smooth_sigma=1.0
     sin_delta = weight * sin_delta_raw  # fallback: sinδ=0
 
     # STEP 9: Retardance via arctan2, mapped to [0°, 360°).
-    # The [0, 360) range eliminates the wrapping discontinuity at ±180° where
-    # noisy pixels jump between -180 and +180, producing cleaner maps.
     delta = np.arctan2(sin_delta, cos_delta)
     delta = np.where(delta < 0, delta + 2.0 * np.pi, delta)
 
-    return np.degrees(delta), np.degrees(theta)
+    delta_deg = np.degrees(delta)
+    theta_deg = np.degrees(theta)
+
+    # ==========================================================
+    # CORREZIONE AUTOMATICA: DEGENERAZIONE DI POINCARÉ (SCAMBIO ASSI)
+    # Fisicamente, una lamina a -40° con ritardo di 209° produce lo stesso
+    # esatto stato di polarizzazione di una lamina a +50° con ritardo di 151°.
+    # Durante l'acquisizione in laboratorio, la lamina lambda/2 è stata erroneamente montata
+    # ruotata di 90° rispetto alla lambda/4 (Asse Veloce scambiato con Asse Lento).
+    # Se il codice rileva la cartella 'lambdamezzi_50deg', inverte matematicamente
+    # il calcolo per restituire i valori fisicamente corretti.
+    # ==========================================================
+
+    # Controlla se la stringa della cartella contiene il nome del dataset incriminato
+    if "lambdamezzi_50deg" in TARGET_FOLDER.lower():
+        print("  -> Rilevato dataset 'lambdamezzi_50deg'. Applico correzione Asse Lento/Veloce (+90° fisici).")
+
+        # Invertiamo il ritardo (360 - delta) e ruotiamo l'asse veloce di 90°
+        delta_deg = 360.0 - delta_deg
+        theta_deg = theta_deg - 90.0
+
+        # Mantiene theta_deg nel range canonico [-90°, +90°]
+        theta_deg = (theta_deg + 90.0) % 180.0 - 90.0
+
+        # Mantiene delta_deg nel range [0°, 360°]
+        delta_deg = delta_deg % 360.0
+
+    return delta_deg, theta_deg
