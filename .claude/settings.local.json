@@ -33,7 +33,23 @@
       "Bash(git push:*)",
       "Bash(python -c \"import final_utils; import final_polarimeter; import final_thesis_figure; print\\('OK'\\)\")",
       "Bash(python -m py_compile final_utils.py final_polarimeter.py final_thesis_figure.py)",
-      "Bash(grep -roh --include=\"*.tex\" -E '\\\\\\\\cite\\\\{[^}]+\\\\}' \"/c/Users/filip/OneDrive - setupe06/Documenti/Script/GitHub/Tesi/\")"
+      "Bash(grep -roh --include=\"*.tex\" -E '\\\\\\\\cite\\\\{[^}]+\\\\}' \"/c/Users/filip/OneDrive - setupe06/Documenti/Script/GitHub/Tesi/\")",
+      "Bash(python -c ' *)",
+      "Bash(python *)",
+      "Bash(pip install *)",
+      "Bash(mkdir -p \"/c/Users/filip/.config/caveman\")",
+      "Read(//c/Users/filip/.config/**)",
+      "Bash(where node *)",
+      "Bash(winget install *)",
+      "Bash(grep -n \"\\\\\\\\\\\\\\\\cite{\" chapters/*.tex)",
+      "Bash(export PYTHONIOENCODING=utf-8)",
+      "Bash(git -c commit.gpgsign=false commit -m '[python-pipeline]: integrazione saturazione, dark frame, Ghosh 1999, allineamento 2D, arctan2 in final_utils *)",
+      "Bash(git -c commit.gpgsign=false commit -m '[python-pipeline]: propagazione maschera saturazione in final_polarimeter *)",
+      "Bash(git -c commit.gpgsign=false commit -m '[python-pipeline]: integrazione saturazione in final_thesis_figure *)",
+      "Bash(git -c commit.gpgsign=false commit -m '[python-pipeline]: aggiunto final_umap.py per embedding 2D degli Stokes *)",
+      "Bash(git -c commit.gpgsign=false commit -m '[python-pipeline]: aggiunto requirements.txt con umap-learn *)",
+      "Bash(git -c commit.gpgsign=false commit -m '[python-pipeline]: final_plot_strati legge lunghezze d'\\\\''onda da CSV e marca valori da rimisurare *)",
+      "Bash(git -c commit.gpgsign=false commit -m '[doc]: CLAUDE.md radice e nidificate, TODO vivo, prompt di revisione *)"
     ]
   }
 }
