@@ -198,6 +198,10 @@ def main():
 
     print(f"--- Generazione figure per: {', '.join(valid_params)} ---")
 
+    # Arma l'accumulatore di saturazione: ogni frame RAW caricato dopo questo
+    # reset contribuisce alla maschera globale dei photosite clippati.
+    utils.reset_saturation_accumulator()
+
     # Determina quali calcoli complessi servono in base all'insieme di figure
     needs_s3 = any(p in ('S3', 'delta', 'theta', 'mask') for p in valid_params)
     needs_retardance = any(p in ('delta', 'theta') for p in valid_params)
@@ -238,7 +242,21 @@ def main():
         delta_deg, theta_deg = utils.calculate_retardance_and_fast_axis(
             S0, S1_al, S2_al, S3, bg_mask)
 
-    # 5. Genera e salva le figure per ogni parametro valido
+    # 5. Maschera di saturazione: esclude i blocchi clippati dalle mappe finali.
+    sat_mask = utils.get_saturation_mask(utils.DOWNSAMPLE_FACTOR)
+    if sat_mask is not None:
+        n_sat = int(sat_mask.sum())
+        if n_sat:
+            frac = 100.0 * n_sat / sat_mask.size
+            print(f"Saturazione: {n_sat} blocchi clippati "
+                  f"({frac:.2f}% dei pixel) esclusi dalle mappe.")
+            for arr in (S1_al, S2_al, S3, DoLP, AoLP, delta_deg, theta_deg):
+                if arr is not None:
+                    arr[sat_mask] = np.nan
+        else:
+            print("Saturazione: nessun photosite clippato rilevato.")
+
+    # 6. Genera e salva le figure per ogni parametro valido
 
     # Preparazione della directory di output: Images/generated/<nome_campione>/
     sample_name = os.path.basename(os.path.normpath(utils.TARGET_FOLDER))
