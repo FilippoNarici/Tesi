@@ -3,6 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 
+import final_utils as utils
+
 # =============================================================================
 # GESTIONE PERCORSI (Coerente con la struttura del progetto)
 # =============================================================================
@@ -10,6 +12,8 @@ from scipy.optimize import curve_fit
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT_DIR = os.path.join(BASE_DIR, 'Images', 'generated', 'strati_fit')
 os.makedirs(OUT_DIR, exist_ok=True)
+WAVELENGTHS_CSV = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                               'outputs', 'rgb_wavelengths.csv')
 
 # =============================================================================
 # STILE PUBBLICAZIONE (Coerente con final_thesis_figure.py)
@@ -35,17 +39,23 @@ plt.rcParams.update({
 })
 
 # =============================================================================
-# DATI HARDCODED (da Desmos)
+# DATI DI INPUT
 # =============================================================================
+# Numero di strati di nastro adesivo per ciascun punto di misura.
 n_strati = np.array([1, 2, 3, 4, 5, 4, 3, 2, 1])
 
-# Fasi srotolate (calcolate dai dati del fit_strati.pdf)
+# Fasi srotolate misurate sulle mappe di retardance (gradi).
+# NOTA: questi valori vanno rimisurati manualmente dalle mappe prodotte dalla
+# pipeline arctan2 [0, 360) (B1). I numeri qui sotto sono placeholder derivati
+# dalla vecchia pipeline arccos e NON devono essere usati per conclusioni.
 delta_unwrap_R = np.array([229, 463, 720, 959, 1205, 964, 720, 488, 238])
 delta_unwrap_G = np.array([274, 559, 825, 1129, 1415, 1140, 841, 544, 280])
 delta_unwrap_B = np.array([328, 652, 947, 1249, 1576, 1258, 991, 677, 336])
 
-# Lunghezze d'onda dei canali RGB (nm)
-lambda_R, lambda_G, lambda_B = 626, 536, 466
+# Lunghezze d'onda centroide dei canali RGB (nm), lette da outputs/rgb_wavelengths.csv.
+lambda_R = utils.get_channel_wavelength(WAVELENGTHS_CSV, 0)
+lambda_G = utils.get_channel_wavelength(WAVELENGTHS_CSV, 1)
+lambda_B = utils.get_channel_wavelength(WAVELENGTHS_CSV, 2)
 lambdas = np.array([lambda_R, lambda_G, lambda_B])
 
 
@@ -96,7 +106,7 @@ def generate_fit_strati():
                 label=rf'{label}: $\delta_{label} \approx {slope:.1f}^\circ/n$', zorder=2)
 
     ax.set_xlabel('Numero di strati $n$')
-    ax.set_ylabel('Ritardo di fase srotolato $\delta_{unwrap}$ (°)')
+    ax.set_ylabel(r'Ritardo di fase srotolato $\delta_{unwrap}$ (°)')
     ax.set_xlim(0, 5.5)
     ax.set_ylim(0, 1900)
     ax.grid(True, linestyle=':', alpha=0.6)
