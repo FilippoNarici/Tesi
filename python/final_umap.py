@@ -49,9 +49,10 @@ UMAP_N_NEIGHBORS = 80
 UMAP_MIN_DIST = 0.008
 UMAP_METRIC = 'euclidean'
 
-DOLP_MIN = 0.05
+DOLP_MIN = 0.20
 S0_MIN = 1e-6
 RANDOM_STATE = 42
+HIST_EDGE_EXCLUDE_DEG = 20.0
 
 # =============================================================================
 # FEATURE EXTRACTION
@@ -65,13 +66,21 @@ def _normalize_stokes(S0, S1, S2, S3):
     s3 = (S3 / safe_S0) if S3 is not None else np.zeros_like(S0)
     return s1, s2, s3
 
-def _build_feature_matrix(S0, S1, S2, S3, DoLP, delta_deg, valid_mask):
+def _build_feature_matrix(S0, S1, S2, S3, DoLP, delta_deg, valid_mask,
+                          feature_mode='full'):
+    """feature_mode:
+    - 'full': (s1, s2, s3, DoLP, delta_deg)
+    - 'no_delta': (s1, s2, s3, DoLP) — utile per verificare se UMAP trova
+      comunque la struttura senza l'hint esplicito di delta.
+    """
     s1, s2, s3 = _normalize_stokes(S0, S1, S2, S3)
     flat_valid = valid_mask.ravel()
-    features = np.column_stack([
-        s1.ravel(), s2.ravel(), s3.ravel(),
-        DoLP.ravel(), delta_deg.ravel(),
-    ])[flat_valid]
+    cols = [s1.ravel(), s2.ravel(), s3.ravel(), DoLP.ravel()]
+    if feature_mode == 'full':
+        cols.append(delta_deg.ravel())
+    elif feature_mode != 'no_delta':
+        raise ValueError(f"feature_mode sconosciuto: {feature_mode}")
+    features = np.column_stack(cols)[flat_valid]
     valid_indices = np.flatnonzero(flat_valid)
     return features.astype(np.float32), valid_indices
 
@@ -195,7 +204,35 @@ def plot_retardance_and_umap(embedding, delta_deg, valid_indices,
 # MAIN
 # =============================================================================
 
-def run(sample_name=None, show=True, save_path=None, sparse_stride=None):
+def plot_delta_histogram(delta_valid, sample_name, save_path, bins=180):
+    """Istogramma di delta sui pixel validi su [0, 360), 2 gradi per bin di
+    default. L'asse y viene clippato al massimo dei bin centrali (ignora i
+    primi e gli ultimi ``HIST_EDGE_EXCLUDE_DEG`` gradi) perche' i residui di
+    sfondo a basso DoLP producono picchi artificiali vicino a 0 e 360 che
+    nascondono la struttura per-strato.
+    """
+    fig, ax = plt.subplots(figsize=(7, 4))
+    counts, edges, _ = ax.hist(delta_valid, bins=bins, range=(0, 360),
+                               color='steelblue', edgecolor='none')
+    centers = 0.5 * (edges[:-1] + edges[1:])
+    inner = (centers > HIST_EDGE_EXCLUDE_DEG) & (centers < 360 - HIST_EDGE_EXCLUDE_DEG)
+    ymax_inner = counts[inner].max() if inner.any() and counts[inner].size > 0 else counts.max()
+    ax.set_xlim(0, 360)
+    ax.set_ylim(0, ymax_inner * 1.25)
+    ax.set_xlabel(r"$\delta$ (deg)")
+    ax.set_ylabel("# pixel validi")
+    ax.set_title(fr"Istogramma $\delta$ - {sample_name}")
+    ax.axvspan(0, HIST_EDGE_EXCLUDE_DEG, color='gray', alpha=0.08)
+    ax.axvspan(360 - HIST_EDGE_EXCLUDE_DEG, 360, color='gray', alpha=0.08)
+    ax.grid(True, linestyle=':', alpha=0.5)
+    plt.tight_layout()
+    fig.savefig(save_path, dpi=150, bbox_inches='tight')
+    plt.close(fig)
+    print(f"  Istogramma salvato: {save_path}")
+
+
+def run(sample_name=None, show=True, save_path=None, sparse_stride=None,
+        feature_mode='full', histogram_path=None):
     if sample_name is None:
         sample_name = os.path.basename(os.path.normpath(utils.TARGET_FOLDER))
     stride = sparse_stride if sparse_stride is not None else UMAP_SPARSE_STRIDE
@@ -240,10 +277,12 @@ def run(sample_name=None, show=True, save_path=None, sparse_stride=None):
     valid_mask = base_valid & grid_mask
 
     features, valid_indices = _build_feature_matrix(
-        S0, S1_al, S2_al, S3, DoLP, delta_deg, valid_mask)
+        S0, S1_al, S2_al, S3, DoLP, delta_deg, valid_mask,
+        feature_mode=feature_mode)
     total_grid_points = int(grid_mask.sum())
     print(f"  Valid sparse pixels: {features.shape[0]} / {total_grid_points} "
-          f"punti di griglia ({100.0 * features.shape[0] / max(total_grid_points, 1):.1f}%)")
+          f"punti di griglia ({100.0 * features.shape[0] / max(total_grid_points, 1):.1f}%) "
+          f"[feature_mode={feature_mode}, dim={features.shape[1]}]")
 
     if features.shape[0] < 100:
         print("Too few valid pixels.")
@@ -251,6 +290,9 @@ def run(sample_name=None, show=True, save_path=None, sparse_stride=None):
 
     delta_valid = delta_deg.ravel()[valid_indices] if delta_deg is not None else None
     theta_valid = theta_deg.ravel()[valid_indices] if theta_deg is not None else None
+
+    if histogram_path is not None and delta_valid is not None:
+        plot_delta_histogram(delta_valid, sample_name, histogram_path)
 
     embedding = _fit_umap(features, delta_valid, theta_valid)
 
