@@ -12,6 +12,12 @@ from matplotlib.colors import LinearSegmentedColormap
 
 import final_utils as utils
 
+try:
+    import plotly.graph_objects as go
+    _PLOTLY_OK = True
+except ImportError:
+    _PLOTLY_OK = False
+
 # =============================================================================
 # STILE PUBBLICAZIONE
 # =============================================================================
@@ -131,6 +137,65 @@ def _resolve_limits(data, vmin_spec, vmax_spec):
         bound = np.percentile(np.abs(data), 99)
         return -bound, bound
     return vmin_spec, vmax_spec
+
+
+def _mpl_cmap_to_plotly(cmap, n=64):
+    """Converte una colormap matplotlib (stringa o oggetto) in colorscale plotly."""
+    cmap_obj = plt.get_cmap(cmap) if isinstance(cmap, str) else cmap
+    stops = np.linspace(0.0, 1.0, n)
+    scale = []
+    for s in stops:
+        r, g, b, _ = cmap_obj(float(s))
+        scale.append([float(s), f"rgb({int(255*r)},{int(255*g)},{int(255*b)})"])
+    return scale
+
+
+def save_interactive_html(data, param_name, channel_idx, out_path):
+    """Salva una versione HTML interattiva (plotly Heatmap) del plot.
+
+    Apribile in qualunque browser: hover sul pixel mostra (x, y, valore)
+    con la stessa immediatezza del data cursor di MATLAB. Nessuna
+    dipendenza runtime oltre plotly.
+    """
+    if not _PLOTLY_OK:
+        return False
+
+    cfg = PARAM_CONFIG[param_name]
+    cmap = _get_s0_cmap(channel_idx) if cfg['cmap'] is None else cfg['cmap']
+    vmin, vmax = _resolve_limits(data, cfg['vmin'], cfg['vmax'])
+    colorscale = _mpl_cmap_to_plotly(cmap)
+
+    title = cfg['titolo']
+    unita = cfg['unita']
+    cbar_title = unita if unita else ''
+
+    hover = 'x: %{x}<br>y: %{y}<br>valore: %{z:.4g}<extra></extra>'
+
+    fig = go.Figure(
+        data=go.Heatmap(
+            z=data,
+            colorscale=colorscale,
+            zmin=vmin,
+            zmax=vmax,
+            hovertemplate=hover,
+            colorbar=dict(title=cbar_title),
+        )
+    )
+    H, W = data.shape
+    fig.update_layout(
+        title=title,
+        xaxis=dict(scaleanchor='y', constrain='domain'),
+        yaxis=dict(autorange='reversed'),  # allinea a imshow (origine in alto)
+        width=min(1000, 80 + W),
+        height=min(900, 80 + H),
+        margin=dict(l=40, r=40, t=60, b=40),
+    )
+    try:
+        fig.write_html(out_path, include_plotlyjs='cdn', full_html=True)
+        return True
+    except Exception as e:
+        print(f"  (avviso: HTML plotly non scritto per {out_path}: {e})")
+        return False
 
 
 def generate_figure(param_name, data, channel_idx=0):
@@ -262,6 +327,9 @@ def main():
     sample_name = os.path.basename(os.path.normpath(utils.TARGET_FOLDER))
     out_dir = os.path.join(utils.THESIS_FIGURES_DIR, sample_name)
     os.makedirs(out_dir, exist_ok=True)
+    # Sottodirectory per le versioni interattive pickled (cursore dati stile MATLAB)
+    interactive_dir = os.path.join(out_dir, 'interactive')
+    os.makedirs(interactive_dir, exist_ok=True)
     channel_prefix = {0: 'R', 1: 'G', 2: 'B'}.get(utils.TARGET_CHANNEL_IDX, 'X')
 
     # Dizionario che mappa i nomi delle stringhe alle matrici generate
@@ -294,6 +362,10 @@ def main():
         out_path = os.path.join(out_dir, filename)
         fig.savefig(out_path, format='pdf')
         plt.close(fig)
+
+        # Versione interattiva plotly (heatmap HTML con hover = data cursor stile MATLAB).
+        html_path = os.path.join(interactive_dir, f"{channel_prefix}_{param_name}.html")
+        save_interactive_html(data, param_name, utils.TARGET_CHANNEL_IDX, html_path)
 
         print(f"  -> Figura salvata: {out_path}")
 
