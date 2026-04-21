@@ -115,6 +115,10 @@ def plot_all_parameters(S0, S1, S2, S3, DoLP, AoLP, delta, theta, bg_mask, chann
 def main():
     print("--- Starting Stokes Fit ---")
 
+    # Arm the saturation accumulator so every RAW frame loaded after this point
+    # contributes to the global clipped-photosite mask.
+    utils.reset_saturation_accumulator()
+
     # 1. Linear Stokes Parameters (S0, S1, S2)
     angles, stack = utils.load_rotation_sequence(
         utils.POL_SUBFOLDER,
@@ -152,6 +156,21 @@ def main():
     # 5. Polarization & Retardance Math (reference state from clean background)
     DoLP, AoLP = utils.calculate_dolp_aolp(S0, S1_aligned, S2_aligned)
     delta_degrees, theta_degrees = utils.calculate_retardance_and_fast_axis(S0, S1_aligned, S2_aligned, S3, bg_mask_ref)
+
+    # Retrieve the aggregated saturation mask covering both the 36 linear frames
+    # and the 2 waveplate frames, downsampled onto the analysis grid.
+    sat_mask = utils.get_saturation_mask(utils.DOWNSAMPLE_FACTOR)
+    if sat_mask is not None:
+        n_sat = int(sat_mask.sum())
+        if n_sat:
+            frac = 100.0 * n_sat / sat_mask.size
+            print(f"Saturation: {n_sat} clipped blocks "
+                  f"({frac:.2f}% of pixels) excluded from polarimetric maps.")
+            for arr in (DoLP, AoLP, delta_degrees, theta_degrees):
+                if arr is not None:
+                    arr[sat_mask] = np.nan
+        else:
+            print("Saturation: no clipped photosites detected.")
 
     # 6. Plotting - debug mask uses the S3-refined region for visual clarity
     plot_all_parameters(S0, S1_aligned, S2_aligned, S3, DoLP, AoLP, delta_degrees, theta_degrees, bg_mask_display, utils.TARGET_CHANNEL_IDX)
