@@ -1,0 +1,7 @@
+numpy
+scipy
+matplotlib
+pandas
+rawpy
+tqdm
+umap-learn
