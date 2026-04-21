@@ -1,6 +1,6 @@
 # TODO — Stato del progetto
 
-Ultimo aggiornamento: 2026-04-21 (sessione Phase 3 Layer A)
+Ultimo aggiornamento: 2026-04-21 (sessione Phase 3 Layer A + B1)
 
 Questo file è la singola fonte di verità sullo stato di avanzamento. Aggiornare ad ogni task completato. Per istruzioni operative vedere `CLAUDE.md`.
 
@@ -31,9 +31,9 @@ Questo file è la singola fonte di verità sullo stato di avanzamento. Aggiornar
 - [x] Committare nuove figure in `Images/generated/barraon_v2/` (come stato pre-saturazione, 2026-04-21)
 - [x] Integrazione accumulatore saturazione in `final_thesis_figure.py` (A1, 2026-04-21) — tutti i 77 PDF erano prodotti senza maschera
 - [x] `final_plot_strati.py`: lunghezze d'onda lette da CSV, valori retardance marcati come placeholder da rimisurare (A4, 2026-04-21)
-- [ ] B1: rigenerazione completa PDF per tutti i dataset (strati_v2, lambdaquarti_50deg, lambdamezzi_50deg, zucchero, barraon_v2, barraoff_v2, righello_v2), tutti e tre i canali — con pipeline completa (saturazione + dark + arctan2 + allineamento 2D)
+- [x] B1: rigenerazione completa PDF per tutti i dataset (strati_v2, lambdaquarti_50deg, lambdamezzi_50deg, zucchero, barraon_v2, barraoff_v2, righello_v2), tutti e tre i canali — con pipeline completa (saturazione + dark + arctan2 + allineamento 2D). Batch runner `final_thesis_figure_all.py`; 189 PDF + 189 HTML plotly interattivi in 22.7 min, zero fallimenti (2026-04-21)
 - [ ] B2: rerun `final_plot_strati.py` con valori di retardance rimisurati dall'utente
-- [ ] U1: reimplementare `final_umap.py` con campionamento sparso a risoluzione nativa (no downsample blur)
+- [x] U1: reimplementare `final_umap.py` con campionamento sparso a risoluzione nativa (2026-04-21). Feature set (S1/S0, S2/S0, S3/S0, DoLP, delta), stride=20 su S0/S1/S2/S3 calcolati a piena risoluzione. Pearson |r(UMAP1, delta)| salita da 0.10 a 0.67 su lambdaquarti/R. bg_mask generata al DOWNSAMPLE_FACTOR standard e upsamplata (il Sobel a piena risoluzione satura di rumore). ~165 s / combo.
 - [ ] Tabelle cap6: rimisurare valori di retardance con pipeline arctan2 [0°, 360°) — l'utente si occupa della misura
 
 ## Miglioramenti Python (se il tempo lo permette)
