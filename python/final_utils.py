@@ -15,7 +15,7 @@ from tqdm import tqdm
 # COMMON CONFIGURATION
 # =============================================================================
 
-TARGET_FOLDER = './raw/barraon_v2'
+TARGET_FOLDER = './raw/strati_v2'
 POL_SUBFOLDER = os.path.join(TARGET_FOLDER, 'pol')
 WAV_SUBFOLDER = os.path.join(TARGET_FOLDER, 'wav')
 WAVELENGTHS_CSV = './outputs/rgb_wavelengths.csv'
@@ -29,8 +29,40 @@ DOWNSAMPLE_FACTOR = 20
 # Toggle per la correzione dell'inclinazione dello sfondo (allineamento S1/S2)
 ENABLE_BACKGROUND_ALIGNMENT = True
 
+# Raw Bayer extraction mode.
+# True  : read raw_image_visible directly, pick the Bayer plane for the target channel.
+#         Avoids the camera-colour-matrix crosstalk that raw.postprocess mixes into each
+#         channel and keeps the intensity strictly proportional to the sensor count.
+# False : legacy path through rawpy.postprocess with WB disabled and linear gamma.
+USE_RAW_BAYER = True
+
+# Bias/dark frame captured with the sensor capped. Subtracted from every pol/wav image
+# before Stokes fitting to remove the CMOS pedestal.
+DARK_FRAME_PATH = './raw/dark.dng'
+
+# Hardware calibration: the lambda-mezzi dataset was acquired with the waveplate mounted
+# rotated 90 degrees (fast/slow axes physically swapped). Setting this flag applies the
+# equivalent Poincare-sphere transformation (delta -> 360 - delta, theta -> theta - 90)
+# at the end of the retardance calculation, restoring the correct physical parameters.
+WAVEPLATE_AXES_SWAPPED = "lambdamezzi_50deg" in TARGET_FOLDER.lower()
+
 # Cache to hold the wav intensity so the mask generator can find the exact vignette
 _WAV_INTENSITY_CACHE = None
+
+# Cache for the dark frame at full native resolution (keyed by channel index)
+_DARK_FRAME_CACHE = {}
+
+# Saturation threshold: pixels reaching or exceeding this fraction of the sensor
+# white level are flagged as clipped. The DNG metadata reports white_level=4095
+# (12-bit linear read-out), so the default threshold corresponds to ~4013 counts.
+SENSOR_WHITE_LEVEL = 4095
+SATURATION_FRACTION = 0.98
+
+# Module-level OR-accumulator of saturated photosites across every RAW frame
+# loaded since reset_saturation_accumulator() was last called. Stored at the
+# native sensor resolution so saturation inside a single photosite is preserved
+# even after aggressive block downsampling.
+_SATURATION_ACCUMULATOR = None
 
 # =============================================================================
 # THESIS FIGURE CONFIGURATION
@@ -83,23 +115,132 @@ def downsample_image(img, factor):
     img_downsampled = img_cropped.reshape(new_H // factor, factor, new_W // factor, factor).mean(axis=(1, 3))
     return img_downsampled
 
-def load_raw_image(path, channel_index, downsample_factor=1):
-    """Loads a RAW image, extracts the 16-bit color channel, and downsamples."""
+def _read_raw_channel_fullres(path, channel_index, track_saturation=True):
+    """Low-level read of a single colour plane at the sensor's native resolution.
+
+    In Bayer mode the function returns one of the four CFA planes exposed by
+    rawpy as ``raw_image_visible`` (layout R, G1, B, G2). The channel mapping
+    0->R, 1->G1, 2->B mirrors the convention used by the higher-level API.
+    In postprocess mode the image is rendered with white balance disabled and
+    a linear response curve so that the output is still a linear intensity.
+
+    Also updates the global saturation accumulator when it has been armed by
+    ``reset_saturation_accumulator()``: any photosite reaching
+    ``SENSOR_WHITE_LEVEL * SATURATION_FRACTION`` in any frame is recorded so
+    the downstream mask can exclude clipped pixels from the polarimetric maps.
+    """
+    global _SATURATION_ACCUMULATOR
+    with rawpy.imread(path) as raw:
+        if USE_RAW_BAYER:
+            ri = raw.raw_image_visible
+            if ri.ndim != 3 or ri.shape[2] < 3:
+                raise RuntimeError(
+                    f"Expected 4-plane RGBG raw layout, got shape {ri.shape}. "
+                    "Disable USE_RAW_BAYER to fall back to the postprocess path."
+                )
+            # Planes: 0=R, 1=G1, 2=B, 3=G2 (G2 is identically zero on this phone)
+            plane_map = {0: 0, 1: 1, 2: 2}
+            data = ri[:, :, plane_map[channel_index]].astype(np.float32)
+        else:
+            rgb = raw.postprocess(
+                use_camera_wb=False,
+                user_wb=[1.0, 1.0, 1.0, 1.0],
+                no_auto_bright=True,
+                gamma=(1, 1),
+                output_bps=16,
+            )
+            data = rgb[:, :, channel_index].astype(np.float32)
+
+    if track_saturation and _SATURATION_ACCUMULATOR is not None:
+        # Threshold is expressed against the native sensor range; the post-WB
+        # path scales the counts to the 16-bit output but keeps proportionality,
+        # so the comparison works in both modes once the scale is matched.
+        if USE_RAW_BAYER:
+            threshold = SENSOR_WHITE_LEVEL * SATURATION_FRACTION
+        else:
+            threshold = 65535.0 * SATURATION_FRACTION
+        frame_sat = data >= threshold
+        if _SATURATION_ACCUMULATOR.shape != frame_sat.shape:
+            _SATURATION_ACCUMULATOR = frame_sat.copy()
+        else:
+            np.logical_or(_SATURATION_ACCUMULATOR, frame_sat,
+                          out=_SATURATION_ACCUMULATOR)
+    return data
+
+def reset_saturation_accumulator():
+    """Arms the global saturation accumulator for a new acquisition session."""
+    global _SATURATION_ACCUMULATOR
+    _SATURATION_ACCUMULATOR = np.zeros((1, 1), dtype=bool)
+
+def get_saturation_mask(downsample_factor=1):
+    """Returns the saturation mask downsampled to the analysis grid.
+
+    A block is marked saturated whenever *any* photosite inside it clipped in
+    *any* frame of the acquisition (logical OR over the 40-frame stack). The
+    block-wise OR is preferred to a fractional threshold because a single
+    saturated photosite already biases the mean intensity used by the Stokes
+    fit, no matter how small its weight inside the block.
+    """
+    if _SATURATION_ACCUMULATOR is None or _SATURATION_ACCUMULATOR.size == 1:
+        return None
+    sat = _SATURATION_ACCUMULATOR
+    if downsample_factor <= 1:
+        return sat.copy()
+    H, W = sat.shape
+    new_H = H - (H % downsample_factor)
+    new_W = W - (W % downsample_factor)
+    sat = sat[:new_H, :new_W]
+    sat = sat.reshape(new_H // downsample_factor, downsample_factor,
+                      new_W // downsample_factor, downsample_factor)
+    return sat.any(axis=(1, 3))
+
+def load_dark_frame(channel_index):
+    """Returns the full-resolution dark frame for the requested channel.
+
+    Cached across calls. Returns ``None`` if ``DARK_FRAME_PATH`` is missing,
+    in which case dark subtraction is skipped and a warning is printed once.
+    """
+    key = (channel_index, USE_RAW_BAYER)
+    if key in _DARK_FRAME_CACHE:
+        return _DARK_FRAME_CACHE[key]
+    if not os.path.exists(DARK_FRAME_PATH):
+        print(f"Warning: dark frame not found at {DARK_FRAME_PATH}. "
+              "Skipping bias subtraction.")
+        _DARK_FRAME_CACHE[key] = None
+        return None
+    try:
+        dark = _read_raw_channel_fullres(DARK_FRAME_PATH, channel_index,
+                                         track_saturation=False)
+    except Exception as e:
+        print(f"Error reading dark frame {DARK_FRAME_PATH}: {e}. "
+              "Skipping bias subtraction.")
+        _DARK_FRAME_CACHE[key] = None
+        return None
+    _DARK_FRAME_CACHE[key] = dark
+    print(f"Loaded dark frame ({('raw Bayer' if USE_RAW_BAYER else 'postprocess')}, "
+          f"channel {channel_index}): mean={dark.mean():.2f}, max={dark.max():.0f}")
+    return dark
+
+def load_raw_image(path, channel_index, downsample_factor=1, subtract_dark=True):
+    """Loads a RAW image, subtracts the dark frame, and downsamples.
+
+    Dark subtraction happens at native resolution before downsampling so the
+    bias is removed on a per-photosite basis; negative residuals after
+    subtraction are preserved (they average out in the Stokes fit and must
+    not be clipped, otherwise the noise distribution is biased upward).
+    """
     if not os.path.exists(path):
         return None
     try:
-        with rawpy.imread(path) as raw:
-            rgb = raw.postprocess(
-                use_camera_wb=True,
-                no_auto_bright=True,
-                gamma=(1, 1),
-                output_bps=16
-            )
-        channel_data = rgb[:, :, channel_index].astype(np.float32)
-        return downsample_image(channel_data, downsample_factor)
+        data = _read_raw_channel_fullres(path, channel_index)
     except Exception as e:
         print(f"Error reading {path}: {e}")
         return None
+    if subtract_dark:
+        dark = load_dark_frame(channel_index)
+        if dark is not None:
+            data = data - dark
+    return downsample_image(data, downsample_factor)
 
 def load_rotation_sequence(pol_dir, channel_index, downsample_factor=1, invert_angles=False):
     """Loads the pol*.dng image sequence. Optionally inverts angles."""
@@ -159,6 +300,36 @@ def calculate_linear_stokes(angles_rad_2x, image_stack):
 
     return S0, S1, S2
 
+def quartz_birefringence(wavelength_nm):
+    """Returns the birefringence Delta_n = n_e - n_o of crystalline alpha-quartz.
+
+    Uses the two-term Sellmeier fit published by Ghosh (1999), valid between
+    ~200 nm and ~2 um. Reproduces the literature value 0.00909 at 633 nm.
+    """
+    lam_um = wavelength_nm / 1000.0
+    lam2 = lam_um ** 2
+    # Ordinary ray
+    n_o_sq = (1.28604141
+              + 1.07044083 * lam2 / (lam2 - 0.0100585997)
+              + 1.10202242 * lam2 / (lam2 - 100.0))
+    # Extraordinary ray
+    n_e_sq = (1.28851804
+              + 1.09509924 * lam2 / (lam2 - 0.0102101864)
+              + 1.15662475 * lam2 / (lam2 - 100.0))
+    return np.sqrt(n_e_sq) - np.sqrt(n_o_sq)
+
+def waveplate_retardance(wavelength_nm, design_wavelength_nm=633.0, order=0.25):
+    """Retardance (in radians) of a zero-order quartz waveplate at a non-design wavelength.
+
+    Scales the design retardance ``2 * pi * order`` by the ratio of the
+    ``Delta_n / lambda`` products between the two wavelengths, which is the
+    exact single-pass birefringent phase. ``order`` defaults to 0.25 (lambda/4).
+    """
+    delta_design = 2.0 * np.pi * order
+    dn_ratio = quartz_birefringence(wavelength_nm) / quartz_birefringence(design_wavelength_nm)
+    lam_ratio = design_wavelength_nm / wavelength_nm
+    return delta_design * dn_ratio * lam_ratio
+
 def calculate_s3(wav_dir, channel_index, downsample_factor=1, wavelength=633.0):
     """Loads wav images, applies angle inversion, and calculates wavelength-corrected S3."""
     global _WAV_INTENSITY_CACHE
@@ -186,11 +357,17 @@ def calculate_s3(wav_dir, channel_index, downsample_factor=1, wavelength=633.0):
     # CACHE THE WAV INTENSITY for the mask generator to find the vignette!
     _WAV_INTENSITY_CACHE = I_45 + I_minus_45
 
-    # Wavelength correction for zero-order 633nm lambda/4 waveplate
-    delta = (np.pi / 2.0) * (633.0 / wavelength)
+    # Zero-order quartz lambda/4 waveplate: retardance at an off-design wavelength
+    # scales with both 1/lambda and the (weak) chromatic dispersion of Delta_n.
+    delta = waveplate_retardance(wavelength, design_wavelength_nm=633.0, order=0.25)
     correction_factor = np.sin(delta)
+    dn_ratio = (quartz_birefringence(wavelength)
+                / quartz_birefringence(633.0))
 
-    print(f"Calculating S3... (Applying correction for {wavelength}nm, factor: 1/sin({np.degrees(delta):.1f}°) = {1/correction_factor:.3f})")
+    print(f"Calculating S3... (lambda = {wavelength:.1f} nm, "
+          f"Delta_n ratio = {dn_ratio:.4f}, "
+          f"delta = {np.degrees(delta):.2f} deg, "
+          f"1/sin(delta) = {1/correction_factor:.3f})")
 
     # S3 = (I(45) - I(-45)) / sin(delta)
     S3 = (I_45 - I_minus_45) / correction_factor
@@ -200,10 +377,8 @@ def calculate_s3(wav_dir, channel_index, downsample_factor=1, wavelength=633.0):
 def generate_background_mask(S0, S3=None):
     """
     Creates a universal background mask using highly sensitive Edge Detection.
-    Works for closed mounts, open slides, and objects that split the background.
-    Extracts the exact S3 waveplate vignette from the cached wav images.
+    Returns the FULL background (no vignette crop) so S1 and S2 can fit the corners perfectly.
     """
-    global _WAV_INTENSITY_CACHE
     print("Generating universal background mask (Multi-Island Edge logic)...")
     H, W = S0.shape
 
@@ -235,14 +410,12 @@ def generate_background_mask(S0, S3=None):
     candidate_bg = bright_mask & (~edge_mask)
 
     # 6. Label the regions and keep ALL massive islands
-    # (Solves the issue where a sample splits the background in half)
     labeled_array, num_features = ndimage.label(candidate_bg)
     if num_features > 0:
         sizes = ndimage.sum(candidate_bg, labeled_array, range(1, num_features + 1))
         max_size = np.max(sizes)
 
         # Keep any background chunk that is at least 20% of the largest chunk.
-        # This easily keeps split left/right halves, but rejects small sample interiors.
         valid_labels = np.where(sizes > 0.20 * max_size)[0] + 1
         bg_mask = np.isin(labeled_array, valid_labels)
     else:
@@ -250,33 +423,25 @@ def generate_background_mask(S0, S3=None):
         bg_mask = bright_mask
 
     # Erode the background slightly to stay safely away from the sample edges
-    erosion_px = max(2, int(max(H, W) * 0.02))
+    erosion_px = max(2, int(max(H, W) * 0.005))
     bg_mask = ndimage.binary_erosion(bg_mask, structure=struct, iterations=erosion_px)
 
-    # 7. EXCLUDE THE EXACT S3 VIGNETTE
-    if _WAV_INTENSITY_CACHE is not None:
-        print("  -> Extracting exact vignette mask from wav images...")
-        wav_blur = ndimage.gaussian_filter(_WAV_INTENSITY_CACHE, sigma=max(H, W) * 0.01)
-        wav_thresh = np.mean(wav_blur) * 0.5
-        wav_bright = wav_blur > wav_thresh
-
-        valid_wav_area = ndimage.binary_fill_holes(wav_bright)
-
-        # Generous erosion to stay away from the vignette shadow
-        generous_erosion = max(5, int(max(H, W) * 0.025))
-        valid_wav_area = ndimage.binary_erosion(valid_wav_area, structure=struct, iterations=generous_erosion)
-
-        bg_mask = bg_mask & valid_wav_area
-    else:
-        print("Warning: Wav intensity cache not found. Skipping vignette crop.")
-
+    # Note: We NO LONGER crop the wav vignette here!
+    # This ensures S1 and S2 have data in the corners so they don't blow up.
     return bg_mask
 
 def align_reference_frame(S1, S2, bg_mask, enable=ENABLE_BACKGROUND_ALIGNMENT):
     """
     Mathematically rotates the S1/S2 reference frame so the background input
     light represents perfectly horizontal/vertical polarization (AoLP = 0).
-    Uses a 2D spatial surface fit to compensate for the LCD's viewing-angle rotation.
+
+    Fits independent 2D polynomial surfaces to the measured S1 and S2 on the
+    background region, then recovers the rotation angle from
+    ``alpha = 0.5 * arctan2(S2_surface, S1_surface)``. Fitting the two Cartesian
+    components separately avoids the branch cut of ``arctan2`` that appears
+    when the background polarization lies near the +/- 90 deg boundary: the
+    previous approach fitted the wrapped angle directly and produced a
+    catastrophic jump in that regime.
     """
     if not enable:
         print("Background alignment is disabled. Skipping reference frame rotation.")
@@ -288,10 +453,6 @@ def align_reference_frame(S1, S2, bg_mask, enable=ENABLE_BACKGROUND_ALIGNMENT):
         print("Warning: Background mask is empty. Skipping alignment.")
         return S1, S2
 
-    # 1. Calculate the raw offset angle for every pixel in the background
-    alpha_raw = 0.5 * np.arctan2(S2, S1)
-
-    # 2. Fit a 2D polynomial to the background angle to model the LCD's optical rotation
     H, W = S1.shape
     y_idx, x_idx = np.mgrid[0:H, 0:W]
 
@@ -300,19 +461,24 @@ def align_reference_frame(S1, S2, bg_mask, enable=ENABLE_BACKGROUND_ALIGNMENT):
     y_norm = (y_idx - H / 2) / (H / 2)
 
     x_bg, y_bg = x_norm[bg_mask], y_norm[bg_mask]
-    alpha_bg = alpha_raw[bg_mask]
 
-    # Design matrix for 2nd order polynomial
-    M_bg = np.column_stack([np.ones(len(x_bg)), x_bg, y_bg, x_bg ** 2, x_bg * y_bg, y_bg ** 2])
-    M_full = np.column_stack([np.ones(S1.size), x_norm.ravel(), y_norm.ravel(), x_norm.ravel() ** 2, x_norm.ravel() * y_norm.ravel(), y_norm.ravel() ** 2])
+    M_bg = np.column_stack([np.ones(len(x_bg)), x_bg, y_bg,
+                            x_bg ** 2, x_bg * y_bg, y_bg ** 2])
+    M_full = np.column_stack([np.ones(S1.size), x_norm.ravel(), y_norm.ravel(),
+                              x_norm.ravel() ** 2,
+                              x_norm.ravel() * y_norm.ravel(),
+                              y_norm.ravel() ** 2])
 
-    # Solve for the 2D surface of the rotation angle
-    coeffs_alpha, _, _, _ = np.linalg.lstsq(M_bg, alpha_bg, rcond=None)
-    alpha_surface = (M_full @ coeffs_alpha).reshape(H, W)
+    # Fit each Stokes component independently on the background.
+    coeffs_s1, _, _, _ = np.linalg.lstsq(M_bg, S1[bg_mask], rcond=None)
+    coeffs_s2, _, _, _ = np.linalg.lstsq(M_bg, S2[bg_mask], rcond=None)
+    S1_surface = (M_full @ coeffs_s1).reshape(H, W)
+    S2_surface = (M_full @ coeffs_s2).reshape(H, W)
 
-    print(f"  -> Median background rotation angle: {np.degrees(np.median(alpha_surface)):.2f}°")
+    alpha_surface = 0.5 * np.arctan2(S2_surface, S1_surface)
 
-    # 3. Rotate S1 and S2 pixel-by-pixel using the 2D surface
+    print(f"  -> Median background rotation angle: {np.degrees(np.median(alpha_surface)):.2f} deg")
+
     cos_2a = np.cos(2 * alpha_surface)
     sin_2a = np.sin(2 * alpha_surface)
 
@@ -374,32 +540,56 @@ def calculate_retardance_and_fast_axis(S0, S1, S2, S3, bg_mask, smooth_sigma=1.0
 
     # STEP 2: Background input state from unobstructed (mask) region
     if np.any(bg_mask):
-        # We keep s2_in as a scalar median because the math assumes global alignment to s2=0
+        global _WAV_INTENSITY_CACHE
+        # s2_in is used as a diagnostic of the alignment residual: after
+        # align_reference_frame the median on the background must be close to
+        # zero, otherwise the linear-horizontal assumption underlying the
+        # retarder inversion no longer holds and the retardance is biased.
         s2_in = np.median(s2[bg_mask])
+        if abs(s2_in) > 0.05:
+            print(f"  WARNING: residual s2 on background = {s2_in:+.4f} "
+                  "(> 0.05). Alignment may have failed; retardance estimate "
+                  "will carry a systematic error.")
 
-        # Fit a 2D polynomial to the background s1 and s3 to account for the LCD's spatial non-uniformity
         H, W = s3.shape
         y_idx, x_idx = np.mgrid[0:H, 0:W]
 
-        # NORMALIZE coordinates to [-1, 1] to prevent massive numerical instability when squaring
+        # NORMALIZE coordinates to [-1, 1] to prevent massive numerical instability
         x_norm = (x_idx - W / 2) / (W / 2)
         y_norm = (y_idx - H / 2) / (H / 2)
 
-        x_bg, y_bg = x_norm[bg_mask], y_norm[bg_mask]
-
-        # Design matrix for 2nd order polynomial: 1, x, y, x^2, xy, y^2
-        M_bg = np.column_stack([np.ones(len(x_bg)), x_bg, y_bg, x_bg ** 2, x_bg * y_bg, y_bg ** 2])
         M_full = np.column_stack(
             [np.ones(s3.size), x_norm.ravel(), y_norm.ravel(), x_norm.ravel() ** 2, x_norm.ravel() * y_norm.ravel(),
              y_norm.ravel() ** 2])
 
-        # Fit S3 background
-        coeffs_s3, _, _, _ = np.linalg.lstsq(M_bg, s3[bg_mask], rcond=None)
-        s3_in = (M_full @ coeffs_s3).reshape(H, W)
-
-        # Fit S1 background
+        # --- FIT S1 (Using the FULL mask so the corners don't blow up) ---
+        x_bg, y_bg = x_norm[bg_mask], y_norm[bg_mask]
+        M_bg = np.column_stack([np.ones(len(x_bg)), x_bg, y_bg, x_bg ** 2, x_bg * y_bg, y_bg ** 2])
         coeffs_s1, _, _, _ = np.linalg.lstsq(M_bg, s1[bg_mask], rcond=None)
         s1_in = (M_full @ coeffs_s1).reshape(H, W)
+
+        # --- FIT S3 (Using a dynamically CROPPED mask to avoid the wav vignette) ---
+        bg_mask_s3 = bg_mask.copy()
+        if _WAV_INTENSITY_CACHE is not None:
+            wav_blur = ndimage.gaussian_filter(_WAV_INTENSITY_CACHE, sigma=max(H, W) * 0.01)
+            wav_thresh = np.mean(wav_blur) * 0.5
+            wav_bright = wav_blur > wav_thresh
+            valid_wav_area = ndimage.binary_fill_holes(wav_bright)
+
+            generous_erosion = max(5, int(max(H, W) * 0.005))
+            valid_wav_area = ndimage.binary_erosion(valid_wav_area, structure=ndimage.generate_binary_structure(2, 2),
+                                                    iterations=generous_erosion)
+
+            bg_mask_s3 = bg_mask & valid_wav_area
+
+        if np.any(bg_mask_s3):
+            x_bg_s3, y_bg_s3 = x_norm[bg_mask_s3], y_norm[bg_mask_s3]
+            M_bg_s3 = np.column_stack(
+                [np.ones(len(x_bg_s3)), x_bg_s3, y_bg_s3, x_bg_s3 ** 2, x_bg_s3 * y_bg_s3, y_bg_s3 ** 2])
+            coeffs_s3, _, _, _ = np.linalg.lstsq(M_bg_s3, s3[bg_mask_s3], rcond=None)
+            s3_in = (M_full @ coeffs_s3).reshape(H, W)
+        else:
+            s3_in = np.zeros((H, W))
 
         med_s1 = np.median(s1_in)
         med_s3 = np.median(s3_in)
@@ -411,8 +601,6 @@ def calculate_retardance_and_fast_axis(S0, S1, S2, S3, bg_mask, smooth_sigma=1.0
         med_s3 = 0.0
 
     print(f"  Background input modeled as 2D surfaces. Medians: s1={med_s1:.4f}, s2={s2_in:.4f}, s3={med_s3:.4f}")
-    if abs(s2_in) > 0.05 * abs(med_s1):
-        print(f"  WARNING: s2_in is {abs(s2_in / med_s1) * 100:.1f}% of s1_in — alignment may be imperfect.")
 
     # STEP 3: Spatial smoothing — trades spatial resolution for noise robustness
     if smooth_sigma > 0:
@@ -477,28 +665,16 @@ def calculate_retardance_and_fast_axis(S0, S1, S2, S3, bg_mask, smooth_sigma=1.0
     delta_deg = np.degrees(delta)
     theta_deg = np.degrees(theta)
 
-    # ==========================================================
-    # CORREZIONE AUTOMATICA: DEGENERAZIONE DI POINCARÉ (SCAMBIO ASSI)
-    # Fisicamente, una lamina a -40° con ritardo di 209° produce lo stesso
-    # esatto stato di polarizzazione di una lamina a +50° con ritardo di 151°.
-    # Durante l'acquisizione in laboratorio, la lamina lambda/2 è stata erroneamente montata
-    # ruotata di 90° rispetto alla lambda/4 (Asse Veloce scambiato con Asse Lento).
-    # Se il codice rileva la cartella 'lambdamezzi_50deg', inverte matematicamente
-    # il calcolo per restituire i valori fisicamente corretti.
-    # ==========================================================
-
-    # Controlla se la stringa della cartella contiene il nome del dataset incriminato
-    if "lambdamezzi_50deg" in TARGET_FOLDER.lower():
-        print("  -> Rilevato dataset 'lambdamezzi_50deg'. Applico correzione Asse Lento/Veloce (+90° fisici).")
-
-        # Invertiamo il ritardo (360 - delta) e ruotiamo l'asse veloce di 90°
-        delta_deg = 360.0 - delta_deg
-        theta_deg = theta_deg - 90.0
-
-        # Mantiene theta_deg nel range canonico [-90°, +90°]
-        theta_deg = (theta_deg + 90.0) % 180.0 - 90.0
-
-        # Mantiene delta_deg nel range [0°, 360°]
-        delta_deg = delta_deg % 360.0
+    # Hardware calibration for acquisitions where the waveplate was physically
+    # mounted with fast/slow axes swapped (rotated 90 deg from intended). On
+    # the Poincare sphere the swap is equivalent to (delta -> 2*pi - delta,
+    # theta -> theta +/- 90 deg), so the correct physical parameters are
+    # recovered analytically without re-measuring. Controlled by the explicit
+    # WAVEPLATE_AXES_SWAPPED flag in the configuration section.
+    if WAVEPLATE_AXES_SWAPPED:
+        print("  -> WAVEPLATE_AXES_SWAPPED active: applying fast/slow axis "
+              "correction (delta -> 360 - delta, theta -> theta - 90 deg).")
+        delta_deg = (360.0 - delta_deg) % 360.0
+        theta_deg = (theta_deg - 90.0 + 90.0) % 180.0 - 90.0
 
     return delta_deg, theta_deg
