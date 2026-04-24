@@ -49,7 +49,26 @@
       "Bash(git -c commit.gpgsign=false commit -m '[python-pipeline]: aggiunto final_umap.py per embedding 2D degli Stokes *)",
       "Bash(git -c commit.gpgsign=false commit -m '[python-pipeline]: aggiunto requirements.txt con umap-learn *)",
       "Bash(git -c commit.gpgsign=false commit -m '[python-pipeline]: final_plot_strati legge lunghezze d'\\\\''onda da CSV e marca valori da rimisurare *)",
-      "Bash(git -c commit.gpgsign=false commit -m '[doc]: CLAUDE.md radice e nidificate, TODO vivo, prompt di revisione *)"
+      "Bash(git -c commit.gpgsign=false commit -m '[doc]: CLAUDE.md radice e nidificate, TODO vivo, prompt di revisione *)",
+      "Bash(tee ../umap_strati.log)",
+      "Bash(tee ../umap_strati_nodelta.log)",
+      "Bash(tee outputs/_hist_delta_strati_v2.log)",
+      "Bash(MPLBACKEND=Agg \"C:\\\\Users\\\\filip\\\\OneDrive - setupe06\\\\Documenti\\\\Script\\\\GitHub\\\\Tesi\\\\.venv\\\\Scripts\\\\python.exe\" final_slice_debug.py)",
+      "Bash(tee /tmp/run_baseline.log)",
+      "Bash(tee /tmp/run_thr05.log)",
+      "Bash(tee /tmp/run_stokes_B.log)",
+      "Bash(tee /tmp/run_stokes_R.log)",
+      "Bash(tee /tmp/run_stokes_G.log)",
+      "Bash(tee /tmp/run_aligned_B.log)",
+      "Bash(tee /tmp/run_aligned_diag_B.log)",
+      "Bash(MPLBACKEND=Agg \"C:\\\\Users\\\\filip\\\\OneDrive - setupe06\\\\Documenti\\\\Script\\\\GitHub\\\\Tesi\\\\.venv\\\\Scripts\\\\python.exe\" -c \"import final_utils; print\\('IMPORT OK'\\); print\\('config:', final_utils.WAV_HOLDER_THRESHOLD, final_utils.TARGET_CHANNEL_IDX\\); print\\('cache exists:', hasattr\\(final_utils, '_POINCARE_BETA_MAP_CACHE'\\)\\)\")",
+      "Bash(tee /tmp/run_dop_B.log)",
+      "Bash(awk 'NR<=637 || NR>=843' \"C:\\\\Users\\\\filip\\\\OneDrive - setupe06\\\\Documenti\\\\Script\\\\GitHub\\\\Tesi\\\\python\\\\final_slice_debug.py\")",
+      "Bash(awk 'NR<=641 || NR>=843' \"C:\\\\Users\\\\filip\\\\OneDrive - setupe06\\\\Documenti\\\\Script\\\\GitHub\\\\Tesi\\\\python\\\\final_slice_debug.py\")",
+      "Bash(MPLBACKEND=Agg \"C:\\\\Users\\\\filip\\\\OneDrive - setupe06\\\\Documenti\\\\Script\\\\GitHub\\\\Tesi\\\\.venv\\\\Scripts\\\\python.exe\" -c \"import ast; ast.parse\\(open\\('final_slice_debug.py'\\).read\\(\\)\\); print\\('SYNTAX OK'\\)\")",
+      "Bash(git check-ignore *)",
+      "Bash(git reset *)",
+      "Bash(git commit -m ' *)"
     ]
   }
 }
