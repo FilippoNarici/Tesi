@@ -6,11 +6,13 @@ Questo file è letto da Claude quando lavora nella directory `python/`. Per rego
 
 | Script | Tipo | Scopo |
 |--------|------|-------|
-| `final_utils.py` | libreria | Funzioni comuni: RAW loading, Stokes (pseudo-inversa), S3 via lamina λ/4, maschere, allineamento 2D, retardance arctan2, saturation/dark handling |
-| `final_polarimeter.py` | entry point principale | Pipeline completa su un dataset: Stokes + derivate + plot 3×3 |
+| `final_utils.py` | libreria | Funzioni comuni: RAW loading, Stokes (pseudo-inversa), S3 via lamina λ/4, maschere, allineamento 2D (S3 axis) + ellitticità Poincaré (S2 axis), retardance arctan2, saturation/dark handling |
+| `final_polarimeter.py` | entry point principale | Pipeline completa su un dataset: Stokes + derivate + plot 3×3 (con overlay RGB per bg mask Poincaré) |
 | `final_thesis_figure.py` | generatore figure | Produce PDF per tesi (S0/S1/S2/S3/DoLP/AoLP/δ/θ/mask) con stile pubblicazione |
 | `final_umap.py` | analisi | UMAP 2D di vettori di Stokes, colorato per retardance |
+| `final_delta_histogram.py` | figura tesi | Istogrammi pubblicabili di δ (PDF + HTML plotly) con barre colorate twilight |
 | `final_plot_strati.py` | analisi specifica | Fit retardance-vs-strati (nastro adesivo multistrato); fit 1/λ² per dispersione |
+| `final_slice_debug.py` | diagnostica | Slice diagonale spessa di δ: auto-crop su soglia angolare + ignore band, rilevamento plateau, etichette 1L–5–1R, fit through-origin con unwrap per-side cumulativo. Single PNG `slice_delta_<dataset>_<channel>.png`. Utile per quantificare asimmetrie left/right per strato. |
 | `final_monochrome_approx.py` | utility spettrale | Stima lunghezza d'onda centroide per canale RGB del sensore + sorgente |
 | `final_fit.py` | debugger interattivo | Ispettore pixel-per-pixel con animazione intensità |
 
@@ -25,14 +27,15 @@ Questo file è letto da Claude quando lavora nella directory `python/`. Per rego
 
 ## Punti chiave di `final_utils.py`
 
-- **Configurazione in testa al file**: `TARGET_FOLDER`, `TARGET_CHANNEL_IDX`, `DOWNSAMPLE_FACTOR`, `ENABLE_BACKGROUND_ALIGNMENT`, `USE_RAW_BAYER`, `DARK_FRAME_PATH`, `SATURATION_FRACTION`.
+- **Configurazione in testa al file**: `TARGET_FOLDER`, `TARGET_CHANNEL_IDX`, `DOWNSAMPLE_FACTOR`, `ENABLE_BACKGROUND_ALIGNMENT`, `USE_RAW_BAYER`, `DARK_FRAME_PATH`, `SATURATION_FRACTION`, `WAV_HOLDER_THRESHOLD` (frazione del median wav-bg per maschera holder lamina nel rebase Poincaré, default 0.7).
 - `load_raw_image`, `load_rotation_sequence` — caricamento DNG + dark subtract + downsampling.
 - `calculate_linear_stokes` — S0/S1/S2 via pseudo-inversa sui 36 angoli.
-- `calculate_s3` — S3 da lamina λ/4 con correzione `sin(δ(λ))` (modello Ghosh del quarzo).
+- `calculate_s3` — S3 da lamina λ/4 con correzione `sin(δ(λ))` (modello Ghosh del quarzo). Cache `_WAV_INTENSITY_CACHE` = I(+45)+I(-45), usata a valle per mask holder.
 - `quartz_birefringence`, `waveplate_retardance` — modelli dispersivi.
 - `generate_background_mask` — edge + brightness, tiene regioni >20% dell'isola più grande, non taglia più la vignette.
-- `align_reference_frame` — rotazione S1/S2 con fit di superfici polinomiali 2D sullo sfondo.
-- `calculate_dolp_aolp`, `calculate_retardance_and_fast_axis` — derivate fisiche. **Retardance in [0°, 360°) via arctan2 dal 2026-04**.
+- `align_reference_frame` — rotazione S1/S2 attorno asse S3 (equatore Poincaré) con fit superfici polinomiali 2D sullo sfondo. Zera s2_bg.
+- `align_poincare_ellipticity` (2026-04-23) — rotazione S1/S3 attorno asse S2 pixel-wise, β(x,y) da fit grado 2 di s1_bg e s3_bg su cleaned wav-bright mask (holder lamina escluso via `_WAV_INTENSITY_CACHE > 0.7 × median`). Complementare a `align_reference_frame`: la composizione porta bg Stokes → (1,0,0), assunto dalle formule retardance. Cache cleaned mask in `_POINCARE_BG_MASK_CACHE` per debug plot.
+- `calculate_dolp_aolp`, `calculate_retardance_and_fast_axis` — derivate fisiche. **Retardance in [0°, 360°) via arctan2 dal 2026-04**. Assume base Poincaré già ribalzata via `align_poincare_ellipticity`.
 - `reset_saturation_accumulator`, `get_saturation_mask` — accumulatore OR globale dei pixel saturati su tutti i frame.
 
 ## Dati
@@ -50,6 +53,8 @@ Vedi `CLAUDE.md` (radice), sezione "Insidie tecniche note". In breve:
 - Lamina λ/4 ottimizzata a 633 nm — correzione dispersiva necessaria.
 - Saturation accumulator va resettato a inizio run (`reset_saturation_accumulator()`).
 - `umap-learn` va installato a parte se non in `requirements.txt`.
+- Pipeline ordine obbligato: `calculate_s3` → `align_reference_frame` → **`align_poincare_ellipticity`** → `calculate_retardance_and_fast_axis`. Il rebasing Poincaré richiede `_WAV_INTENSITY_CACHE` popolato da `calculate_s3`.
+- `align_poincare_ellipticity` modifica S1 e S3 in-place logicamente (ritorna nuovi array). Riassegnare al nome originale nei chiamanti: `S1, S3 = utils.align_poincare_ellipticity(S0, S1, S3, bg_mask)`.
 
 ## Test
 

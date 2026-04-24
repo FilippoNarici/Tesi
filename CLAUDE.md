@@ -86,6 +86,7 @@ Insidie che cambiano il risultato se ignorate:
 * **Saturazione** — soglia al 98% del white level (4095 counts); accumulatore OR globale attraverso tutti i frame; pixel clippati mascherati a NaN nelle uscite finali. Ricordarsi di chiamare `reset_saturation_accumulator()` a inizio pipeline.
 * **Dark frame** — sottratto alla risoluzione nativa prima del downsampling; richiede `./raw/<dataset>/dark.dng`.
 * **Allineamento del sistema di riferimento** — S1/S2 ruotati tramite fit di superfici polinomiali 2D sullo sfondo; richiede un `bg_mask_ref` pulito (distinto dal `bg_mask_display` usato solo per overlay).
+* **Correzione ellitticità Poincaré (2026-04-23)** — `align_poincare_ellipticity` in `final_utils.py`: rotazione pixel-wise attorno asse S2 che zera s3_bg (ellitticità residua LCD + imperfezioni lamina). Fit polinomiale grado 2 di s1_bg e s3_bg su maschera wav-bright (holder lamina escluso via `_WAV_INTENSITY_CACHE > 0.7 × median`). Ordine pipeline obbligato: `calculate_s3` → `align_reference_frame` → `align_poincare_ellipticity` → `calculate_retardance_and_fast_axis`. Riduce errore formule retardance da O(β) a O(β²). Overlay diagnostico nel debug plot di `final_polarimeter`.
 * **`umap-learn`** non è in `requirements.txt`: installare separatamente se si usa `final_umap.py`.
 
 ## Modalità di compressione (caveman e simili)
