@@ -97,13 +97,28 @@ def plot_all_parameters(S0, S1, S2, S3, DoLP, AoLP, delta, theta, bg_mask, chann
     # Create the debug mask: Normalize S0 to 0-1 range
     S0_norm = (S0 - np.min(S0)) / (np.max(S0) - np.min(S0) + 1e-8)
 
-    # Put 0.0 (black) where bg_mask is False (excluded from average), otherwise show S0_norm
-    debug_mask_img = np.where(bg_mask, S0_norm, 0.0)
+    # Encode both masks in one RGB image:
+    #  * grey background = S0_norm under the generic bg_mask (alignment / s1_in fit)
+    #  * blue tint = region also kept by the Poincare s3-bg mask (used for beta fit)
+    #  * black = outside bg_mask
+    bg_s3 = utils._POINCARE_BG_MASK_CACHE
+    if bg_s3 is None or bg_s3.shape != bg_mask.shape:
+        bg_s3 = np.zeros_like(bg_mask)
+    base = np.where(bg_mask, S0_norm, 0.0)
+    rgb = np.stack([base, base, base], axis=-1)
+    # Mark pixels inside bg_mask but NOT in bg_s3 (holder-excluded) in red.
+    holder = bg_mask & (~bg_s3)
+    rgb[holder] = np.stack([np.full(holder.sum(), 0.8),
+                            np.full(holder.sum(), 0.2),
+                            np.full(holder.sum(), 0.2)], axis=-1)
+    # Tint bg_s3 pixels lightly blue (cyan overlay) to show the cleaned bg.
+    cyan_tint = bg_s3 & bg_mask
+    rgb[cyan_tint, 2] = np.minimum(1.0, rgb[cyan_tint, 2] * 0.5 + 0.5)
 
-    im_mask = axes[2, 2].imshow(debug_mask_img, cmap='gray', vmin=0, vmax=1)
-    axes[2, 2].set_title('Safe Background Mask (Debug)')
+    axes[2, 2].imshow(rgb)
+    axes[2, 2].set_title(
+        'BG masks: grey+cyan=beta fit, red=holder excluded, black=outside bg')
     axes[2, 2].axis('off')
-    fig.colorbar(im_mask, ax=axes[2, 2], fraction=0.046, pad=0.04)
 
     plt.tight_layout()
     plt.show()
@@ -152,6 +167,11 @@ def main():
 
     # Align the reference frame using the clean (unrefined) background
     S1_aligned, S2_aligned = utils.align_reference_frame(S1, S2, bg_mask_ref)
+
+    # Rebase the Poincare sphere around the S2 axis to zero residual s3 on bg
+    # (LCD ellipticity + waveplate imperfection).  Rewrites S1 and S3 so all
+    # downstream plots reflect the corrected basis.
+    S1_aligned, S3 = utils.align_poincare_ellipticity(S0, S1_aligned, S3, bg_mask_ref)
 
     # 5. Polarization & Retardance Math (reference state from clean background)
     DoLP, AoLP = utils.calculate_dolp_aolp(S0, S1_aligned, S2_aligned)

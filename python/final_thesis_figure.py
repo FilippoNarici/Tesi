@@ -295,6 +295,8 @@ def main():
     # 3. Maschera e allineamento (servono per quasi tutto tranne S0 grezzo)
     bg_mask = utils.generate_background_mask(S0, S3)
     S1_al, S2_al = utils.align_reference_frame(S1, S2, bg_mask)
+    if S3 is not None:
+        S1_al, S3 = utils.align_poincare_ellipticity(S0, S1_al, S3, bg_mask)
 
     # 4. Calcoli derivati
     DoLP, AoLP = None, None

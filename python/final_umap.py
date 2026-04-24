@@ -231,19 +231,19 @@ def plot_delta_histogram(delta_valid, sample_name, save_path, bins=180):
     print(f"  Istogramma salvato: {save_path}")
 
 
-def run(sample_name=None, show=True, save_path=None, sparse_stride=None,
-        feature_mode='full', histogram_path=None):
-    if sample_name is None:
-        sample_name = os.path.basename(os.path.normpath(utils.TARGET_FOLDER))
-    stride = sparse_stride if sparse_stride is not None else UMAP_SPARSE_STRIDE
+def compute_polarimetric_maps_fullres(sparse_stride=None):
+    """Carica RAW, calcola Stokes + DoLP + delta + theta a risoluzione nativa e
+    prepara la maschera sparse-grid di validita'. NON modifica le globals della
+    pipeline: ``utils.DOWNSAMPLE_FACTOR`` resta invariato, qui si forza solo il
+    caricamento a ``downsample_factor=1``. Riusato da ``run`` (UMAP) e dal
+    modulo ``final_delta_histogram`` per gli istogrammi pubblicabili.
 
-    print("--- Polarimetric pipeline (UMAP full-res) ---")
-    print(f"  Sparse stride: {stride}px (feature grid), DOWNSAMPLE_FACTOR globale "
-          f"invariato: {utils.DOWNSAMPLE_FACTOR}")
+    Restituisce un dict con: S0, S1_al, S2_al, S3, DoLP, delta_deg, theta_deg,
+    bg_mask, sat_mask, valid_mask_sparse, valid_indices (flat).
+    """
+    stride = sparse_stride if sparse_stride is not None else UMAP_SPARSE_STRIDE
     utils.reset_saturation_accumulator()
 
-    # Caricamento e calcolo Stokes a risoluzione nativa: questa e' la parte
-    # "costosa" di UMAP. Il resto della pipeline del progetto NON e' toccato.
     angles, stack = utils.load_rotation_sequence(
         utils.POL_SUBFOLDER, utils.TARGET_CHANNEL_IDX,
         downsample_factor=1, invert_angles=True)
@@ -258,6 +258,7 @@ def run(sample_name=None, show=True, save_path=None, sparse_stride=None,
 
     bg_mask = _bg_mask_native_resolution(S0, utils.DOWNSAMPLE_FACTOR)
     S1_al, S2_al = utils.align_reference_frame(S1, S2, bg_mask)
+    S1_al, S3 = utils.align_poincare_ellipticity(S0, S1_al, S3, bg_mask)
     DoLP, _ = utils.calculate_dolp_aolp(S0, S1_al, S2_al)
     delta_deg, theta_deg = utils.calculate_retardance_and_fast_axis(
         S0, S1_al, S2_al, S3, bg_mask, smooth_sigma=0)
@@ -268,17 +269,43 @@ def run(sample_name=None, show=True, save_path=None, sparse_stride=None,
             if arr is not None:
                 arr[sat_mask] = np.nan
 
-    # Sparse-grid: il cuore della variante U1. Prendiamo un pixel ogni
-    # ``stride`` su entrambi gli assi, senza mediare con i vicini, cosi' le
-    # transizioni nette fra regioni polarimetriche non vengono sfumate.
-    print(f"--- UMAP (sparse-grid stride={stride}) ---")
     grid_mask = _sparse_grid_mask(S0.shape, stride)
     base_valid = _build_validity_mask(S0, DoLP, bg_mask, sat_mask)
     valid_mask = base_valid & grid_mask
+    valid_indices = np.flatnonzero(valid_mask.ravel())
+    return {
+        'S0': S0, 'S1_al': S1_al, 'S2_al': S2_al, 'S3': S3,
+        'DoLP': DoLP, 'delta_deg': delta_deg, 'theta_deg': theta_deg,
+        'bg_mask': bg_mask, 'sat_mask': sat_mask,
+        'valid_mask_sparse': valid_mask, 'valid_indices': valid_indices,
+        'sparse_stride': stride,
+    }
 
+
+def run(sample_name=None, show=True, save_path=None, sparse_stride=None,
+        feature_mode='full', histogram_path=None):
+    if sample_name is None:
+        sample_name = os.path.basename(os.path.normpath(utils.TARGET_FOLDER))
+    stride = sparse_stride if sparse_stride is not None else UMAP_SPARSE_STRIDE
+
+    print("--- Polarimetric pipeline (UMAP full-res) ---")
+    print(f"  Sparse stride: {stride}px (feature grid), DOWNSAMPLE_FACTOR globale "
+          f"invariato: {utils.DOWNSAMPLE_FACTOR}")
+
+    maps = compute_polarimetric_maps_fullres(sparse_stride=stride)
+    if maps is None:
+        return None
+
+    S0, S1_al, S2_al, S3 = maps['S0'], maps['S1_al'], maps['S2_al'], maps['S3']
+    DoLP, delta_deg, theta_deg = maps['DoLP'], maps['delta_deg'], maps['theta_deg']
+    valid_mask = maps['valid_mask_sparse']
+    valid_indices = maps['valid_indices']
+
+    print(f"--- UMAP (sparse-grid stride={stride}) ---")
     features, valid_indices = _build_feature_matrix(
         S0, S1_al, S2_al, S3, DoLP, delta_deg, valid_mask,
         feature_mode=feature_mode)
+    grid_mask = _sparse_grid_mask(S0.shape, stride)
     total_grid_points = int(grid_mask.sum())
     print(f"  Valid sparse pixels: {features.shape[0]} / {total_grid_points} "
           f"punti di griglia ({100.0 * features.shape[0] / max(total_grid_points, 1):.1f}%) "

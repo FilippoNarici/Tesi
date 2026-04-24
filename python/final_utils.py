@@ -24,7 +24,7 @@ WAVELENGTHS_CSV = './outputs/rgb_wavelengths.csv'
 TARGET_CHANNEL_IDX = 2
 
 # Default downsampling factor for the full polarimeter mapping
-DOWNSAMPLE_FACTOR = 20
+DOWNSAMPLE_FACTOR = 1
 
 # Toggle per la correzione dell'inclinazione dello sfondo (allineamento S1/S2)
 ENABLE_BACKGROUND_ALIGNMENT = True
@@ -48,6 +48,18 @@ WAVEPLATE_AXES_SWAPPED = "lambdamezzi_50deg" in TARGET_FOLDER.lower()
 
 # Cache to hold the wav intensity so the mask generator can find the exact vignette
 _WAV_INTENSITY_CACHE = None
+
+# Cache for the cleaned bg mask used in the Poincare ellipticity rebasing
+# (bg_mask intersected with wav-bright pixels). Exposed to plotting code so the
+# debug figure can overlay the actual mask used for the beta fit.
+_POINCARE_BG_MASK_CACHE = None
+
+# Threshold (fraction of bg median) on the wav intensity used to mask out
+# the dark holder/aperture region before the beta polynomial fit. Lower
+# values keep more bg pixels for the fit (better spatial constraint) at
+# the cost of including pixels closer to the holder transition where the
+# wav numerator is degenerate. Default 0.7 trades off the two.
+WAV_HOLDER_THRESHOLD = 0.7
 
 # Cache for the dark frame at full native resolution (keyed by channel index)
 _DARK_FRAME_CACHE = {}
@@ -487,6 +499,125 @@ def align_reference_frame(S1, S2, bg_mask, enable=ENABLE_BACKGROUND_ALIGNMENT):
 
     return S1_aligned, S2_aligned
 
+
+def align_poincare_ellipticity(S0, S1, S3, bg_mask,
+                               enable=ENABLE_BACKGROUND_ALIGNMENT):
+    """Rotates the Stokes basis around the S2 axis so that the background input
+    state sits on the pure-linear equator (s3/s0 -> 0 on bg).
+
+    Complements ``align_reference_frame`` which rotates around S3 to cancel
+    s2_bg. The combined rotation brings the bg Stokes vector to (1, 0, 0),
+    matching the linear-input assumption of the retarder inversion.
+
+    The bg statistics used to compute the rotation angle exclude
+    waveplate-holder dark pixels (visible in the wav frames as black corners
+    of the lamda/4 mount) using the cached wav intensity; those pixels pass
+    the S0-based bg_mask but carry noisy S3 because the wav numerator
+    I_+45 - I_-45 is tiny there.
+
+    Physically the rotation rebases the Poincaree sphere to absorb residual
+    ellipticity in the illumination (LCD imperfection, optics birefringence).
+    Retardance delta is invariant under this rotation, so downstream formulas
+    recover it correctly to first order in beta.
+    """
+    global _POINCARE_BG_MASK_CACHE
+    _POINCARE_BG_MASK_CACHE = None
+
+    if not enable:
+        print("Poincare ellipticity rebasing disabled. Skipping.")
+        return S1, S3
+
+    print("Rebasing Poincare sphere around S2 axis (ellipticity correction)...")
+
+    if not np.any(bg_mask):
+        print("  Warning: bg mask empty. Skipping.")
+        return S1, S3
+
+    # Build the s3-specific bg mask: exclude wav-dark holder pixels. Threshold
+    # is WAV_HOLDER_THRESHOLD * median(wav intensity on bg). Lower values keep
+    # more bg pixels for the beta fit at the cost of including pixels closer
+    # to the holder transition where the wav numerator is degenerate.
+    bg_mask_s3 = bg_mask
+    if _WAV_INTENSITY_CACHE is not None \
+            and _WAV_INTENSITY_CACHE.shape == bg_mask.shape:
+        wav_bg_med = float(np.median(_WAV_INTENSITY_CACHE[bg_mask]))
+        wav_bright = _WAV_INTENSITY_CACHE > WAV_HOLDER_THRESHOLD * wav_bg_med
+        struct = ndimage.generate_binary_structure(2, 2)
+        wav_bright = ndimage.binary_erosion(
+            wav_bright, structure=struct,
+            iterations=max(3, int(max(bg_mask.shape) * 0.01)))
+        candidate = bg_mask & wav_bright
+        if candidate.sum() < 0.1 * bg_mask.sum():
+            print("  WARNING: wav holder mask too aggressive, using full bg.")
+        else:
+            bg_mask_s3 = candidate
+            n_excl = int(bg_mask.sum() - bg_mask_s3.sum())
+            print(f"  Wav-dark holder pixels excluded "
+                  f"(threshold {WAV_HOLDER_THRESHOLD:.2f}x med): "
+                  f"{n_excl} ({100*n_excl/max(1,bg_mask.sum()):.1f}%)")
+
+    _POINCARE_BG_MASK_CACHE = bg_mask_s3.copy()
+
+    # Fit s1_in and s3_in as 2D degree-2 polynomial surfaces on the cleaned bg
+    # so the rotation angle beta(x, y) can track the spatial variation of the
+    # residual ellipticity. Same basis as align_reference_frame (1, x, y, x^2,
+    # xy, y^2). Tens of thousands of bg pixels make degree 2 stable; higher
+    # degree risks overfitting sample-edge seepage.
+    S0_safe = np.where(S0 == 0, 1e-8, S0)
+    s1_ratio = S1 / S0_safe
+    s3_ratio = S3 / S0_safe
+    s1_vals = s1_ratio[bg_mask_s3]
+    s3_vals = s3_ratio[bg_mask_s3]
+
+    H, W = S0.shape
+    y_idx, x_idx = np.mgrid[0:H, 0:W]
+    xn = (x_idx - W / 2) / (W / 2)
+    yn = (y_idx - H / 2) / (H / 2)
+    xb, yb = xn[bg_mask_s3], yn[bg_mask_s3]
+    M_bg = np.column_stack([np.ones(len(xb)), xb, yb,
+                            xb ** 2, xb * yb, yb ** 2])
+    M_full = np.column_stack([np.ones(xn.size), xn.ravel(), yn.ravel(),
+                              xn.ravel() ** 2,
+                              xn.ravel() * yn.ravel(),
+                              yn.ravel() ** 2])
+    c_s1, _, _, _ = np.linalg.lstsq(M_bg, s1_vals, rcond=None)
+    c_s3, _, _, _ = np.linalg.lstsq(M_bg, s3_vals, rcond=None)
+    s1_fit = (M_full @ c_s1).reshape(H, W)
+    s3_fit = (M_full @ c_s3).reshape(H, W)
+
+    # Diagnostics: before/after residual on the cleaned bg.
+    s3_bg_med_pre = float(np.median(s3_vals))
+    s3_bg_std_pre = float(np.std(s3_vals))
+    s3_fit_bg = s3_fit[bg_mask_s3]
+    s3_resid_std = float(np.std(s3_vals - s3_fit_bg))
+    print(f"  s3_bg (cleaned) pre: median={s3_bg_med_pre:+.4f}, "
+          f"std={s3_bg_std_pre:.4f}")
+    print(f"  s3_bg deg-2 fit: residual std={s3_resid_std:.4f} "
+          f"(ratio resid/raw = {s3_resid_std/max(1e-8,s3_bg_std_pre):.2f})")
+
+    # Pixel-wise rotation angle beta(x, y) from the fitted input state.
+    beta_map = np.arctan2(s3_fit, s1_fit)
+    cos_b = np.cos(beta_map)
+    sin_b = np.sin(beta_map)
+
+    # Rotation acts linearly on absolute Stokes components (S0 unchanged).
+    S1_rot = S1 * cos_b + S3 * sin_b
+    S3_rot = -S1 * sin_b + S3 * cos_b
+
+    s3_post_vals = (S3_rot / S0_safe)[bg_mask_s3]
+    s3_bg_med_post = float(np.median(s3_post_vals))
+    s3_bg_std_post = float(np.std(s3_post_vals))
+    beta_med_deg = float(np.degrees(np.median(beta_map)))
+    beta_range_deg = (float(np.degrees(beta_map.min())),
+                      float(np.degrees(beta_map.max())))
+    print(f"  beta(x,y): median={beta_med_deg:+.2f} deg, "
+          f"range=[{beta_range_deg[0]:+.2f}, {beta_range_deg[1]:+.2f}] deg")
+    print(f"  s3_bg (cleaned) post: median={s3_bg_med_post:+.4f}, "
+          f"std={s3_bg_std_post:.4f}")
+
+    return S1_rot, S3_rot
+
+
 def calculate_dolp_aolp(S0, S1, S2):
     """Calculates Degree of Linear Polarization and Angle of Linear Polarization."""
     print("Calculating DoLP and AoLP...")
@@ -538,13 +669,10 @@ def calculate_retardance_and_fast_axis(S0, S1, S2, S3, bg_mask, smooth_sigma=1.0
     s2 = S2 / S0_safe
     s3 = S3 / S0_safe
 
-    # STEP 2: Background input state from unobstructed (mask) region
+    # STEP 2: Background input state from unobstructed (mask) region.
+    # Assumes Poincare basis is already rebased via align_poincare_ellipticity
+    # (callers: S1, S3 already rotated around S2 so s3_bg ~ 0).
     if np.any(bg_mask):
-        global _WAV_INTENSITY_CACHE
-        # s2_in is used as a diagnostic of the alignment residual: after
-        # align_reference_frame the median on the background must be close to
-        # zero, otherwise the linear-horizontal assumption underlying the
-        # retarder inversion no longer holds and the retardance is biased.
         s2_in = np.median(s2[bg_mask])
         if abs(s2_in) > 0.05:
             print(f"  WARNING: residual s2 on background = {s2_in:+.4f} "
@@ -559,48 +687,27 @@ def calculate_retardance_and_fast_axis(S0, S1, S2, S3, bg_mask, smooth_sigma=1.0
         y_norm = (y_idx - H / 2) / (H / 2)
 
         M_full = np.column_stack(
-            [np.ones(s3.size), x_norm.ravel(), y_norm.ravel(), x_norm.ravel() ** 2, x_norm.ravel() * y_norm.ravel(),
+            [np.ones(s3.size), x_norm.ravel(), y_norm.ravel(),
+             x_norm.ravel() ** 2, x_norm.ravel() * y_norm.ravel(),
              y_norm.ravel() ** 2])
 
-        # --- FIT S1 (Using the FULL mask so the corners don't blow up) ---
+        # --- FIT S1 su bg (necessario per calcolo di delta: baseline di s1
+        # lineare orizzontale). S3 non sottratto: rotazione Poincare gestisce
+        # l'ellitticita' residua dell'input.
         x_bg, y_bg = x_norm[bg_mask], y_norm[bg_mask]
-        M_bg = np.column_stack([np.ones(len(x_bg)), x_bg, y_bg, x_bg ** 2, x_bg * y_bg, y_bg ** 2])
+        M_bg = np.column_stack([np.ones(len(x_bg)), x_bg, y_bg,
+                                x_bg ** 2, x_bg * y_bg, y_bg ** 2])
         coeffs_s1, _, _, _ = np.linalg.lstsq(M_bg, s1[bg_mask], rcond=None)
         s1_in = (M_full @ coeffs_s1).reshape(H, W)
 
-        # --- FIT S3 (Using a dynamically CROPPED mask to avoid the wav vignette) ---
-        bg_mask_s3 = bg_mask.copy()
-        if _WAV_INTENSITY_CACHE is not None:
-            wav_blur = ndimage.gaussian_filter(_WAV_INTENSITY_CACHE, sigma=max(H, W) * 0.01)
-            wav_thresh = np.mean(wav_blur) * 0.5
-            wav_bright = wav_blur > wav_thresh
-            valid_wav_area = ndimage.binary_fill_holes(wav_bright)
-
-            generous_erosion = max(5, int(max(H, W) * 0.005))
-            valid_wav_area = ndimage.binary_erosion(valid_wav_area, structure=ndimage.generate_binary_structure(2, 2),
-                                                    iterations=generous_erosion)
-
-            bg_mask_s3 = bg_mask & valid_wav_area
-
-        if np.any(bg_mask_s3):
-            x_bg_s3, y_bg_s3 = x_norm[bg_mask_s3], y_norm[bg_mask_s3]
-            M_bg_s3 = np.column_stack(
-                [np.ones(len(x_bg_s3)), x_bg_s3, y_bg_s3, x_bg_s3 ** 2, x_bg_s3 * y_bg_s3, y_bg_s3 ** 2])
-            coeffs_s3, _, _, _ = np.linalg.lstsq(M_bg_s3, s3[bg_mask_s3], rcond=None)
-            s3_in = (M_full @ coeffs_s3).reshape(H, W)
-        else:
-            s3_in = np.zeros((H, W))
-
         med_s1 = np.median(s1_in)
-        med_s3 = np.median(s3_in)
     else:
         s1_in = 1.0
         s2_in = 0.0
-        s3_in = 0.0
         med_s1 = 1.0
-        med_s3 = 0.0
 
-    print(f"  Background input modeled as 2D surfaces. Medians: s1={med_s1:.4f}, s2={s2_in:.4f}, s3={med_s3:.4f}")
+    print(f"  Background s1 surface fitted. Median s1_in={med_s1:.4f}, "
+          f"residual s2 on bg={s2_in:+.4f}.")
 
     # STEP 3: Spatial smoothing — trades spatial resolution for noise robustness
     if smooth_sigma > 0:
@@ -608,14 +715,8 @@ def calculate_retardance_and_fast_axis(S0, S1, S2, S3, bg_mask, smooth_sigma=1.0
         s2 = ndimage.gaussian_filter(s2, sigma=smooth_sigma)
         s3 = ndimage.gaussian_filter(s3, sigma=smooth_sigma)
 
-    # STEP 4: Background-corrected S3 (remove residual circular component from source)
-    s3_corrected = s3 - s3_in
-
-    # --- THE MAGIC PLOT FIX ---
-    # We modify the original S3 array in memory so that when your main script
-    # plots it, it plots the beautifully flattened, corrected version!
-    if S3 is not None:
-        S3[:] = s3_corrected * S0_safe
+    # STEP 4: S3 usato direttamente (senza sottrazione di baseline).
+    s3_corrected = s3
 
     # STEP 5: Fast Axis Angle (Theta)
     # For horizontally-polarised input (s2_in=0):
