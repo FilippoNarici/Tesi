@@ -6,3 +6,4 @@ rawpy
 tqdm
 umap-learn
 plotly
+scikit-image

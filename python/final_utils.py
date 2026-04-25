@@ -388,58 +388,168 @@ def calculate_s3(wav_dir, channel_index, downsample_factor=1, wavelength=633.0):
 
 def generate_background_mask(S0, S3=None):
     """
-    Creates a universal background mask using highly sensitive Edge Detection.
-    Returns the FULL background (no vignette crop) so S1 and S2 can fit the corners perfectly.
+    Segmenta il sample via Canny + dark-pixel prior + circle expansion +
+    flood-fill del bg dal bordo foto, restituisce il complemento.
+
+    Progetto scale-invariant: tutti i parametri geometrici sono espressi in
+    frazione di ``max(H, W)`` oppure di ``H*W``.
+
+    Strategia:
+      * **Canny con soglie assolute** (low=29/255, high=148/255): hysteresis
+        tarata per catturare anche bordi semi-trasparenti senza generare
+        random walk da rumore.
+      * **Dark-pixel prior**: ogni pixel al di sotto di ``DARK_THRESH`` (30%
+        del range) viene marcato come sample per definizione. Cattura
+        holder neri e monture anche quando il bordo sfuma.
+      * **Circle expansion**: dilation con disco proporzionale per cucire
+        edge vicini ma non perfettamente allineati.
+      * **Flood-fill del bg dal bordo foto**: il bg e' l'unica componente
+        connessa del complemento del barrier che tocchi almeno un lato
+        dell'immagine. Piu' robusto di "largest + brightest" che puo'
+        scegliere regioni luminose enclosed (es. cerchio interno della
+        montatura lambda/4).
+      * **Fill holes del sample**: buchi interni al sample (bg intrappolato
+        dentro il campione) vengono tappati con ``binary_fill_holes``.
+      * **Auto error detection via compactness**: misura
+        ``4*pi*A/perimetro^2`` sulla componente sample piu' grande; se il
+        contorno risulta troppo frastagliato, emette warning.
     """
-    print("Generating universal background mask (Multi-Island Edge logic)...")
+    from skimage.feature import canny
+    from skimage.morphology import disk, closing, opening, dilation
+
+    DARK_THRESH = 0.30        # nero >= 70% -> sample
+    CANNY_SIGMA = 1.5         # scelto su sweep strati_v2/B (2026-04-24)
+    CANNY_LOW = 0.05          # soglia bassa su gradiente [0, 1]
+    CANNY_HIGH = 0.15         # soglia alta su gradiente [0, 1]
+    COMPACTNESS_WARN = 0.05   # sotto questa soglia: warning "frastagliato"
+
+    print("Generating background mask (Canny + dark + expand + flood)...")
     H, W = S0.shape
+    dim = max(H, W)
+    struct4 = ndimage.generate_binary_structure(2, 1)
 
-    # 1. Very light blur for EDGE detection (preserves faint edges)
-    S0_sharp = ndimage.gaussian_filter(S0, sigma=max(H, W) * 0.001)
+    def _brightness_fallback(reason):
+        print(f"  [bg_mask] fallback brightness: {reason}")
+        S0_smooth = ndimage.gaussian_filter(S0, sigma=dim * 0.005)
+        bg = S0_smooth > np.mean(S0_smooth) * 0.5
+        eros = max(3, int(dim * 0.005))
+        return ndimage.binary_erosion(
+            bg, structure=ndimage.generate_binary_structure(2, 2),
+            iterations=eros)
 
-    # 2. Stronger blur for BRIGHTNESS detection (removes noise)
-    S0_smooth = ndimage.gaussian_filter(S0, sigma=max(H, W) * 0.005)
+    # 1) normalizzazione in [0, 1]
+    s_ptp = float(np.ptp(S0))
+    if s_ptp < 1e-8:
+        return _brightness_fallback("S0 costante (ptp ~ 0)")
+    S0_norm = (S0 - np.min(S0)) / s_ptp
 
-    # 3. Find "Fences" (Edges) using Sobel on the SHARP image
-    sx = ndimage.sobel(S0_sharp, axis=0, mode='reflect')
-    sy = ndimage.sobel(S0_sharp, axis=1, mode='reflect')
-    edges = np.hypot(sx, sy)
+    # 2) dark prior
+    dark_mask = S0_norm < DARK_THRESH
+    print(f"  dark_mask (<{DARK_THRESH:.2f}): "
+          f"frac={dark_mask.sum() / dark_mask.size:.4f}")
 
-    # Lower threshold to catch faint transparent glass edges
-    edge_thresh = np.mean(edges)
-    edge_mask = edges > edge_thresh
+    # 3) Canny con sigma fisso e soglie assolute scelte via parameter sweep
+    #    su strati_v2/B (dataset piu' challenging: mistilinee ravvicinate
+    #    con bordi trasparenti). Sigma basso (1.5 px) preserva bordi fini
+    #    senza lasciare troppo rumore, soglie moderate catturano bordi
+    #    deboli senza random walk.
+    edges = canny(
+        S0_norm, sigma=CANNY_SIGMA,
+        low_threshold=CANNY_LOW, high_threshold=CANNY_HIGH,
+        use_quantiles=False,
+    )
+    frac_edges = edges.sum() / edges.size
+    print(f"  Canny: sigma={CANNY_SIGMA:.2f} px, "
+          f"low={CANNY_LOW:.3f}, high={CANNY_HIGH:.3f}, "
+          f"edges_frac={frac_edges:.4f}")
+    if frac_edges < 1e-5 and not dark_mask.any():
+        return _brightness_fallback(
+            "Canny vuoto e nessun pixel scuro sotto soglia")
 
-    # Dilate the edges to ensure outlines act as a solid, unbroken wall
-    struct = ndimage.generate_binary_structure(2, 2)
-    edge_dilation_px = max(2, int(max(H, W) * 0.015))
-    edge_mask = ndimage.binary_dilation(edge_mask, structure=struct, iterations=edge_dilation_px)
+    # 4) circle expansion: dilation con disco proporzionale per fondere
+    #    edge vicini in un unico barrier. Raggio ~0.004 * dim -> ~15 px
+    #    native, ~4 px DS=20. Piu' aggressivo di un semplice closing perche'
+    #    dilata prima del complemento.
+    expand_r = max(4, int(dim * 0.004))
+    edges_expanded = dilation(edges, disk(expand_r))
 
-    # 4. Find bright areas (Excludes the black tape and dark mounts)
-    bright_thresh = np.mean(S0_smooth) * 0.5
-    bright_mask = S0_smooth > bright_thresh
+    # 5) barrier = edge expansi + dark prior, piu' closing di 1-2 px
+    #    per cucire gap residui sottili
+    barrier = edges_expanded | dark_mask
+    closing_r = max(2, int(dim * 0.002))
+    barrier = closing(barrier, disk(closing_r))
 
-    # 5. The background candidates are bright areas that are NOT edges
-    candidate_bg = bright_mask & (~edge_mask)
+    # 6) etichetta componenti del complemento del barrier (4-conn)
+    labeled, n_feat = ndimage.label(~barrier, structure=struct4)
+    if n_feat == 0:
+        return _brightness_fallback("nessuna componente bg candidata")
 
-    # 6. Label the regions and keep ALL massive islands
-    labeled_array, num_features = ndimage.label(candidate_bg)
-    if num_features > 0:
-        sizes = ndimage.sum(candidate_bg, labeled_array, range(1, num_features + 1))
-        max_size = np.max(sizes)
+    # 7) bg = componente piu' grande che tocca il bordo foto (true
+    #    "outside"). Evita che interni luminosi enclosed (es. cerchio
+    #    montatura lambda/4) vengano scambiati per bg.
+    border_labels = set()
+    border_labels.update(np.unique(labeled[0, :]).tolist())
+    border_labels.update(np.unique(labeled[-1, :]).tolist())
+    border_labels.update(np.unique(labeled[:, 0]).tolist())
+    border_labels.update(np.unique(labeled[:, -1]).tolist())
+    border_labels.discard(0)
+    if not border_labels:
+        return _brightness_fallback(
+            "nessuna componente del complemento tocca il bordo foto")
 
-        # Keep any background chunk that is at least 20% of the largest chunk.
-        valid_labels = np.where(sizes > 0.20 * max_size)[0] + 1
-        bg_mask = np.isin(labeled_array, valid_labels)
-    else:
-        print("Warning: Could not isolate background. Falling back to brightness.")
-        bg_mask = bright_mask
+    border_sizes = {int(lbl): int((labeled == lbl).sum())
+                    for lbl in border_labels}
+    label_best = max(border_sizes, key=border_sizes.get)
+    bg_flood = (labeled == label_best)
+    print(f"  bg flood-fill (border-touching): label={label_best} "
+          f"di {n_feat} tot, size_frac={bg_flood.sum() / bg_flood.size:.4f}, "
+          f"mean_brightness={float(S0_norm[bg_flood].mean()):.3f}")
 
-    # Erode the background slightly to stay safely away from the sample edges
-    erosion_px = max(2, int(max(H, W) * 0.005))
-    bg_mask = ndimage.binary_erosion(bg_mask, structure=struct, iterations=erosion_px)
+    # 8) sample = ~bg, fill holes interni (buchi di bg intrappolato dentro
+    #    il campione vengono tappati)
+    sample_mask = ~bg_flood
+    sample_mask = ndimage.binary_fill_holes(sample_mask)
+    if sample_mask is None:
+        return _brightness_fallback("fill_holes sul sample ha fallito")
 
-    # Note: We NO LONGER crop the wav vignette here!
-    # This ensures S1 and S2 have data in the corners so they don't blow up.
+    # 9) opening per ammorbidire zigrini residui
+    opening_r = max(2, int(dim * 0.0015))
+    sample_mask = opening(sample_mask, disk(opening_r))
+
+    # 10) auto error detection: compactness della componente sample piu'
+    #     grande. Sample fisici hanno contorni regolari (rettangoli,
+    #     dischi, mistilinee a tratti lunghi) -> compactness >= 0.1 ok,
+    #     < 0.05 probabilmente segmentazione fallita.
+    lbl_s, n_s = ndimage.label(sample_mask, structure=struct4)
+    if n_s > 0:
+        sizes_s = ndimage.sum(sample_mask, lbl_s,
+                              index=range(1, n_s + 1))
+        largest_s = int(np.argmax(sizes_s)) + 1
+        sample_largest = (lbl_s == largest_s)
+        area = int(sample_largest.sum())
+        perim_mask = ndimage.binary_dilation(
+            sample_largest, structure=struct4) & (~sample_largest)
+        perim = int(perim_mask.sum())
+        if area > 0 and perim > 0:
+            compactness = 4.0 * np.pi * area / (perim ** 2)
+            status = "OK" if compactness >= COMPACTNESS_WARN else "WARN"
+            print(f"  compactness sample piu' grande = {compactness:.3f} "
+                  f"(1=cerchio, 0=frastagliato) [{status}]")
+            if compactness < COMPACTNESS_WARN:
+                print("  [bg_mask] WARNING: contorno del sample molto "
+                      "frastagliato; segmentazione probabilmente sporca.")
+
+    # 11) bg finale + erosione di sicurezza
+    bg_mask = ~sample_mask
+    erosion_r = max(5, int(dim * 0.005))
+    bg_mask = ndimage.binary_erosion(
+        bg_mask, structure=disk(erosion_r), iterations=1)
+
+    frac_bg = bg_mask.sum() / bg_mask.size
+    if frac_bg < 0.01 or frac_bg > 0.995:
+        return _brightness_fallback(f"bg_frac degenere={frac_bg:.4f}")
+
+    print(f"  bg_frac={frac_bg:.4f} (sample_frac={1-frac_bg:.4f})")
     return bg_mask
 
 def align_reference_frame(S1, S2, bg_mask, enable=ENABLE_BACKGROUND_ALIGNMENT):
