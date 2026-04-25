@@ -198,35 +198,89 @@ def save_interactive_html(data, param_name, channel_idx, out_path):
         return False
 
 
+def _build_mask_overlay_rgb(S0, bg_mask, bg_s3):
+    """Costruisce overlay RGB modulato dall'intensita' di S0.
+
+    Codifica:
+      * pixel coperti da **entrambe** le maschere (bg utile sia per allineamento
+        2D sia per fit beta Poincare) -> grayscale modulato da S0;
+      * pixel coperti da **una sola** delle due (XOR, tipicamente holder
+        lamina dentro bg_mask ma fuori bg_s3) -> rosso a 0.5 x S0;
+      * pixel coperti da **nessuna** -> rosso pieno x S0 (sample o fuori scena).
+
+    Ritorna un array (H, W, 3) in [0, 1].
+    """
+    S0n = (S0 - np.min(S0)) / (np.max(S0) - np.min(S0) + 1e-8)
+    if bg_s3 is None or bg_s3.shape != bg_mask.shape:
+        bg_s3 = np.zeros_like(bg_mask)
+
+    both = bg_mask & bg_s3
+    xor = bg_mask ^ bg_s3
+    neither = (~bg_mask) & (~bg_s3)
+
+    rgb = np.zeros((*bg_mask.shape, 3), dtype=np.float32)
+    rgb[both, 0] = S0n[both]
+    rgb[both, 1] = S0n[both]
+    rgb[both, 2] = S0n[both]
+    rgb[xor, 0] = 0.5 * S0n[xor]
+    rgb[neither, 0] = S0n[neither]
+
+    return np.clip(rgb, 0, 1)
+
+
 def generate_figure(param_name, data, channel_idx=0):
-    """Genera e salva una singola figura PDF per il parametro richiesto."""
+    """Genera e salva una singola figura PDF per il parametro richiesto.
+
+    Per ``param_name == 'mask'``, ``data`` deve essere gia' un array RGB
+    (H, W, 3) preparato da ``_build_mask_overlay_rgb`` e viene plottato
+    senza colorbar.
+    """
 
     cfg = PARAM_CONFIG[param_name]
 
-    # Colormap
+    # Mask con overlay RGB: render dedicato senza colormap/colorbar
+    if param_name == 'mask' and data.ndim == 3:
+        H, W, _ = data.shape
+        aspect = H / W
+        fig_w = 3.35
+        fig_h = fig_w * aspect
+        fig, ax = plt.subplots(figsize=(fig_w + 0.2, fig_h))
+        ax.imshow(data, aspect='equal')
+        ax.set_title(cfg['titolo'], pad=6)
+        ax.axis('off')
+        # Mini-legenda: grigio = entrambe, rosso scuro = XOR, rosso = nessuna
+        from matplotlib.patches import Patch
+        handles = [
+            Patch(facecolor='#bfbfbf', edgecolor='none',
+                  label='entrambe (bg utile)'),
+            Patch(facecolor='#7f0000', edgecolor='none',
+                  label='XOR (una sola)'),
+            Patch(facecolor='#ff0000', edgecolor='none',
+                  label='nessuna (sample)'),
+        ]
+        ax.legend(handles=handles, loc='lower right',
+                  fontsize=6, framealpha=0.85, handlelength=1.2,
+                  borderpad=0.3, labelspacing=0.25)
+        return fig
+
+    # Colormap standard
     if cfg['cmap'] is None:
         cmap = _get_s0_cmap(channel_idx)
     else:
         cmap = cfg['cmap']
 
-    # Limiti colore
     vmin, vmax = _resolve_limits(data, cfg['vmin'], cfg['vmax'])
 
-    # Dimensione figura: proporzionale ai dati, ~8 cm di larghezza
     H, W = data.shape
     aspect = H / W
-    fig_w = 3.35  # ~85 mm, larghezza colonna singola tipica
+    fig_w = 3.35
     fig_h = fig_w * aspect
-    # Spazio extra per la colorbar
     fig_w_total = fig_w + 0.7
 
     fig, ax = plt.subplots(figsize=(fig_w_total, fig_h))
-
     im = ax.imshow(data, cmap=cmap, vmin=vmin, vmax=vmax, aspect='equal')
     ax.set_title(cfg['titolo'], pad=6)
     ax.axis('off')
-
-    # Colorbar
     cbar = fig.colorbar(im, ax=ax, fraction=0.046, pad=0.03)
     if cfg['unita']:
         cbar.set_label(cfg['unita'])
@@ -349,8 +403,9 @@ def main():
     # Loop attraverso l'array di richieste ed esportazione sequenziale
     for param_name in valid_params:
         if param_name == 'mask':
-            S0_norm = (S0 - np.min(S0)) / (np.max(S0) - np.min(S0) + 1e-8)
-            data = np.where(bg_mask, S0_norm, 0.0)
+            # Overlay 2-color: bg_mask (verde) + bg_s3 Poincare (blu)
+            data = _build_mask_overlay_rgb(
+                S0, bg_mask, utils._POINCARE_BG_MASK_CACHE)
         else:
             data = data_map[param_name]
 
@@ -366,8 +421,10 @@ def main():
         plt.close(fig)
 
         # Versione interattiva plotly (heatmap HTML con hover = data cursor stile MATLAB).
-        html_path = os.path.join(interactive_dir, f"{channel_prefix}_{param_name}.html")
-        save_interactive_html(data, param_name, utils.TARGET_CHANNEL_IDX, html_path)
+        # Mask e' RGB overlay -> plotly Heatmap incompatibile, salta HTML.
+        if param_name != 'mask':
+            html_path = os.path.join(interactive_dir, f"{channel_prefix}_{param_name}.html")
+            save_interactive_html(data, param_name, utils.TARGET_CHANNEL_IDX, html_path)
 
         print(f"  -> Figura salvata: {out_path}")
 

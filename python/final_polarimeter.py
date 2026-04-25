@@ -94,30 +94,34 @@ def plot_all_parameters(S0, S1, S2, S3, DoLP, AoLP, delta, theta, bg_mask, chann
         axes[2, 1].text(0.5, 0.5, 'Requires S3', ha='center', va='center')
         axes[2, 1].axis('off')
 
-    # Create the debug mask: Normalize S0 to 0-1 range
+    # Debug mask overlay: 3 stati codificati su base S0 normalizzato.
+    #  * b/w (grigio) = pixel coperti da entrambe (bg utile sia per allineamento
+    #                   sia per fit beta Poincare)
+    #  * rosso x 0.5 = pixel coperti da una sola delle due (XOR; tipicamente
+    #                  holder lamina dentro bg_mask ma fuori bg_s3)
+    #  * rosso pieno = pixel non coperti da nessuna (sample / fuori scena)
     S0_norm = (S0 - np.min(S0)) / (np.max(S0) - np.min(S0) + 1e-8)
-
-    # Encode both masks in one RGB image:
-    #  * grey background = S0_norm under the generic bg_mask (alignment / s1_in fit)
-    #  * blue tint = region also kept by the Poincare s3-bg mask (used for beta fit)
-    #  * black = outside bg_mask
     bg_s3 = utils._POINCARE_BG_MASK_CACHE
     if bg_s3 is None or bg_s3.shape != bg_mask.shape:
         bg_s3 = np.zeros_like(bg_mask)
-    base = np.where(bg_mask, S0_norm, 0.0)
-    rgb = np.stack([base, base, base], axis=-1)
-    # Mark pixels inside bg_mask but NOT in bg_s3 (holder-excluded) in red.
-    holder = bg_mask & (~bg_s3)
-    rgb[holder] = np.stack([np.full(holder.sum(), 0.8),
-                            np.full(holder.sum(), 0.2),
-                            np.full(holder.sum(), 0.2)], axis=-1)
-    # Tint bg_s3 pixels lightly blue (cyan overlay) to show the cleaned bg.
-    cyan_tint = bg_s3 & bg_mask
-    rgb[cyan_tint, 2] = np.minimum(1.0, rgb[cyan_tint, 2] * 0.5 + 0.5)
 
-    axes[2, 2].imshow(rgb)
+    both = bg_mask & bg_s3
+    xor = bg_mask ^ bg_s3
+    neither = (~bg_mask) & (~bg_s3)
+
+    rgb = np.zeros((*bg_mask.shape, 3), dtype=np.float32)
+    # entrambe -> grayscale
+    rgb[both, 0] = S0_norm[both]
+    rgb[both, 1] = S0_norm[both]
+    rgb[both, 2] = S0_norm[both]
+    # XOR -> rosso a meta' intensita'
+    rgb[xor, 0] = 0.5 * S0_norm[xor]
+    # nessuna -> rosso pieno (modulato da S0)
+    rgb[neither, 0] = S0_norm[neither]
+
+    axes[2, 2].imshow(np.clip(rgb, 0, 1))
     axes[2, 2].set_title(
-        'BG masks: grey+cyan=beta fit, red=holder excluded, black=outside bg')
+        'BG masks: bw=entrambe, rosso x0.5=XOR, rosso=nessuna')
     axes[2, 2].axis('off')
 
     plt.tight_layout()
