@@ -13,6 +13,7 @@ Questo file è letto da Claude quando lavora nella directory `python/`. Per rego
 | `final_delta_histogram.py` | figura tesi | Istogrammi pubblicabili di δ (PDF + HTML plotly) con barre colorate twilight |
 | `final_plot_strati.py` | analisi specifica | Fit retardance-vs-strati (nastro adesivo multistrato); fit 1/λ² per dispersione |
 | `final_slice_debug.py` | diagnostica | Slice diagonale spessa di δ: auto-crop su soglia angolare + ignore band, rilevamento plateau, etichette 1L–5–1R, fit through-origin con unwrap per-side cumulativo. Single PNG `slice_delta_<dataset>_<channel>.png`. Utile per quantificare asimmetrie left/right per strato. |
+| `final_slice_figure.py` | figura tesi | Versione publication-style del precedente: 3 pannelli (mappa δ con banda evidenziata, profilo 1D con plateau etichettati, fit through-origin) in stile coerente con `final_thesis_figure`. PDF + HTML plotly (profilo interattivo). Default su `strati_v2`. |
 | `final_monochrome_approx.py` | utility spettrale | Stima lunghezza d'onda centroide per canale RGB del sensore + sorgente |
 | `final_fit.py` | debugger interattivo | Ispettore pixel-per-pixel con animazione intensità |
 
@@ -32,7 +33,7 @@ Questo file è letto da Claude quando lavora nella directory `python/`. Per rego
 - `calculate_linear_stokes` — S0/S1/S2 via pseudo-inversa sui 36 angoli.
 - `calculate_s3` — S3 da lamina λ/4 con correzione `sin(δ(λ))` (modello Ghosh del quarzo). Cache `_WAV_INTENSITY_CACHE` = I(+45)+I(-45), usata a valle per mask holder.
 - `quartz_birefringence`, `waveplate_retardance` — modelli dispersivi.
-- `generate_background_mask` — edge + brightness, tiene regioni >20% dell'isola più grande, non taglia più la vignette.
+- `generate_background_mask` — segmentazione Canny + dark prior + flood-fill (2026-04-25). Pipeline: normalizza S0 in [0,1] → Canny (sigma=1.5, low=0.05, high=0.15) → dilation con disco (circle expansion) → unione con `S0_norm < 0.3` (dark prior, holder neri) → closing → label complemento → bg = componente che tocca il bordo foto + max area → fill_holes su sample → opening contorno → erosione di sicurezza. Fallback brightness se la mask risulta degenere; auto-warning compactness `4πA/P²` < 0.05. Richiede `scikit-image`.
 - `align_reference_frame` — rotazione S1/S2 attorno asse S3 (equatore Poincaré) con fit superfici polinomiali 2D sullo sfondo. Zera s2_bg.
 - `align_poincare_ellipticity` (2026-04-23) — rotazione S1/S3 attorno asse S2 pixel-wise, β(x,y) da fit grado 2 di s1_bg e s3_bg su cleaned wav-bright mask (holder lamina escluso via `_WAV_INTENSITY_CACHE > 0.7 × median`). Complementare a `align_reference_frame`: la composizione porta bg Stokes → (1,0,0), assunto dalle formule retardance. Cache cleaned mask in `_POINCARE_BG_MASK_CACHE` per debug plot.
 - `calculate_dolp_aolp`, `calculate_retardance_and_fast_axis` — derivate fisiche. **Retardance in [0°, 360°) via arctan2 dal 2026-04**. Assume base Poincaré già ribalzata via `align_poincare_ellipticity`.

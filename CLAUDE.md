@@ -87,7 +87,8 @@ Insidie che cambiano il risultato se ignorate:
 * **Dark frame** — sottratto alla risoluzione nativa prima del downsampling; richiede `./raw/<dataset>/dark.dng`.
 * **Allineamento del sistema di riferimento** — S1/S2 ruotati tramite fit di superfici polinomiali 2D sullo sfondo; richiede un `bg_mask_ref` pulito (distinto dal `bg_mask_display` usato solo per overlay).
 * **Correzione ellitticità Poincaré (2026-04-23)** — `align_poincare_ellipticity` in `final_utils.py`: rotazione pixel-wise attorno asse S2 che zera s3_bg (ellitticità residua LCD + imperfezioni lamina). Fit polinomiale grado 2 di s1_bg e s3_bg su maschera wav-bright (holder lamina escluso via `_WAV_INTENSITY_CACHE > 0.7 × median`). Ordine pipeline obbligato: `calculate_s3` → `align_reference_frame` → `align_poincare_ellipticity` → `calculate_retardance_and_fast_axis`. Riduce errore formule retardance da O(β) a O(β²). Overlay diagnostico nel debug plot di `final_polarimeter`.
-* **`umap-learn`** non è in `requirements.txt`: installare separatamente se si usa `final_umap.py`.
+* **`generate_background_mask` rewrite Canny (2026-04-25)** — vecchia logica `mean(Sobel) + 1.5% dilation` falliva su 3 combo a `DOWNSAMPLE_FACTOR=1` (lambdaquarti R/B, barraoff_v2/R) producendo bg_mask vuota e skip silenzioso di `align_reference_frame` + `align_poincare_ellipticity` → δ/θ sistematicamente errati. Nuova pipeline (`final_utils.py`): Canny (sigma=1.5, low=0.05, high=0.15) + dark prior (`S0_norm < 0.3`) + circle expansion + flood-fill bg dalla componente connessa al bordo foto + fill_holes sample + opening + erosione. Auto-error detection via compactness `4πA/P²`. Dipendenze: `scikit-image`. Tutte le 21 combo (7 dataset × 3 canali) processate senza fallback al batch B3 del 2026-04-25.
+* **`umap-learn`** e **`scikit-image`** non sono in `requirements.txt`: installare separatamente.
 
 ## Modalità di compressione (caveman e simili)
 
