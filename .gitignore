@@ -4,6 +4,8 @@
 # Ignora l'ambiente virtuale (vitale per non bloccare Overleaf)
 python/venv/
 python/env/
+.venv/
+venv/
 
 # Ignora la cache di Python
 python/__pycache__/
@@ -57,3 +59,44 @@ python/raw_input/
 
 # Variabili d'ambiente (chiavi API, ecc.)
 .env
+
+# =========================
+# SCRATCH / DIAGNOSTICA
+# =========================
+# Convenzione: script Python e output diagnostici hanno prefisso underscore
+# e non vanno mai committati. Esempi: _bg_mask_diag.py, _bg_sweep_*.png.
+python/_*.py
+python/outputs/_*
+python/outputs/*_diag.png
+python/outputs/*_sweep_*.png
+
+# =========================
+# OS / EDITOR
+# =========================
+.DS_Store
+Thumbs.db
+desktop.ini
+*~
+*.swp
+*.swo
+.vscode/
+
+# =========================
+# PYTHON TOOLING
+# =========================
+.pytest_cache/
+.coverage
+htmlcov/
+*.egg-info/
+build/
+dist/
+
+# =========================
+# AVVISO PER FILE BINARI GROSSI
+# =========================
+# I PDF generati da matplotlib (Images/generated/) contengono raster
+# imshow ad alta DPI: 4-10 MB l'uno. Sono accettati ma stanno al limite
+# di GitHub HTTPS push (timeout RPC oltre ~200 MB / commit). Se si aggiungono
+# nuovi dataset, committare un dataset alla volta. Le HTML plotly heatmap
+# a DOWNSAMPLE_FACTOR=1 sono gia' ignorate piu' sopra (50-160 MB ciascuna,
+# impossibili da pushare).
