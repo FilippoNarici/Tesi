@@ -15,7 +15,7 @@ from tqdm import tqdm
 # COMMON CONFIGURATION
 # =============================================================================
 
-TARGET_FOLDER = './raw/strati_v2'
+TARGET_FOLDER = './raw/zucchero'
 POL_SUBFOLDER = os.path.join(TARGET_FOLDER, 'pol')
 WAV_SUBFOLDER = os.path.join(TARGET_FOLDER, 'wav')
 WAVELENGTHS_CSV = './outputs/rgb_wavelengths.csv'
@@ -24,7 +24,7 @@ WAVELENGTHS_CSV = './outputs/rgb_wavelengths.csv'
 TARGET_CHANNEL_IDX = 2
 
 # Default downsampling factor for the full polarimeter mapping
-DOWNSAMPLE_FACTOR = 1
+DOWNSAMPLE_FACTOR = 4
 
 # Toggle per la correzione dell'inclinazione dello sfondo (allineamento S1/S2)
 ENABLE_BACKGROUND_ALIGNMENT = True
@@ -54,12 +54,12 @@ _WAV_INTENSITY_CACHE = None
 # debug figure can overlay the actual mask used for the beta fit.
 _POINCARE_BG_MASK_CACHE = None
 
-# Threshold (fraction of bg median) on the wav intensity used to mask out
-# the dark holder/aperture region before the beta polynomial fit. Lower
-# values keep more bg pixels for the fit (better spatial constraint) at
-# the cost of including pixels closer to the holder transition where the
-# wav numerator is degenerate. Default 0.7 trades off the two.
-WAV_HOLDER_THRESHOLD = 0.7
+# Fraction of the maximum wav intensity (within bg_mask) below which a bg
+# pixel is treated as holder/dark and excluded from the beta polynomial fit.
+# The wav numerator I_+45 - I_-45 is degenerate where both wav frames are
+# dim, so those pixels carry noisy s3 even though they pass the S0-based
+# bg_mask. The dark mask is dilated before subtraction to absorb edge blur.
+WAV_HOLDER_THRESHOLD = 0.50
 
 # Cache for the dark frame at full native resolution (keyed by channel index)
 _DARK_FRAME_CACHE = {}
@@ -497,12 +497,18 @@ def generate_background_mask(S0, S3=None):
         return _brightness_fallback(
             "nessuna componente del complemento tocca il bordo foto")
 
+    # Union of all border-touching components above 20% of the largest:
+    # protects against tiny noise blobs and small sample-interior leaks
+    # (e.g. ruler interior reaching border through Canny gaps), while still
+    # capturing legitimate bg split in two by a vertical sample (e.g. bottle).
     border_sizes = {int(lbl): int((labeled == lbl).sum())
                     for lbl in border_labels}
-    label_best = max(border_sizes, key=border_sizes.get)
-    bg_flood = (labeled == label_best)
-    print(f"  bg flood-fill (border-touching): label={label_best} "
-          f"di {n_feat} tot, size_frac={bg_flood.sum() / bg_flood.size:.4f}, "
+    largest_sz = max(border_sizes.values())
+    keep_labels = [lbl for lbl, sz in border_sizes.items()
+                   if sz >= 0.20 * largest_sz]
+    bg_flood = np.isin(labeled, keep_labels)
+    print(f"  bg flood-fill (border-touching): kept {len(keep_labels)}/"
+          f"{len(border_sizes)} comp, size_frac={bg_flood.sum() / bg_flood.size:.4f}, "
           f"mean_brightness={float(S0_norm[bg_flood].mean()):.3f}")
 
     # 8) sample = ~bg, fill holes interni (buchi di bg intrappolato dentro
@@ -539,9 +545,9 @@ def generate_background_mask(S0, S3=None):
                 print("  [bg_mask] WARNING: contorno del sample molto "
                       "frastagliato; segmentazione probabilmente sporca.")
 
-    # 11) bg finale + erosione di sicurezza
+    # 11) bg finale + erosione di sicurezza scalata con DS (100 px native)
     bg_mask = ~sample_mask
-    erosion_r = max(5, int(dim * 0.005))
+    erosion_r = max(1, 100 // DOWNSAMPLE_FACTOR)
     bg_mask = ndimage.binary_erosion(
         bg_mask, structure=disk(erosion_r), iterations=1)
 
@@ -643,27 +649,36 @@ def align_poincare_ellipticity(S0, S1, S3, bg_mask,
         print("  Warning: bg mask empty. Skipping.")
         return S1, S3
 
-    # Build the s3-specific bg mask: exclude wav-dark holder pixels. Threshold
-    # is WAV_HOLDER_THRESHOLD * median(wav intensity on bg). Lower values keep
-    # more bg pixels for the beta fit at the cost of including pixels closer
-    # to the holder transition where the wav numerator is degenerate.
+    # Build the s3-specific bg mask: average the two wav frames, find the
+    # dark pixels inside bg_mask (< WAV_HOLDER_THRESHOLD * max), dilate that
+    # holder mask to absorb blur, then subtract from bg_mask.
     bg_mask_s3 = bg_mask
     if _WAV_INTENSITY_CACHE is not None \
             and _WAV_INTENSITY_CACHE.shape == bg_mask.shape:
-        wav_bg_med = float(np.median(_WAV_INTENSITY_CACHE[bg_mask]))
-        wav_bright = _WAV_INTENSITY_CACHE > WAV_HOLDER_THRESHOLD * wav_bg_med
-        struct = ndimage.generate_binary_structure(2, 2)
-        wav_bright = ndimage.binary_erosion(
-            wav_bright, structure=struct,
-            iterations=max(3, int(max(bg_mask.shape) * 0.01)))
-        candidate = bg_mask & wav_bright
+        from skimage.morphology import disk, dilation
+        wav_mean = _WAV_INTENSITY_CACHE / 2.0
+        wav_bg_max = float(wav_mean[bg_mask].max())
+        thresh = WAV_HOLDER_THRESHOLD * wav_bg_max
+        holder = bg_mask & (wav_mean < thresh)
+        dilate_r = max(1, 150 // DOWNSAMPLE_FACTOR)
+        # Border band: exclude pixels within dilate_r/2 of photo edges
+        border_r = max(1, dilate_r // 2)
+        H, W = bg_mask.shape
+        border = np.zeros_like(bg_mask)
+        border[:border_r, :] = True
+        border[-border_r:, :] = True
+        border[:, :border_r] = True
+        border[:, -border_r:] = True
+        holder = holder | border
+        holder = dilation(holder, disk(dilate_r))
+        candidate = bg_mask & ~holder
         if candidate.sum() < 0.1 * bg_mask.sum():
             print("  WARNING: wav holder mask too aggressive, using full bg.")
         else:
             bg_mask_s3 = candidate
             n_excl = int(bg_mask.sum() - bg_mask_s3.sum())
             print(f"  Wav-dark holder pixels excluded "
-                  f"(threshold {WAV_HOLDER_THRESHOLD:.2f}x med): "
+                  f"(< {WAV_HOLDER_THRESHOLD:.2f}x max wav in bg): "
                   f"{n_excl} ({100*n_excl/max(1,bg_mask.sum()):.1f}%)")
 
     _POINCARE_BG_MASK_CACHE = bg_mask_s3.copy()

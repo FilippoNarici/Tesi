@@ -198,14 +198,16 @@ def save_interactive_html(data, param_name, channel_idx, out_path):
         return False
 
 
-def _build_mask_overlay_rgb(S0, bg_mask, bg_s3):
+def _build_mask_overlay_rgb(S0, bg_mask, bg_s3, wav_mean=None):
     """Costruisce overlay RGB modulato dall'intensita' di S0.
 
     Codifica:
       * pixel coperti da **entrambe** le maschere (bg utile sia per allineamento
         2D sia per fit beta Poincare) -> grayscale modulato da S0;
       * pixel coperti da **una sola** delle due (XOR, tipicamente holder
-        lamina dentro bg_mask ma fuori bg_s3) -> rosso a 0.5 x S0;
+        lamina dentro bg_mask ma fuori bg_s3) -> se ``wav_mean`` e' fornita,
+        grayscale debug modulato dall'intensita' wav media (per verificare
+        che la soglia catturi tutti i pixel scuri); altrimenti rosso a 0.5 x S0;
       * pixel coperti da **nessuna** -> rosso pieno x S0 (sample o fuori scena).
 
     Ritorna un array (H, W, 3) in [0, 1].
@@ -222,7 +224,12 @@ def _build_mask_overlay_rgb(S0, bg_mask, bg_s3):
     rgb[both, 0] = S0n[both]
     rgb[both, 1] = S0n[both]
     rgb[both, 2] = S0n[both]
-    rgb[xor, 0] = 0.5 * S0n[xor]
+    if wav_mean is not None and wav_mean.shape == bg_mask.shape:
+        wav_n = wav_mean / (float(wav_mean.max()) + 1e-8)
+        # gradient nero -> blu modulato dall'intensita' wav media
+        rgb[xor, 2] = wav_n[xor]
+    else:
+        rgb[xor, 0] = 0.5 * S0n[xor]
     rgb[neither, 0] = S0n[neither]
 
     return np.clip(rgb, 0, 1)
@@ -248,13 +255,14 @@ def generate_figure(param_name, data, channel_idx=0):
         ax.imshow(data, aspect='equal')
         ax.set_title(cfg['titolo'], pad=6)
         ax.axis('off')
-        # Mini-legenda: grigio = entrambe, rosso scuro = XOR, rosso = nessuna
+        # Mini-legenda: grigio = entrambe (S0), blu = XOR (wav debug nero->blu),
+        # rosso = nessuna (sample)
         from matplotlib.patches import Patch
         handles = [
             Patch(facecolor='#bfbfbf', edgecolor='none',
-                  label='entrambe (bg utile)'),
-            Patch(facecolor='#7f0000', edgecolor='none',
-                  label='XOR (una sola)'),
+                  label='entrambe (S0)'),
+            Patch(facecolor='#0040ff', edgecolor='none',
+                  label='XOR (wav debug)'),
             Patch(facecolor='#ff0000', edgecolor='none',
                   label='nessuna (sample)'),
         ]
@@ -404,8 +412,10 @@ def main():
     for param_name in valid_params:
         if param_name == 'mask':
             # Overlay 2-color: bg_mask (verde) + bg_s3 Poincare (blu)
+            wav_mean_dbg = (utils._WAV_INTENSITY_CACHE / 2.0
+                            if utils._WAV_INTENSITY_CACHE is not None else None)
             data = _build_mask_overlay_rgb(
-                S0, bg_mask, utils._POINCARE_BG_MASK_CACHE)
+                S0, bg_mask, utils._POINCARE_BG_MASK_CACHE, wav_mean=wav_mean_dbg)
         else:
             data = data_map[param_name]
 

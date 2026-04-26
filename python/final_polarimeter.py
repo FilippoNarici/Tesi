@@ -94,11 +94,11 @@ def plot_all_parameters(S0, S1, S2, S3, DoLP, AoLP, delta, theta, bg_mask, chann
         axes[2, 1].text(0.5, 0.5, 'Requires S3', ha='center', va='center')
         axes[2, 1].axis('off')
 
-    # Debug mask overlay: 3 stati codificati su base S0 normalizzato.
-    #  * b/w (grigio) = pixel coperti da entrambe (bg utile sia per allineamento
+    # Debug mask overlay: 3 stati.
+    #  * grayscale S0 = pixel coperti da entrambe (bg utile sia per allineamento
     #                   sia per fit beta Poincare)
-    #  * rosso x 0.5 = pixel coperti da una sola delle due (XOR; tipicamente
-    #                  holder lamina dentro bg_mask ma fuori bg_s3)
+    #  * grayscale wav debug = pixel XOR (bg_mask ma esclusi da bg_s3): mostra
+    #                          l'intensita' wav media per verificare la soglia
     #  * rosso pieno = pixel non coperti da nessuna (sample / fuori scena)
     S0_norm = (S0 - np.min(S0)) / (np.max(S0) - np.min(S0) + 1e-8)
     bg_s3 = utils._POINCARE_BG_MASK_CACHE
@@ -110,18 +110,22 @@ def plot_all_parameters(S0, S1, S2, S3, DoLP, AoLP, delta, theta, bg_mask, chann
     neither = (~bg_mask) & (~bg_s3)
 
     rgb = np.zeros((*bg_mask.shape, 3), dtype=np.float32)
-    # entrambe -> grayscale
     rgb[both, 0] = S0_norm[both]
     rgb[both, 1] = S0_norm[both]
     rgb[both, 2] = S0_norm[both]
-    # XOR -> rosso a meta' intensita'
-    rgb[xor, 0] = 0.5 * S0_norm[xor]
-    # nessuna -> rosso pieno (modulato da S0)
+    if utils._WAV_INTENSITY_CACHE is not None \
+            and utils._WAV_INTENSITY_CACHE.shape == bg_mask.shape:
+        wav_mean = utils._WAV_INTENSITY_CACHE / 2.0
+        wav_n = wav_mean / (float(wav_mean.max()) + 1e-8)
+        # gradient nero -> blu
+        rgb[xor, 2] = wav_n[xor]
+    else:
+        rgb[xor, 0] = 0.5 * S0_norm[xor]
     rgb[neither, 0] = S0_norm[neither]
 
     axes[2, 2].imshow(np.clip(rgb, 0, 1))
     axes[2, 2].set_title(
-        'BG masks: bw=entrambe, rosso x0.5=XOR, rosso=nessuna')
+        'BG masks: bw=entrambe (S0), blu=XOR (wav debug), rosso=nessuna')
     axes[2, 2].axis('off')
 
     plt.tight_layout()
