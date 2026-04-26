@@ -9,6 +9,15 @@ python/env/
 python/__pycache__/
 *.py[cod]
 
+# Plotly HTML interattivi delle mappe heatmap: a DOWNSAMPLE_FACTOR=1 i file
+# arrivano a 50-160 MB ciascuno (JSON inline di tutti i pixel) e non sono
+# pushabili via HTTPS (timeout). Sono rigenerabili in locale eseguendo
+# final_thesis_figure.py / final_polarimeter.py. Tracciate solo le HTML
+# leggere (slice 1D, istogrammi delta).
+Images/generated/*/interactive/*.html
+!Images/generated/*/interactive/*_slice.html
+!Images/generated/*/interactive/*_hist_delta.html
+
 # Ignora i file di dati pesanti (se superano i limiti di GitHub/Overleaf)
 # Togli il commento se hai dataset pesanti che non vuoi su Git
 # python/data/
