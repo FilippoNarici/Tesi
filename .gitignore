@@ -24,6 +24,15 @@ Images/generated/*/interactive/*.html
 # Togli il commento se hai dataset pesanti che non vuoi su Git
 # python/data/
 
+# Cache npz del modulo UMAP interattivo: contengono Stokes + embedding a
+# risoluzione nativa, ~70-100 MB ciascuna. Rigenerabili al primo run di
+# final_umap.py senza --no-cache.
+python/outputs/umap_*_cache.npz
+
+# Sottocartelle UMAP con timestamp generate dal vecchio export (formato
+# obsoleto, sostituito da Images/generated/<dataset>/aolp_umap/<CH>/).
+python/outputs/umap_*_-_canale_*/
+
 # Jupyter Notebook checkpoints
 .ipynb_checkpoints/
 
