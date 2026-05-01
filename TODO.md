@@ -23,6 +23,25 @@ Questo file è la singola fonte di verità sullo stato di avanzamento. Aggiornar
 - [ ] Espansione bibliografia: target 10–15 voci nuove (attualmente 6, quasi tutti libri di testo)
 - [ ] Menzione UMAP in cap7 come esplorazione raffinabile (decisione 2026-04-22: i risultati attuali non giustificano una sottosezione in cap6)
 
+## Revisione cap6 per-sample (in corso)
+
+Flusso iterativo, un campione alla volta. Per ogni sample:
+
+1. AI produce sintesi: cosa è scritto attualmente nel `.tex`, quali figure sono già incluse, quali PDF candidati esistono in `Images/generated/<dataset>/`.
+2. Utente risponde con: intenzione del sample, misure prese, plot già pronti vs. plot da scrivere/codificare ex novo, focus della discussione fisica.
+3. AI rifattorizza la sezione cap6 di quel sample: prosa, figure, caption, eventuali nuovi script Python.
+4. Commit per-sample.
+
+| Sample | Stato revisione | Note |
+|--------|-----------------|------|
+| lambdaquarti_50deg | [ ] | — |
+| lambdamezzi_50deg | [ ] | — |
+| strati_v2 | [ ] | dipende da B2 (retardance rimisurate) e B4 (istogrammi δ) |
+| zucchero | [ ] | UMAP AoLP appena rigenerato (R/G/B) |
+| barraon_v2 | [ ] | — |
+| barraoff_v2 | [ ] | — |
+| righello_v2 | [ ] | — |
+
 ## Pipeline Python
 
 - [x] Committare lavori in sospeso: saturation accumulator in `final_polarimeter.py` e `final_utils.py` (2026-04-21)

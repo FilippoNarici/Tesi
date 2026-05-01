@@ -508,16 +508,24 @@ def _draw_hist_centroid(ax, psi_mean, psi_std, color='red'):
 
 
 def _draw_umap_n_label(ax, embedding, sel_mask, n_sel, color='red'):
-    """Etichetta ``N=...`` poco sopra il cluster selezionato (no bbox, stesso
-    stile dell'etichetta vline). Ritorna l'artist Text per cleanup.
+    """Etichetta ``N=...`` fuori dal cluster selezionato (sopra se c'e'
+    spazio, altrimenti sotto), no bbox, stesso stile dell'etichetta vline.
+    Ritorna l'artist Text per cleanup.
     """
     cx = float(embedding[sel_mask, 0].mean())
-    y_max = float(embedding[sel_mask, 1].max())
-    span_y = float(embedding[:, 1].max() - embedding[:, 1].min())
-    pad = 0.02 * span_y if span_y > 0 else 0.0
+    y_max_sel = float(embedding[sel_mask, 1].max())
+    y_min_sel = float(embedding[sel_mask, 1].min())
+    y_lo, y_hi = ax.get_ylim()
+    margin = 0.05 * (y_hi - y_lo) if y_hi > y_lo else 0.0
+    pad = 0.4 * margin
+
+    if y_max_sel + margin <= y_hi:
+        y_text, va = y_max_sel + pad, 'bottom'
+    else:
+        y_text, va = y_min_sel - pad, 'top'
     return ax.text(
-        cx, y_max + pad, f"N = {n_sel}",
-        color=color, ha='center', va='bottom',
+        cx, y_text, f"N = {n_sel}",
+        color=color, ha='center', va=va,
         fontsize=8, zorder=6)
 
 

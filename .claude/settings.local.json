@@ -87,7 +87,29 @@
       "Bash(xargs git *)",
       "Bash(git commit -m '[infra]: gitignore HTML plotly heatmap \\(50-160 MB ciascuno a DS=1\\) *)",
       "Bash(git commit -m '[figures]: B3 lambdaquarti_50deg PDF con bg_mask Canny + Poincare *)",
-      "Bash(git commit -m '[config]: allowlist comandi sessione bg_mask + slice_delta refresh *)"
+      "Bash(git commit -m '[config]: allowlist comandi sessione bg_mask + slice_delta refresh *)",
+      "Bash(git commit -m '[infra]: gitignore espanso \\(scratch, OS, editor, tooling, avviso PDF\\) *)",
+      "Bash(MPLBACKEND=Agg C:\\\\\\\\Users\\\\\\\\filip\\\\\\\\OneDrive - setupe06\\\\\\\\Documenti\\\\\\\\Script\\\\\\\\GitHub\\\\\\\\Tesi\\\\\\\\.venv\\\\\\\\Scripts\\\\\\\\python.exe *)",
+      "Bash(cd \"C:\\\\\\\\Users\\\\\\\\filip\\\\\\\\OneDrive - setupe06\\\\\\\\Documenti\\\\\\\\Script\\\\\\\\GitHub\\\\\\\\Tesi\")",
+      "Bash(MPLBACKEND=Agg \"./.venv/Scripts/python.exe\" python/final_polarimeter.py)",
+      "Bash(cd \"C:\\\\\\\\Users\\\\\\\\filip\\\\\\\\OneDrive - setupe06\\\\\\\\Documenti\\\\\\\\Script\\\\\\\\GitHub\\\\\\\\Tesi/python\")",
+      "Bash(MPLBACKEND=Agg \"../.venv/Scripts/python.exe\" final_polarimeter.py)",
+      "Bash(../.venv/Scripts/python.exe -c ' *)",
+      "Bash(ls \"C:\\\\\\\\Users\\\\\\\\filip\\\\\\\\OneDrive - setupe06\\\\\\\\Documenti\\\\\\\\Script\\\\\\\\GitHub\\\\\\\\Tesi/python/\")",
+      "Bash(MPLBACKEND=Agg \"../.venv/Scripts/python.exe\" final_thesis_figure_all.py)",
+      "Bash(git -C \"C:\\\\\\\\Users\\\\\\\\filip\\\\\\\\OneDrive - setupe06\\\\\\\\Documenti\\\\\\\\Script\\\\\\\\GitHub\\\\\\\\Tesi\" status --short)",
+      "Bash(git *)",
+      "Bash(tee /tmp/umap_zucchero.log)",
+      "Bash(ls .venv/Scripts/python.exe)",
+      "Bash(ls ../.venv/Scripts/python.exe)",
+      "Bash(../.venv/Scripts/python.exe -c \"import final_umap; final_umap.run_dataset_rgb\\('zucchero', show=False\\)\")",
+      "Bash(.venv/Scripts/python.exe -c \"import skimage; print\\(skimage.__version__, skimage.__file__\\)\")",
+      "Bash(.venv/Scripts/python -c \"import skimage, umap; print\\('skimage', skimage.__version__\\); print\\('umap', umap.__version__\\)\")",
+      "Bash(../.venv/Scripts/python.exe -c \"import skimage, umap; print\\('skimage', skimage.__version__\\); print\\('umap', umap.__version__\\)\")",
+      "Bash(../.venv/Scripts/python.exe *)",
+      "Bash(tasklist)",
+      "PowerShell(Get-CimInstance *)",
+      "Bash(tee /tmp/umap_interactive.log)"
     ]
   }
 }
