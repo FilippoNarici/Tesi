@@ -22,26 +22,29 @@ Espandere l'approccio puntuale 1D della polarimetria classica a un'analisi matri
 ├── Thesis.tex                          # File principale LaTeX (template PoliMi3i)
 ├── Thesis\_bibliography.bib            # Bibliografia
 ├── Configuration\_Files/               # Template class e config LaTeX
-├── Images/                             # Immagini per la tesi
-│   └── generated/                      # Figure generate dalla pipeline Python
-│       └── CLAUDE.md                   # Guida nidificata (nomenclatura, dataset)
 ├── chapters/                           # Capitoli LaTeX separati
 │   └── CLAUDE.md                       # Guida nidificata (stato capitoli, stile)
 ├── python/                             # Codice di analisi
 │   ├── CLAUDE.md                       # Guida nidificata (mappa script, insidie)
-│   ├── final\_utils.py                 # Libreria: RAW, Stokes, maschere, retardance
+│   ├── final\_utils.py                 # Libreria: RAW, Stokes, maschere, retardance, Poincaré
 │   ├── final\_polarimeter.py           # Pipeline principale: Stokes + plot 3×3
 │   ├── final\_thesis\_figure.py        # Generazione PDF per tesi (stile pubblicazione)
-│   ├── final\_umap.py                  # UMAP 2D dei vettori di Stokes
-│   ├── final\_plot\_strati.py          # Fit retardance-vs-strati (nastro multistrato)
+│   ├── final\_thesis\_figure\_all.py   # Batch runner: 7 dataset × 3 canali × 9 parametri
+│   ├── final\_umap.py                  # UMAP 2D dei vettori di Stokes (interattivo + batch)
+│   ├── final\_delta\_histogram.py      # Istogrammi δ pubblicabili (PDF + HTML)
+│   ├── final\_slice\_debug.py          # Slice diagonale δ multistrato (PNG diagnostica)
+│   ├── final\_slice\_figure.py         # Slice δ publication-style (PDF + HTML)
+│   ├── final\_fit\_plot\_strati.py    # Fit retardance-vs-strati + dispersione 1/λ²
 │   ├── final\_monochrome\_approx.py    # Stima lunghezze d'onda centroide RGB
 │   ├── final\_fit.py                   # Debugger interattivo pixel-per-pixel
 │   ├── requirements.txt                # Dipendenze Python
 │   ├── spettri/                        # CSV di risposta sensore e sorgente
-│   ├── outputs/                        # CSV e PNG prodotti (UMAP, centroidi spettrali)
+│   ├── outputs/                        # CSV, PDF spettrale, cache npz UMAP (gitignored)
 │   └── raw/                            # Dataset RAW DNG (non tracciato in git)
-├── prompts/                            # Prompt ready-to-use per Claude Code
-│   └── next-session-deep-review.md     # Revisione profonda e avanzamento
+├── Images/                             # Immagini per la tesi
+│   ├── setup/                          # Foto setup sperimentale (vista\_NE/NW)
+│   └── generated/                      # Figure generate dalla pipeline Python
+│       └── CLAUDE.md                   # Guida nidificata (nomenclatura, dataset)
 └── tools/                              # Utility (es. search\_refs.py per la bibliografia)
 
 ## Convenzioni di scrittura (Testo LaTeX)
@@ -76,7 +79,7 @@ Elementi tecnici stabili:
 * 36 immagini RAW a passi di 10° per S0/S1/S2 (pseudo-inversa).
 * 2 immagini con lamina λ/4 a ±45° per S3.
 * Convenzione angoli invertita per coerenza destrorsa.
-* Downsampling a blocchi `DOWNSAMPLE_FACTOR × DOWNSAMPLE_FACTOR` (default 20) per stabilità computazionale.
+* Downsampling a blocchi `DOWNSAMPLE_FACTOR × DOWNSAMPLE_FACTOR` (default 4) per stabilità computazionale.
 
 Insidie che cambiano il risultato se ignorate:
 * **Retardance in [0°, 360°) via `arctan2`** — da aprile 2026. Tabelle storiche basate su `arccos` vanno rimisurate.
@@ -88,7 +91,7 @@ Insidie che cambiano il risultato se ignorate:
 * **Allineamento del sistema di riferimento** — S1/S2 ruotati tramite fit di superfici polinomiali 2D sullo sfondo; richiede un `bg_mask_ref` pulito (distinto dal `bg_mask_display` usato solo per overlay).
 * **Correzione ellitticità Poincaré (2026-04-23, mask rewrite 2026-04-26)** — `align_poincare_ellipticity` in `final_utils.py`: rotazione pixel-wise attorno asse S2 che zera s3_bg (ellitticità residua LCD + imperfezioni lamina). Fit polinomiale grado 2 di s1_bg e s3_bg su maschera s3-specifica costruita come `bg_mask & ~holder` dove `holder = (wav_mean < WAV_HOLDER_THRESHOLD × max(wav[bg]))` unito a una banda di bordo, dilatato di 150 px nativi (`150 // DOWNSAMPLE_FACTOR`); banda di bordo a metà raggio. Default `WAV_HOLDER_THRESHOLD = 0.50` (frazione del max wav nel bg). Ordine pipeline obbligato: `calculate_s3` → `align_reference_frame` → `align_poincare_ellipticity` → `calculate_retardance_and_fast_axis`. Riduce errore formule retardance da O(β) a O(β²). Debug plot maschera (parametro `mask` in `final_thesis_figure` e cella `[2,2]` in `final_polarimeter`): grayscale S0 dove entrambe le maschere applicano, gradient nero→blu con wav medio nei pixel XOR (debug per verifica soglia/dilation), rosso × S0 dove nessuna maschera applica.
 * **`generate_background_mask` rewrite Canny (2026-04-25, erosione scalata + multi-component flood-fill 2026-04-26)** — vecchia logica `mean(Sobel) + 1.5% dilation` falliva su 3 combo a `DOWNSAMPLE_FACTOR=1` (lambdaquarti R/B, barraoff_v2/R) producendo bg_mask vuota e skip silenzioso di `align_reference_frame` + `align_poincare_ellipticity` → δ/θ sistematicamente errati. Nuova pipeline (`final_utils.py`): Canny (sigma=1.5, low=0.05, high=0.15) + dark prior (`S0_norm < 0.3`) + circle expansion + flood-fill bg = unione di tutte le componenti border-touching con size >= 20% del max (copre bg splittati da sample verticali come la bottiglia in zucchero, esclude leak interni in sample con edges incompleti come righello/B a DS=4) + fill_holes sample + opening + erosione di sicurezza scalata `100 // DOWNSAMPLE_FACTOR` (100 px nativi). Auto-error detection via compactness `4πA/P²`. Dipendenze: `scikit-image`. Batch B3 al 2026-04-26 (DS=4): 21/21 in 25.0 min, zero warning, zero fallback.
-* **`umap-learn`** e **`scikit-image`** non sono in `requirements.txt`: installare separatamente.
+* Dipendenze opzionali per analisi avanzate: **`umap-learn`** (script `final_umap.py`), **`plotly`** (HTML interattivi), **`scikit-image`** (morfologia in `generate_background_mask`, `align_poincare_ellipticity`). Tutte presenti in `python/requirements.txt`.
 
 ## Modalità di compressione (caveman e simili)
 
@@ -121,8 +124,6 @@ Prima di iniziare qualsiasi lavoro, leggere in ordine:
 
 Quando si aggiunge uno script, un capitolo o una nuova cartella di figure, aggiornare la `CLAUDE.md` della directory e `TODO.md`. Non creare nuovi file di navigazione se non strettamente necessari.
 
-Per una sessione di revisione profonda e avanzamento del repo: usare il prompt in `prompts/next-session-deep-review.md`.
-
 ## Comandi rapidi
 
 Ambiente Python: `.venv` locale; installare con `pip install -r python/requirements.txt`.
@@ -130,10 +131,13 @@ Ambiente Python: `.venv` locale; installare con `pip install -r python/requireme
 Pipeline principale su un dataset (modificare `TARGET_FOLDER` in `python/final_utils.py`): `python python/final_polarimeter.py`.
 
 Debugger interattivo pixel-per-pixel: `python python/final_fit.py`.
-Generazione figure per tesi: `python python/final_thesis_figure.py`.
-Embedding UMAP: `python python/final_umap.py`.
+Generazione figure per tesi (un dataset/canale): `python python/final_thesis_figure.py`.
+Batch figure tesi (7 dataset × 3 canali × 9 parametri): `python python/final_thesis_figure_all.py`.
+UMAP interattivo: `python python/final_umap.py [interactive|batch] [dataset] [R|G|B] [--color-by aolp|delta|both]`.
+Istogrammi δ pubblicabili: `python python/final_delta_histogram.py`.
+Slice diagonale δ multistrato: `python python/final_slice_figure.py` (pub) / `final_slice_debug.py` (diagnostica).
 Stima centroidi spettrali RGB: `python python/final_monochrome_approx.py`.
-Fit multistrato (nastro adesivo): `python python/final_plot_strati.py`.
+Fit multistrato (nastro adesivo): `python python/final_fit_plot_strati.py`.
 
 Compilazione tesi: `pdflatex Thesis.tex && bibtex Thesis && pdflatex Thesis.tex && pdflatex Thesis.tex`.
 
