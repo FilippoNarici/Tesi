@@ -1,47 +1,6 @@
 """
 Utility functions and common configurations for Stokes parameter calculations.
 """
-Windows PowerShell
-Copyright (C) Microsoft Corporation. Tutti i diritti riservati.
-
-Installa la versione più recente di PowerShell per nuove funzionalità e miglioramenti. https://aka.ms/PSWindows
-
-(.venv) PS C:\Users\filip\OneDrive - setupe06\Documenti\Script\py\biblio>   biblio init
-Codice fiscale: AAAAAA00A00A000A
-Cognome nome: AAA AAA
-Email: AAAAAA@AAA.COM
-wrote C:\Users\filip\.biblio\config.toml
-(.venv) PS C:\Users\filip\OneDrive - setupe06\Documenti\Script\py\biblio>   biblio aree
-                                                                              Aree
-┏━━━━┳━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃ id ┃ code                 ┃ name                                                                             ┃ address                                        ┃
-┡━━━━╇━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│ 25 │ Biblioteca_BICF      │ Biblioteca BICF                                                                  │                                                │
-│ 22 │ Biblioteca_Biomedica │ Biblioteca Biomedica Citta' Studi                                                │ Via Valvassori Peroni, 21 - 20133 Milano       │
-│ 45 │ Biblioteca_Malliani  │ Biblioteca Malliani                                                              │ Via Giovanni Battista Grassi, 74, 20157 Milano │
-│  4 │ Biblioteca_anglistic │ Biblioteca Polo Lingue sala di anglistica                                        │                                                │
-│ 65 │ Biblioteca_SPaolo    │ Biblioteca Polo San Paolo                                                        │ Via Antonio di Rudinì, 8, 20142 Milano         │
-│ 34 │ Biblioteca_SAFM_Egit │ Biblioteca di Egittologia                                                        │ Via Festa del Perdono, 7 – Milano              │
-│  3 │ Biblioteca_Filosofia │ Biblioteca di Filosofia                                                          │ Via Festa del Perdono 7,  Milano               │
-│ 20 │ Biblioteca_Matematic │ Biblioteca di Matematica                                                         │ via Saldini 50 - Milano                        │
-│ 35 │ Biblioteca_SAFM_Papi │ Biblioteca di Papirologia                                                        │ Via Festa del Perdono, 7 – Milano              │
-│ 44 │ Biblioteca_SP        │ Biblioteca di Scienze Politiche                                                  │ Via del Conservatorio 7                        │
-│ 64 │ Biblio_Agraria       │ Biblioteca di Scienze agrarie ed alimentari                                      │ via Celoria 2 - Milano                         │
-│ 24 │ Biblioteca_SAFM      │ Biblioteca di Scienze dell'Antichita' e Filologia Moderna                        │ Via Festa del Perdono, 7 – Milano              │
-│  6 │ Biblioteca_Storia    │ Biblioteca di Scienze della Storia e della Documentazione Storica                │ Via Festa del Perdono 7 - 20122 Milano         │
-│ 55 │ Biblioteca_BSGU_Comm │ Biblioteca di Studi giuridici e umanistici - Common Law e Diritto Internazionale │ via Festa del Perdono 7                        │
-│ 60 │ Biblioteca_BSGU_DirL │ Biblioteca di Studi giuridici e umanistici - Diritto del Lavoro                  │ via Festa del Perdono 7                        │
-│ 68 │ Biblioteca_BSGU_Cent │ Biblioteca di Studi giuridici e umanistici - Sala Centrale                       │ via Festa del Perdono 7                        │
-│ 63 │ Biblioteca_BSGU_DiPr │ Biblioteca di Studi giuridici e umanistici - Sala Senato (Diritto privato e      │ via Festa del Perdono 7                        │
-│    │                      │ Storia del diritto)                                                              │                                                │
-│ 73 │ Biblioteca_BSGU_700  │ Biblioteca di Studi giuridici e umanistici - Sala del Settecento                 │ via Festa del Perdono 7                        │
-│ 74 │ bib_eikon            │ Consultazione Banca Dati LSEG Workspace (ex Eikon)                               │                                                │
-│ 71 │ Uffici_Dir_SBA       │ Uffici Direzione SBA - Archivio Tesi                                             │ Via Santa Sofia n. 9, 20122 Milano             │
-└────┴──────────────────────┴──────────────────────────────────────────────────────────────────────────────────┴────────────────────────────────────────────────┘
-(.venv) PS C:\Users\filip\OneDrive - setupe06\Documenti\Script\py\biblio>   biblio test-captcha
-ok token len=2105 prefix=0cAFcWeA4DbieAEX3RuN397pHs2jnB…
-cookies: ['locale']
-(.venv) PS C:\Users\filip\OneDrive - setupe06\Documenti\Script\py\biblio>
 import os
 import re
 import glob
@@ -55,7 +14,7 @@ from tqdm import tqdm
 # COMMON CONFIGURATION
 # =============================================================================
 
-TARGET_FOLDER = './raw/zucchero'
+TARGET_FOLDER = './raw/lambdamezzi_50deg'
 POL_SUBFOLDER = os.path.join(TARGET_FOLDER, 'pol')
 WAV_SUBFOLDER = os.path.join(TARGET_FOLDER, 'wav')
 WAVELENGTHS_CSV = './outputs/rgb_wavelengths.csv'

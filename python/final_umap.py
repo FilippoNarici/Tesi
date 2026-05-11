@@ -88,10 +88,33 @@ S0_MIN = 1e-6
 RANDOM_STATE = 42
 HIST_EDGE_EXCLUDE_DEG = 20.0
 
+# Soglia di confidenza sull'estrazione di delta: pixel con sin^2(2*theta) sotto
+# questa soglia hanno fast axis vicino a 0 o 90 deg, dove l'inversione del
+# ritardatore e' degenere e il peso di transizione in
+# ``calculate_retardance_and_fast_axis`` spinge delta -> 0. Escludendoli dalla
+# valid_mask si rimuove il blob fittizio a delta ~ 0 che inquina lo scatter
+# UMAP. Per disattivare il filtro porre a 0.
+UMAP_AXIS_CONFIDENCE_MIN = 0.05
+
 # Cmap AoLP autoscala: cmap sequenziale + clip percentile (cicli a 180 gradi
 # non rilevante: distribuzioni reali stanno lontane dai bordi).
 AOLP_CMAP = 'viridis'
 AOLP_CLIP_PCT = (1.0, 99.0)
+
+# Cmap retardance: ciclica 0-360 deg, range fisso.
+DELTA_CMAP = 'twilight'
+DELTA_VMIN = 0.0
+DELTA_VMAX = 360.0
+DELTA_EDGE_EXCLUDE_DEG = HIST_EDGE_EXCLUDE_DEG  # bande di esclusione su hist
+
+# Modalita' default per finestra interattiva, batch RGB, export PDF:
+#   'aolp'  - AoLP psi, cmap viridis con autoscala 1-99 pct, range dinamico,
+#             nessuna banda di esclusione sull'istogramma.
+#   'delta' - retardance delta, cmap ciclica twilight, range fisso 0-360,
+#             banda edge ±DELTA_EDGE_EXCLUDE_DEG sull'istogramma per
+#             nascondere residui di sfondo a basso DoLP che si accumulano
+#             vicino a 0 / 360.
+INTERACTIVE_COLOR_BY = 'aolp'
 
 # =============================================================================
 # FEATURE EXTRACTION
@@ -105,25 +128,45 @@ def _normalize_stokes(S0, S1, S2, S3):
     s3 = (S3 / safe_S0) if S3 is not None else np.zeros_like(S0)
     return s1, s2, s3
 
-def _build_feature_matrix(S0, S1, S2, S3, DoLP, delta_deg, valid_mask,
-                          feature_mode='full'):
-    """feature_mode:
-    - 'full': (s1, s2, s3, DoLP, delta_deg)
-    - 'no_delta': (s1, s2, s3, DoLP) — utile per verificare se UMAP trova
-      comunque la struttura senza l'hint esplicito di delta.
+def _build_feature_matrix(S0, S1, S2, S3, DoLP, valid_mask,
+                          feature_mode='no_delta'):
+    """Costruisce la matrice di feature per UMAP.
+
+    Aggiungere nuovi feature_mode (es. per il coloraggio delta) come rami
+    elif indipendenti, in modo da non toccare il ramo esistente. La
+    risoluzione del default per color_by avviene in ``_default_feature_mode``.
+
+    Modalita' attive:
+    - 'no_delta': (s1, s2, s3, DoLP) — pure Poincaré + magnitude.
     """
     s1, s2, s3 = _normalize_stokes(S0, S1, S2, S3)
     flat_valid = valid_mask.ravel()
-    cols = [s1.ravel(), s2.ravel(), s3.ravel(), DoLP.ravel()]
-    if feature_mode == 'full':
-        cols.append(delta_deg.ravel())
-    elif feature_mode != 'no_delta':
+
+    if feature_mode == 'no_delta':
+        cols = [s1.ravel(), s2.ravel(), s3.ravel(), DoLP.ravel()]
+    else:
         raise ValueError(f"feature_mode sconosciuto: {feature_mode}")
+
     features = np.column_stack(cols)[flat_valid]
     valid_indices = np.flatnonzero(flat_valid)
     return features.astype(np.float32), valid_indices
 
-def _build_validity_mask(S0, DoLP, bg_mask, sat_mask=None):
+
+def _default_feature_mode(color_by):
+    """Mappa la modalita' di coloraggio al feature set di default.
+
+    Rami separati per AoLP e delta cosi' da poter cambiare l'uno
+    indipendentemente dall'altro. Attualmente entrambi puntano a
+    ``'no_delta'``; per il futuro modificare il ramo ``'delta'`` quando si
+    vuole sperimentare con un feature set dedicato per la retardance.
+    """
+    if color_by == 'aolp':
+        return 'no_delta'
+    elif color_by == 'delta':
+        return 'no_delta'
+    raise ValueError(f"color_by sconosciuto: {color_by!r}")
+
+def _build_validity_mask(S0, DoLP, bg_mask, sat_mask=None, theta_deg=None):
     sample_mask = ~bg_mask
     finite = (np.isfinite(S0) & np.isfinite(DoLP)
               & (np.abs(S0) >= S0_MIN))
@@ -131,6 +174,10 @@ def _build_validity_mask(S0, DoLP, bg_mask, sat_mask=None):
     valid = sample_mask & finite & bright_enough
     if sat_mask is not None:
         valid &= ~sat_mask
+    if theta_deg is not None and UMAP_AXIS_CONFIDENCE_MIN > 0.0:
+        sin2_2theta = np.sin(np.deg2rad(2.0 * theta_deg)) ** 2
+        confidence = np.where(np.isfinite(sin2_2theta), sin2_2theta, 0.0)
+        valid &= confidence > UMAP_AXIS_CONFIDENCE_MIN
     return valid
 
 def _sparse_grid_mask(shape, stride):
@@ -261,6 +308,62 @@ def _aolp_clip_range(aolp_valid, pct=AOLP_CLIP_PCT):
     if vmax - vmin < 1.0:
         return -90.0, 90.0
     return float(vmin), float(vmax)
+
+
+def _color_spec(color_by, aolp_deg, delta_deg, valid_indices):
+    """Restituisce un dict con cmap, range, etichette e file di export per la
+    modalita' di coloraggio scelta (``'aolp'`` o ``'delta'``). Mantiene
+    ``_interactive_panel`` e ``_export_panels`` agnostici rispetto alla
+    grandezza fisica visualizzata.
+    """
+    if color_by == 'aolp':
+        if aolp_deg is None:
+            raise ValueError("color_by='aolp' richiede aolp_deg non-None")
+        valid_vals = aolp_deg.ravel()[valid_indices]
+        vmin, vmax = _aolp_clip_range(valid_vals)
+        return {
+            'mode': 'aolp',
+            'value_map': aolp_deg,
+            'value_valid': valid_vals,
+            'cmap': plt.get_cmap(AOLP_CMAP),
+            'vmin': vmin, 'vmax': vmax,
+            'hist_range': (vmin, vmax),
+            'hist_edge_exclude': 0.0,
+            'cbar_extend': 'both',
+            'bar_tex': r'\bar\psi',
+            'unit_label': r'$\psi$ (deg)',
+            'map_title': r'(a) AoLP $\psi$ (deg)',
+            'map_title_short': r'AoLP $\psi$',
+            'hist_title': r'(c) Istogramma $\psi$',
+            'panel_title_root': 'Polarimetric UMAP + AoLP',
+            'export_subdir': 'aolp_umap',
+            'export_map_file': 'aolp_map.pdf',
+            'export_hist_file': 'aolp_hist.pdf',
+        }
+    elif color_by == 'delta':
+        if delta_deg is None:
+            raise ValueError("color_by='delta' richiede delta_deg non-None")
+        valid_vals = delta_deg.ravel()[valid_indices]
+        return {
+            'mode': 'delta',
+            'value_map': delta_deg,
+            'value_valid': valid_vals,
+            'cmap': plt.get_cmap(DELTA_CMAP),
+            'vmin': DELTA_VMIN, 'vmax': DELTA_VMAX,
+            'hist_range': (DELTA_VMIN, DELTA_VMAX),
+            'hist_edge_exclude': DELTA_EDGE_EXCLUDE_DEG,
+            'cbar_extend': 'neither',
+            'bar_tex': r'\bar\delta',
+            'unit_label': r'$\delta$ (deg)',
+            'map_title': r'(a) Retardance $\delta$ (deg)',
+            'map_title_short': r'Retardance $\delta$',
+            'hist_title': r'(c) Istogramma $\delta$',
+            'panel_title_root': r'Polarimetric UMAP + $\delta$',
+            'export_subdir': 'delta_umap',
+            'export_map_file': 'delta_map.pdf',
+            'export_hist_file': 'delta_hist.pdf',
+        }
+    raise ValueError(f"color_by sconosciuto: {color_by!r}")
 
 
 def plot_aolp_umap_hist(embedding, aolp_deg, valid_indices, sample_name='',
@@ -395,7 +498,8 @@ def compute_polarimetric_maps_fullres(sparse_stride=None):
                 arr[sat_mask] = np.nan
 
     grid_mask = _sparse_grid_mask(S0.shape, stride)
-    base_valid = _build_validity_mask(S0, DoLP, bg_mask, sat_mask)
+    base_valid = _build_validity_mask(S0, DoLP, bg_mask, sat_mask,
+                                      theta_deg=theta_deg)
     valid_mask = base_valid & grid_mask
     valid_indices = np.flatnonzero(valid_mask.ravel())
     return {
@@ -440,7 +544,7 @@ def run(sample_name=None, show=True, save_path=None, sparse_stride=None,
 
     print(f"--- UMAP (sparse-grid stride={stride}) ---")
     features, valid_indices = _build_feature_matrix(
-        S0, S1_al, S2_al, S3, DoLP, delta_deg, valid_mask,
+        S0, S1_al, S2_al, S3, DoLP, valid_mask,
         feature_mode=feature_mode)
     grid_mask = _sparse_grid_mask(S0.shape, stride)
     total_grid_points = int(grid_mask.sum())
@@ -491,16 +595,18 @@ def run(sample_name=None, show=True, save_path=None, sparse_stride=None,
 # INTERACTIVE LASSO SELECTOR
 # =============================================================================
 
-def _draw_hist_centroid(ax, psi_mean, psi_std, color='red'):
-    """Vline tratteggiata rossa al baricentro della selezione + etichetta con
-    ψ media e incertezza. Coordinate: x in data, y in axes-fraction. Ritorna
-    ``(vline, text)`` per cleanup successivo.
+def _draw_hist_centroid(ax, mean_val, std_val, bar_tex=r'\bar\psi',
+                        color='red'):
+    r"""Vline tratteggiata + etichetta con baricentro della selezione e
+    incertezza. ``bar_tex`` e' l'espressione TeX da usare nell'etichetta
+    (default ``\bar\psi``; per delta passare ``\bar\delta``). Coordinate: x in
+    data, y in axes-fraction. Ritorna ``(vline, text)`` per cleanup successivo.
     """
-    vline = ax.axvline(psi_mean, color=color, linewidth=1.0,
+    vline = ax.axvline(mean_val, color=color, linewidth=1.0,
                        linestyle='--', zorder=4)
     text = ax.text(
-        psi_mean, 0.97,
-        fr" $\bar\psi = {psi_mean:+.2f}^\circ \pm {psi_std:.2f}$",
+        mean_val, 0.97,
+        fr" ${bar_tex} = {mean_val:+.2f}^\circ \pm {std_val:.2f}$",
         color=color, ha='left', va='top',
         transform=ax.get_xaxis_transform(),
         fontsize=8, zorder=5)
@@ -529,53 +635,57 @@ def _draw_umap_n_label(ax, embedding, sel_mask, n_sel, color='red'):
         fontsize=8, zorder=6)
 
 
-def _export_panels(dataset_label, channel_label,
-                   embedding, aolp_deg, valid_indices, sel_mask,
-                   S0_shape, vmin, vmax, hist_bins=180,
+def _export_panels(dataset_label, channel_label, spec,
+                   embedding, valid_indices, sel_mask,
+                   S0_shape, hist_bins=180,
                    images_root='../Images/generated'):
     """Esporta 3 PDF single-panel publication-style in
-    ``<images_root>/<dataset>/aolp_umap/<CH>/{aolp_map,umap_scatter,aolp_hist}.pdf``,
-    overwrite a ogni invocazione. Stile (figsize, dpi, font) coerente con
-    ``final_thesis_figure``. Legenda ψ media wrapped a 2 righe + patch rosso
-    sull'istogramma se selezione presente.
+    ``<images_root>/<dataset>/<spec.export_subdir>/<CH>/`` (overwrite). Stile
+    (figsize, dpi, font) coerente con ``final_thesis_figure``. ``spec`` e' il
+    dict prodotto da ``_color_spec``: pilota cmap, range, etichette TeX e
+    nomi file in funzione della grandezza visualizzata.
     """
-    out = os.path.join(images_root, dataset_label, 'aolp_umap', channel_label)
+    out = os.path.join(images_root, dataset_label,
+                       spec['export_subdir'], channel_label)
     os.makedirs(out, exist_ok=True)
 
-    cmap = plt.get_cmap(AOLP_CMAP)
+    cmap = spec['cmap']
+    vmin, vmax = spec['vmin'], spec['vmax']
     norm = plt.Normalize(vmin=vmin, vmax=vmax)
     H, W = S0_shape
     rows, cols = np.unravel_index(valid_indices, (H, W))
-    aolp_valid = aolp_deg.ravel()[valid_indices]
+    value_map = spec['value_map']
+    value_valid = spec['value_valid']
+    extend = spec['cbar_extend']
     has_sel = sel_mask is not None and bool(sel_mask.any())
 
-    # (a) AoLP map: stessa convenzione di final_thesis_figure (3.35 x ratio).
+    # (a) Mappa: stessa convenzione di final_thesis_figure (3.35 x ratio).
     aspect_img = H / W
     fig_w = 3.35
     fig_h = fig_w * aspect_img
     fig, ax = plt.subplots(figsize=(fig_w + 0.7, fig_h))
-    im = ax.imshow(aolp_deg, cmap=cmap, vmin=vmin, vmax=vmax, aspect='equal')
-    ax.set_title(r'AoLP $\psi$', pad=6)
+    im = ax.imshow(value_map, cmap=cmap, vmin=vmin, vmax=vmax, aspect='equal')
+    ax.set_title(spec['map_title_short'], pad=6)
     ax.axis('off')
-    cb = fig.colorbar(im, ax=ax, fraction=0.046, pad=0.03, extend='both')
-    cb.set_label(r'$\psi$ (deg)')
+    cb = fig.colorbar(im, ax=ax, fraction=0.046, pad=0.03, extend=extend)
+    cb.set_label(spec['unit_label'])
     if has_sel:
         ax.scatter(cols[sel_mask], rows[sel_mask], c='red', s=2.5,
                    alpha=0.9, edgecolors='none', zorder=5)
-    fig.savefig(os.path.join(out, 'aolp_map.pdf'), format='pdf')
+    fig.savefig(os.path.join(out, spec['export_map_file']), format='pdf')
     plt.close(fig)
 
     # (b) UMAP scatter: square + colorbar.
     fig, ax = plt.subplots(figsize=(3.35 + 0.7, 3.35))
     ax.scatter(embedding[:, 0], embedding[:, 1],
-               c=aolp_valid, cmap=cmap, vmin=vmin, vmax=vmax,
+               c=value_valid, cmap=cmap, vmin=vmin, vmax=vmax,
                s=2.0, alpha=0.85)
     ax.set_xlabel('UMAP 1')
     ax.set_ylabel('UMAP 2')
     ax.set_title('UMAP embedding', pad=6)
     cb = fig.colorbar(plt.cm.ScalarMappable(norm=norm, cmap=cmap),
-                      ax=ax, fraction=0.046, pad=0.03, extend='both')
-    cb.set_label(r'$\psi$ (deg)')
+                      ax=ax, fraction=0.046, pad=0.03, extend=extend)
+    cb.set_label(spec['unit_label'])
     if has_sel:
         ax.scatter(embedding[sel_mask, 0], embedding[sel_mask, 1],
                    facecolors='none', edgecolors='red', s=18,
@@ -585,45 +695,58 @@ def _export_panels(dataset_label, channel_label,
     plt.close(fig)
 
     # (c) Istogramma.
+    hmin, hmax = spec['hist_range']
     fig, ax = plt.subplots(figsize=(3.35, 2.2))
-    aolp_finite = aolp_valid[np.isfinite(aolp_valid)]
-    counts, edges = np.histogram(aolp_finite, bins=hist_bins,
-                                 range=(vmin, vmax))
+    finite_vals = value_valid[np.isfinite(value_valid)]
+    counts, edges = np.histogram(finite_vals, bins=hist_bins,
+                                 range=(hmin, hmax))
     centers = 0.5 * (edges[:-1] + edges[1:])
     widths = np.diff(edges)
     bar_colors = [cmap(norm(c)) for c in centers]
     ax.bar(centers, counts, width=widths, color=bar_colors,
            edgecolor='none', align='center')
     if has_sel:
-        sel_aolp = aolp_valid[sel_mask]
-        sel_aolp = sel_aolp[np.isfinite(sel_aolp)]
-        sel_counts, _ = np.histogram(sel_aolp, bins=hist_bins,
-                                     range=(vmin, vmax))
+        sel_vals = value_valid[sel_mask]
+        sel_vals = sel_vals[np.isfinite(sel_vals)]
+        sel_counts, _ = np.histogram(sel_vals, bins=hist_bins,
+                                     range=(hmin, hmax))
         ax.bar(centers, sel_counts, width=widths, color='red',
                edgecolor='none', alpha=0.9, align='center', zorder=3)
-        psi_mean = float(np.mean(sel_aolp)) if sel_aolp.size else float('nan')
-        psi_std = float(np.std(sel_aolp)) if sel_aolp.size else float('nan')
-        _draw_hist_centroid(ax, psi_mean, psi_std)
-    ymax = float(np.percentile(counts, 99)) if counts.size else 1.0
-    ax.set_xlim(vmin, vmax)
-    ax.set_ylim(0, ymax * 1.15)
-    ax.set_xlabel(r'$\psi$ (deg)')
+        m = float(np.mean(sel_vals)) if sel_vals.size else float('nan')
+        s = float(np.std(sel_vals)) if sel_vals.size else float('nan')
+        _draw_hist_centroid(ax, m, s, bar_tex=spec['bar_tex'])
+    edge = spec['hist_edge_exclude']
+    if edge > 0.0:
+        inner = (centers > hmin + edge) & (centers < hmax - edge)
+        if inner.any() and counts[inner].size:
+            ymax = float(counts[inner].max())
+        else:
+            ymax = float(counts.max()) if counts.size else 1.0
+        ax.axvspan(hmin, hmin + edge, color='gray', alpha=0.08)
+        ax.axvspan(hmax - edge, hmax, color='gray', alpha=0.08)
+        ax.set_ylim(0, ymax * 1.25)
+    else:
+        ymax = float(np.percentile(counts, 99)) if counts.size else 1.0
+        ax.set_ylim(0, ymax * 1.15)
+    ax.set_xlim(hmin, hmax)
+    ax.set_xlabel(spec['unit_label'])
     ax.set_ylabel('# pixel validi')
-    ax.set_title(r'Istogramma $\psi$', pad=6)
+    ax.set_title(spec['hist_title'].replace('(c) ', ''), pad=6)
     ax.grid(True, axis='y', linestyle=':', alpha=0.4)
-    fig.savefig(os.path.join(out, 'aolp_hist.pdf'), format='pdf')
+    fig.savefig(os.path.join(out, spec['export_hist_file']), format='pdf')
     plt.close(fig)
 
     return out
 
 
 class _PolyClickSelector:
-    """Selettore poligonale minimale: aggiorna il disegno SOLO al click, mai
-    sul mouse motion. Evita il lag della preview-line del ``PolygonSelector``
-    standard di matplotlib su scatter densi.
+    """Selettore poligonale minimale guidato da tastiera + click destro.
 
-    Click sinistro = aggiunge un vertice. Click destro o tasto Enter chiude il
-    poligono e invoca ``onselect(verts)``. 'esc' resetta la sequenza in corso.
+    Aggiunta vertici: tasto 'a' (add) alla posizione corrente del mouse
+    sull'asse. Il click sinistro NON aggiunge vertici, lasciando libero il
+    toolbar di matplotlib per zoom rect e pan. Chiusura: click destro o
+    tasto 'enter' (richiede >=3 vertici); invoca ``onselect(verts)``. 'esc'
+    resetta la sequenza in corso.
     """
 
     def __init__(self, ax, onselect):
@@ -632,7 +755,8 @@ class _PolyClickSelector:
         self.verts = []
         self._line = None
         canvas = ax.figure.canvas
-        self._cid_click = canvas.mpl_connect('button_press_event', self._on_click)
+        self._cid_click = canvas.mpl_connect('button_press_event',
+                                             self._on_click)
         self._cid_key = canvas.mpl_connect('key_press_event', self._on_key)
 
     def _redraw_line(self, closed=False):
@@ -650,16 +774,20 @@ class _PolyClickSelector:
         self.ax.figure.canvas.draw_idle()
 
     def _on_click(self, event):
+        # Solo click destro chiude. Click sinistro lasciato al toolbar
+        # matplotlib (zoom rectangle, pan).
         if event.inaxes is not self.ax or event.xdata is None:
             return
-        if event.button == 1:
-            self.verts.append((event.xdata, event.ydata))
-            self._redraw_line(closed=False)
-        elif event.button == 3 and len(self.verts) >= 3:
+        if event.button == 3 and len(self.verts) >= 3:
             self._close()
 
     def _on_key(self, event):
-        if event.key == 'escape':
+        if event.key == 'a':
+            if event.inaxes is not self.ax or event.xdata is None:
+                return
+            self.verts.append((event.xdata, event.ydata))
+            self._redraw_line(closed=False)
+        elif event.key == 'escape':
             self.clear()
 
     def _close(self):
@@ -676,24 +804,31 @@ class _PolyClickSelector:
             self.ax.figure.canvas.draw_idle()
 
 
-def _interactive_panel(embedding, aolp_deg, valid_indices, S0_shape,
+def _interactive_panel(embedding, aolp_deg, delta_deg, valid_indices, S0_shape,
                        sample_name='', hist_bins=180,
-                       dataset_label=None, channel_label=None):
-    """Costruisce figura 3-pannelli (mappa | UMAP | istogramma) con
-    selettore poligonale click-only sullo scatter UMAP. Click sinistro =
-    vertice; click destro = chiude e seleziona; 'esc' = annulla sequenza in
-    corso.
+                       dataset_label=None, channel_label=None,
+                       color_by='aolp'):
+    """Figura 3-pannelli (mappa | UMAP | istogramma) con selettore poligonale
+    click-only sullo scatter UMAP. ``color_by`` sceglie la grandezza
+    visualizzata ('aolp' o 'delta'); il pannello e' identico in struttura, solo
+    cmap, range, etichette e file di export cambiano. Click sinistro = vertice;
+    click destro = chiude e seleziona; 'esc' = annulla sequenza in corso.
 
     Tasti: 'r' = reset overlay rossi, 'enter' = export 3 PDF in
-    ``Images/generated/<dataset>/aolp_umap/<CH>/`` (overwrite),
+    ``Images/generated/<dataset>/<aolp_umap|delta_umap>/<CH>/`` (overwrite),
     'q' = chiudi finestra.
     """
     from matplotlib.path import Path
 
-    aolp_valid = aolp_deg.ravel()[valid_indices]
-    vmin, vmax = _aolp_clip_range(aolp_valid)
-    cmap = plt.get_cmap(AOLP_CMAP)
+    spec = _color_spec(color_by, aolp_deg, delta_deg, valid_indices)
+    cmap = spec['cmap']
+    vmin, vmax = spec['vmin'], spec['vmax']
     norm = plt.Normalize(vmin=vmin, vmax=vmax)
+    value_map = spec['value_map']
+    value_valid = spec['value_valid']
+    extend = spec['cbar_extend']
+    hmin, hmax = spec['hist_range']
+    edge = spec['hist_edge_exclude']
 
     H, W = S0_shape
     rows, cols = np.unravel_index(valid_indices, (H, W))
@@ -703,39 +838,52 @@ def _interactive_panel(embedding, aolp_deg, valid_indices, S0_shape,
     ax_map = fig.add_subplot(gs[0])
     ax_umap = fig.add_subplot(gs[1])
     ax_hist = fig.add_subplot(gs[2])
-    fig.suptitle(f"Polarimetric UMAP + AoLP - {sample_name}", fontsize=13)
+    fig.suptitle(f"{spec['panel_title_root']} - {sample_name}", fontsize=13)
 
-    im = ax_map.imshow(aolp_deg, cmap=cmap, vmin=vmin, vmax=vmax)
-    ax_map.set_title(r"(a) AoLP $\psi$ (deg)")
+    im = ax_map.imshow(value_map, cmap=cmap, vmin=vmin, vmax=vmax)
+    ax_map.set_title(spec['map_title'])
     ax_map.axis('off')
     fig.colorbar(im, ax=ax_map, fraction=0.046, pad=0.04,
-                 extend='both').set_label(r"$\psi$ (deg)")
+                 extend=extend).set_label(spec['unit_label'])
 
     ax_umap.scatter(embedding[:, 0], embedding[:, 1],
-                    c=aolp_valid, cmap=cmap, vmin=vmin, vmax=vmax,
+                    c=value_valid, cmap=cmap, vmin=vmin, vmax=vmax,
                     s=2.0, alpha=0.85)
     ax_umap.set_title(r"(b) UMAP embedding")
     ax_umap.set_xlabel("UMAP 1")
     ax_umap.set_ylabel("UMAP 2")
     fig.colorbar(plt.cm.ScalarMappable(norm=norm, cmap=cmap),
                  ax=ax_umap, fraction=0.046, pad=0.04,
-                 extend='both').set_label(r"$\psi$ (deg)")
+                 extend=extend).set_label(spec['unit_label'])
 
-    aolp_finite = aolp_valid[np.isfinite(aolp_valid)]
-    counts, edges = np.histogram(aolp_finite, bins=hist_bins,
-                                 range=(vmin, vmax))
+    finite_vals = value_valid[np.isfinite(value_valid)]
+    counts, edges = np.histogram(finite_vals, bins=hist_bins,
+                                 range=(hmin, hmax))
     centers = 0.5 * (edges[:-1] + edges[1:])
     widths = np.diff(edges)
     bar_colors = [cmap(norm(c)) for c in centers]
     ax_hist.bar(centers, counts, width=widths, color=bar_colors,
                 edgecolor='none', align='center')
-    ymax = float(np.percentile(counts, 99)) if counts.size else 1.0
-    ax_hist.set_xlim(vmin, vmax)
-    ax_hist.set_ylim(0, ymax * 1.15)
-    ax_hist.set_xlabel(r"$\psi$ (deg)")
+    if edge > 0.0:
+        inner = (centers > hmin + edge) & (centers < hmax - edge)
+        if inner.any() and counts[inner].size:
+            ymax = float(counts[inner].max())
+        else:
+            ymax = float(counts.max()) if counts.size else 1.0
+        ax_hist.axvspan(hmin, hmin + edge, color='gray', alpha=0.08)
+        ax_hist.axvspan(hmax - edge, hmax, color='gray', alpha=0.08)
+        ax_hist.set_ylim(0, ymax * 1.25)
+    else:
+        ymax = float(np.percentile(counts, 99)) if counts.size else 1.0
+        ax_hist.set_ylim(0, ymax * 1.15)
+    ax_hist.set_xlim(hmin, hmax)
+    ax_hist.set_xlabel(spec['unit_label'])
     ax_hist.set_ylabel("# pixel validi")
-    ax_hist.set_title(r"(c) Istogramma $\psi$")
+    ax_hist.set_title(spec['hist_title'])
     ax_hist.grid(True, axis='y', linestyle=':', alpha=0.4)
+    if vmin > hmin or vmax < hmax:
+        print(f"  {color_by} cmap range (1-99 pct): "
+              f"[{vmin:+.2f}, {vmax:+.2f}] deg")
 
     state = {'map_pts': None, 'umap_ring': None, 'hist_bars': None,
              'hist_vline': None, 'hist_label': None,
@@ -771,24 +919,24 @@ def _interactive_panel(embedding, aolp_deg, valid_indices, S0_shape,
             embedding[sel, 0], embedding[sel, 1],
             facecolors='none', edgecolors='red', s=22,
             linewidths=0.6, zorder=5)
-        sel_aolp = aolp_valid[sel]
-        sel_aolp = sel_aolp[np.isfinite(sel_aolp)]
-        sel_counts, _ = np.histogram(sel_aolp, bins=hist_bins,
-                                     range=(vmin, vmax))
+        sel_vals = value_valid[sel]
+        sel_vals = sel_vals[np.isfinite(sel_vals)]
+        sel_counts, _ = np.histogram(sel_vals, bins=hist_bins,
+                                     range=(hmin, hmax))
         bars = ax_hist.bar(centers, sel_counts, width=widths,
                            color='red', edgecolor='none', alpha=0.9,
                            align='center', zorder=3)
         state['hist_bars'] = list(bars.patches)
-        psi_mean = float(np.mean(sel_aolp)) if sel_aolp.size else float('nan')
-        psi_std = float(np.std(sel_aolp)) if sel_aolp.size else float('nan')
+        m = float(np.mean(sel_vals)) if sel_vals.size else float('nan')
+        s = float(np.std(sel_vals)) if sel_vals.size else float('nan')
         n_sel = int(sel.sum())
         state['hist_vline'], state['hist_label'] = _draw_hist_centroid(
-            ax_hist, psi_mean, psi_std)
+            ax_hist, m, s, bar_tex=spec['bar_tex'])
         state['umap_n_label'] = _draw_umap_n_label(
             ax_umap, embedding, sel, n_sel)
         state['sel_mask'] = sel
         print(f"  selezionati {n_sel} pixel  "
-              f"psi medio = {psi_mean:+.2f} deg  (std = {psi_std:.2f})")
+              f"{color_by} medio = {m:+.2f} deg  (std = {s:.2f})")
         fig.canvas.draw_idle()
 
     selector = _PolyClickSelector(ax_umap, on_select)
@@ -800,12 +948,11 @@ def _interactive_panel(embedding, aolp_deg, valid_indices, S0_shape,
         out_dir = _export_panels(
             dataset_label=dataset_label,
             channel_label=channel_label,
+            spec=spec,
             embedding=embedding,
-            aolp_deg=aolp_deg,
             valid_indices=valid_indices,
             sel_mask=state['sel_mask'],
             S0_shape=S0_shape,
-            vmin=vmin, vmax=vmax,
             hist_bins=hist_bins,
         )
         print(f"  esportato: {out_dir}/ (3 PDF)")
@@ -824,12 +971,17 @@ def _interactive_panel(embedding, aolp_deg, valid_indices, S0_shape,
     fig.canvas.mpl_connect('key_press_event', on_key)
 
     print("\n--- comandi finestra interattiva ---")
-    print("  click sinistro    : aggiunge vertice del poligono")
-    print("  click destro      : chiude poligono e applica selezione")
+    print(f"  modalita' coloraggio: {color_by}")
+    print("  a                 : aggiunge vertice del poligono alla "
+          "posizione corrente del mouse")
+    print("  click destro      : chiude poligono (>=3 vertici) e applica "
+          "selezione")
+    print("  o / p / h         : matplotlib toolbar zoom rect / pan / home "
+          "(click sinistro libero)")
     print("  esc               : annulla sequenza vertici in corso")
     print("  r                 : reset overlay rossi + selettore")
-    print("  enter             : export 3 PDF in "
-          "Images/generated/<dataset>/aolp_umap/<CH>/")
+    print(f"  enter             : export 3 PDF in "
+          f"Images/generated/<dataset>/{spec['export_subdir']}/<CH>/")
     print("  q                 : chiudi finestra")
     print("------------------------------------\n")
 
@@ -839,17 +991,36 @@ def _interactive_panel(embedding, aolp_deg, valid_indices, S0_shape,
 
 def _compute_or_load_cache(cache_path=None, sparse_stride=None,
                            feature_mode='no_delta'):
-    """Restituisce ``(embedding, aolp_deg, valid_indices, S0_shape)`` oppure
-    ``None`` su fallimento. Carica da ``cache_path`` se esiste, altrimenti
-    calcola Stokes + UMAP e salva il cache.
+    """Restituisce ``(embedding, aolp_deg, delta_deg, valid_indices, S0_shape)``
+    oppure ``None`` su fallimento. Carica da ``cache_path`` se esiste e contiene
+    tutti i campi richiesti, altrimenti calcola Stokes + UMAP e salva il cache.
+
+    Cache schema:
+    - v2 (2026-05-11): include ``aolp_deg`` e ``delta_deg``.
+    - v3 (2026-05-11): aggiunge ``axis_conf_min`` per invalidare il cache
+      quando ``UMAP_AXIS_CONFIDENCE_MIN`` viene modificato (la valid_mask
+      cambia, l'embedding non e' piu' consistente).
+    Cache v1/v2 mancanti dei campi richiesti vengono scartati e ricomputati.
     """
     if cache_path and os.path.exists(cache_path):
-        print(f"[cache] carico {cache_path}")
         with np.load(cache_path) as d:
-            return (d['embedding'].copy(),
-                    d['aolp_deg'].copy(),
-                    d['valid_indices'].copy(),
-                    tuple(int(x) for x in d['S0_shape']))
+            if 'delta_deg' not in d.files:
+                print(f"[cache] {cache_path} v1 obsoleto (manca delta_deg), "
+                      f"ricomputo")
+            elif 'axis_conf_min' not in d.files:
+                print(f"[cache] {cache_path} v2 obsoleto "
+                      f"(manca axis_conf_min), ricomputo")
+            elif float(d['axis_conf_min']) != UMAP_AXIS_CONFIDENCE_MIN:
+                print(f"[cache] {cache_path} axis_conf_min "
+                      f"({float(d['axis_conf_min']):.3f}) != corrente "
+                      f"({UMAP_AXIS_CONFIDENCE_MIN:.3f}), ricomputo")
+            else:
+                print(f"[cache] carico {cache_path}")
+                return (d['embedding'].copy(),
+                        d['aolp_deg'].copy(),
+                        d['delta_deg'].copy(),
+                        d['valid_indices'].copy(),
+                        tuple(int(x) for x in d['S0_shape']))
 
     stride = sparse_stride if sparse_stride is not None else UMAP_SPARSE_STRIDE
     maps = compute_polarimetric_maps_fullres(sparse_stride=stride)
@@ -862,7 +1033,7 @@ def _compute_or_load_cache(cache_path=None, sparse_stride=None,
     S1_al, S2_al, S3 = maps['S1_al'], maps['S2_al'], maps['S3']
     valid_mask = maps['valid_mask_sparse']
     features, valid_indices = _build_feature_matrix(
-        S0, S1_al, S2_al, S3, DoLP, delta_deg, valid_mask,
+        S0, S1_al, S2_al, S3, DoLP, valid_mask,
         feature_mode=feature_mode)
     if features.shape[0] < 100:
         print("Too few valid pixels.")
@@ -874,16 +1045,24 @@ def _compute_or_load_cache(cache_path=None, sparse_stride=None,
             cache_path,
             embedding=embedding,
             aolp_deg=AoLP_deg,
+            delta_deg=delta_deg,
             valid_indices=valid_indices,
-            S0_shape=np.array(S0.shape, dtype=np.int64))
+            S0_shape=np.array(S0.shape, dtype=np.int64),
+            axis_conf_min=np.float32(UMAP_AXIS_CONFIDENCE_MIN))
         print(f"[cache] salvato {cache_path}")
-    return embedding, AoLP_deg, valid_indices, S0.shape
+    return embedding, AoLP_deg, delta_deg, valid_indices, S0.shape
 
 
 def run_interactive(sample_name=None, sparse_stride=None,
-                    feature_mode='no_delta', cache_path=None,
-                    dataset_label=None, channel_label=None):
+                    feature_mode=None, cache_path=None,
+                    dataset_label=None, channel_label=None,
+                    color_by=None):
     """UMAP + finestra interattiva con poligono click-only.
+
+    ``color_by`` ('aolp' o 'delta', None = ``INTERACTIVE_COLOR_BY`` di modulo)
+    sceglie la grandezza visualizzata su mappa, scatter e istogramma.
+    ``feature_mode`` None = risolto da ``_default_feature_mode(color_by)``:
+    'aolp' -> 'no_delta', 'delta' -> 'cyclic_delta'.
 
     Cache: se ``cache_path`` esiste, ricarica embedding+arrays evitando il
     recompute (~2 min/canale). Se non esiste e viene fornito, salva il cache
@@ -891,19 +1070,24 @@ def run_interactive(sample_name=None, sparse_stride=None,
     """
     if sample_name is None:
         sample_name = os.path.basename(os.path.normpath(utils.TARGET_FOLDER))
+    if color_by is None:
+        color_by = INTERACTIVE_COLOR_BY
+    if feature_mode is None:
+        feature_mode = _default_feature_mode(color_by)
 
     result = _compute_or_load_cache(cache_path=cache_path,
                                     sparse_stride=sparse_stride,
                                     feature_mode=feature_mode)
     if result is None:
         return None
-    embedding, aolp_deg, valid_indices, S0_shape = result
+    embedding, aolp_deg, delta_deg, valid_indices, S0_shape = result
 
     fig, _selector = _interactive_panel(
-        embedding, aolp_deg, valid_indices, S0_shape,
+        embedding, aolp_deg, delta_deg, valid_indices, S0_shape,
         sample_name=sample_name,
         dataset_label=dataset_label,
-        channel_label=channel_label)
+        channel_label=channel_label,
+        color_by=color_by)
     plt.show(block=True)
     return fig
 
@@ -927,55 +1111,102 @@ def _set_dataset_globals(dataset, channel_idx, waveplate_swap=None):
 
 
 def run_interactive_dataset(dataset, channel_label='R', cache_dir='./outputs',
-                            use_cache=True, waveplate_swap=None):
+                            use_cache=True, waveplate_swap=None,
+                            color_by=None, feature_mode=None):
     """Wrapper: imposta globals per ``dataset``/``channel_label`` e apre la
-    finestra interattiva. ``channel_label`` in {'R','G','B'}.
+    finestra interattiva. ``channel_label`` in {'R','G','B'}. ``color_by``
+    ('aolp' o 'delta', None = ``INTERACTIVE_COLOR_BY``) seleziona la grandezza
+    visualizzata; il ``feature_mode`` di default segue ``color_by`` (None =
+    ``_default_feature_mode(color_by)``). Il cache npz e' separato per
+    feature_mode (embedding diversi a parita' di canale).
 
     Esempio:
         python -c "import final_umap; final_umap.run_interactive_dataset('zucchero', 'R')"
+        python -c "import final_umap; final_umap.run_interactive_dataset('strati_v2', 'R', color_by='delta')"
     """
     label_to_idx = {'R': 0, 'G': 1, 'B': 2}
     if channel_label not in label_to_idx:
         raise ValueError(f"channel_label deve essere R/G/B, non {channel_label!r}")
     channel_idx = label_to_idx[channel_label]
     _set_dataset_globals(dataset, channel_idx, waveplate_swap)
-    cache_path = (os.path.join(cache_dir, f"umap_{dataset}_{channel_label}_cache.npz")
+    if color_by is None:
+        color_by = INTERACTIVE_COLOR_BY
+    if color_by == 'both':
+        raise ValueError("color_by='both' non supportato in interactive: "
+                         "usare 'aolp' o 'delta' (e' previsto solo nel "
+                         "batch run_dataset_rgb)")
+    if feature_mode is None:
+        feature_mode = _default_feature_mode(color_by)
+    # Cache filename indipendente da color_by/feature_mode: il fit UMAP e' lo
+    # stesso (entrambe le modalita' di coloraggio usano 'no_delta'), cambiano
+    # solo cmap/range/etichette/file di export nel pannello e nel batch.
+    cache_path = (os.path.join(
+                      cache_dir,
+                      f"umap_{dataset}_{channel_label}_cache.npz")
                   if use_cache else None)
     return run_interactive(sample_name=f"{dataset} - canale {channel_label}",
                            cache_path=cache_path,
                            dataset_label=dataset,
-                           channel_label=channel_label)
+                           channel_label=channel_label,
+                           color_by=color_by,
+                           feature_mode=feature_mode)
 
 
 def run_dataset_rgb(dataset, cache_dir='./outputs', use_cache=True,
                     waveplate_swap=None,
-                    images_root='../Images/generated'):
-    """Batch UMAP sui 3 canali RGB di ``dataset``. Per ogni canale:
-    1. Carica/ricalcola cache npz in ``<cache_dir>/umap_<dataset>_<CH>_cache.npz``.
+                    images_root='../Images/generated',
+                    color_by=None, feature_mode=None):
+    """Batch UMAP sui 3 canali RGB di ``dataset``. ``color_by`` (None =
+    ``INTERACTIVE_COLOR_BY``) seleziona la modalita' di coloraggio
+    ('aolp', 'delta' o 'both'); ``feature_mode`` segue ``color_by`` se None.
+    Il fit UMAP e' unico per canale (cache `<cache_dir>/umap_<dataset>_<CH>_cache.npz`,
+    indipendente da color_by): cambiano solo cmap, range, etichette e
+    cartella di export. Con ``color_by='both'`` la stessa embedding viene
+    esportata sia come `aolp_umap/` sia come `delta_umap/` senza recomputare.
+
+    Per ogni canale:
+    1. Carica/ricalcola cache npz
+       ``<cache_dir>/umap_<dataset>_<CH>_cache.npz``.
     2. Esporta 3 PDF single-panel publication-style in
-       ``<images_root>/<dataset>/aolp_umap/<CH>/{aolp_map,umap_scatter,aolp_hist}.pdf``
-       (overwrite, no selezione).
+       ``<images_root>/<dataset>/<subdir>/<CH>/`` (overwrite, no selezione),
+       dove ``<subdir>`` e' ``aolp_umap`` o ``delta_umap``.
     """
+    if color_by is None:
+        color_by = INTERACTIVE_COLOR_BY
+    if color_by == 'both':
+        views = ['aolp', 'delta']
+    else:
+        views = [color_by]
+    if feature_mode is None:
+        # Le viste 'aolp' e 'delta' attualmente condividono feature_mode
+        # 'no_delta'; bastera' aggiornare _default_feature_mode per
+        # introdurre fit separati in futuro.
+        feature_mode = _default_feature_mode(views[0])
     for ch_idx, ch_label in CHANNELS_RGB:
         _set_dataset_globals(dataset, ch_idx, waveplate_swap)
-        print(f"\n=== {dataset} / {ch_label} ===")
-        cache_path = (os.path.join(cache_dir, f"umap_{dataset}_{ch_label}_cache.npz")
+        print(f"\n=== {dataset} / {ch_label} "
+              f"[views={views}, feature_mode={feature_mode}] ===")
+        cache_path = (os.path.join(
+                          cache_dir,
+                          f"umap_{dataset}_{ch_label}_cache.npz")
                       if use_cache else None)
-        result = _compute_or_load_cache(cache_path=cache_path)
+        result = _compute_or_load_cache(cache_path=cache_path,
+                                        feature_mode=feature_mode)
         if result is None:
             print(f"  [{ch_label}] skip: pixel insufficienti")
             continue
-        embedding, aolp_deg, valid_indices, S0_shape = result
-        aolp_valid = aolp_deg.ravel()[valid_indices]
-        vmin, vmax = _aolp_clip_range(aolp_valid)
-        out_dir = _export_panels(
-            dataset_label=dataset, channel_label=ch_label,
-            embedding=embedding, aolp_deg=aolp_deg,
-            valid_indices=valid_indices, sel_mask=None,
-            S0_shape=S0_shape, vmin=vmin, vmax=vmax,
-            images_root=images_root,
-        )
-        print(f"  [{ch_label}] esportato: {out_dir}/")
+        embedding, aolp_deg, delta_deg, valid_indices, S0_shape = result
+        for view in views:
+            spec = _color_spec(view, aolp_deg, delta_deg, valid_indices)
+            out_dir = _export_panels(
+                dataset_label=dataset, channel_label=ch_label,
+                spec=spec,
+                embedding=embedding,
+                valid_indices=valid_indices, sel_mask=None,
+                S0_shape=S0_shape,
+                images_root=images_root,
+            )
+            print(f"  [{ch_label}/{view}] esportato: {out_dir}/")
 
 
 if __name__ == "__main__":
@@ -997,19 +1228,38 @@ if __name__ == "__main__":
                              "(default: final_utils.TARGET_CHANNEL_IDX)")
     parser.add_argument('--no-cache', action='store_true',
                         help="forza ricalcolo, ignora cache npz")
+    parser.add_argument('--color-by', choices=['aolp', 'delta', 'both'],
+                        default=None,
+                        help=f"grandezza visualizzata (default top-of-script "
+                             f"INTERACTIVE_COLOR_BY={INTERACTIVE_COLOR_BY!r}; "
+                             f"'both' valido solo in batch, esporta entrambe "
+                             f"le viste dallo stesso fit)")
+    parser.add_argument('--feature-mode',
+                        choices=['no_delta'],
+                        default=None,
+                        help="feature UMAP (default: 'no_delta' per "
+                             "entrambe le modalita' di coloraggio)")
     args = parser.parse_args()
 
     if args.dataset is None:
         args.dataset = os.path.basename(os.path.normpath(utils.TARGET_FOLDER))
     if args.channel is None:
         args.channel = ['R', 'G', 'B'][utils.TARGET_CHANNEL_IDX]
+    effective_color = args.color_by if args.color_by else INTERACTIVE_COLOR_BY
+    effective_feat = (args.feature_mode if args.feature_mode
+                      else _default_feature_mode(effective_color))
     print(f"[final_umap] mode={args.mode}  dataset={args.dataset}  "
-          f"channel={args.channel}  use_cache={not args.no_cache}")
+          f"channel={args.channel}  color_by={effective_color}  "
+          f"feature_mode={effective_feat}  use_cache={not args.no_cache}")
 
     if args.mode == 'batch':
-        run_dataset_rgb(args.dataset, use_cache=not args.no_cache)
+        run_dataset_rgb(args.dataset, use_cache=not args.no_cache,
+                        color_by=args.color_by,
+                        feature_mode=args.feature_mode)
     elif args.mode == 'interactive':
         run_interactive_dataset(args.dataset, args.channel,
-                                use_cache=not args.no_cache)
+                                use_cache=not args.no_cache,
+                                color_by=args.color_by,
+                                feature_mode=args.feature_mode)
     else:
         run()
