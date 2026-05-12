@@ -1,6 +1,6 @@
 # TODO — Stato del progetto
 
-Ultimo aggiornamento: 2026-05-11 (cap5 prosa pipeline; `final_umap.py` coloraggio AoLP/δ + filtro confidenza `sin²(2θ)` + poligono guidato da tastiera; feature set finale `no_delta`)
+Ultimo aggiornamento: 2026-05-12 (refactor team `ipynb-refactor`: `python/analisi.ipynb` singolo + package `python/polarimetro/` + archivio `python/legacy/`)
 
 Questo file è la singola fonte di verità sullo stato di avanzamento. Aggiornare ad ogni task completato. Per istruzioni operative vedere `CLAUDE.md`.
 
@@ -41,6 +41,19 @@ Flusso iterativo, un campione alla volta. Per ogni sample:
 | barraon_v2 | [ ] | — |
 | barraoff_v2 | [ ] | — |
 | righello_v2 | [ ] | — |
+
+## Refactor notebook + package (team `ipynb-refactor`, 2026-05-11/12)
+
+Eseguito da un team di 4 agenti Claude (architect, core_cells, analysis_cells, optional_cells) coordinato da team-lead. 16 commit incrementali con messaggio `[ipynb-refactor]: ...`.
+
+- [x] `python/polarimetro/` package estratto da `final_utils.py` (config, io_raw, stokes, mask, align, retardance, umap_runner, plotting, `__init__`).
+- [x] `python/analisi.ipynb` (26 celle): config + dispatcher analisi-per-dataset + Load+Stokes (cache npz) + 9 mappe (AB) + UMAP AoLP/δ + slice δ + fit retardance-vs-strati + istogrammi δ con marker strati + strumenti opzionali off-by-default (G0, debugger, FULL BATCH).
+- [x] 11 script originali (`final_*.py`, incluso `final_utils.py`) spostati in `python/legacy/`.
+- [x] Smoke test end-to-end su `strati_v2` canale G a DS=4: pipeline completa, cache salvato in `outputs/stokes_strati_v2_DS4.npz` (gitignored).
+- [x] `.gitignore` aggiornato con pattern `python/outputs/stokes_*.npz`.
+- [x] `CLAUDE.md` (radice + `python/`) e `TODO.md` aggiornati.
+
+Punto d'ingresso unico ora: aprire `python/analisi.ipynb`, impostare `DATASET`/`CHANNEL`/`DOWNSAMPLE_FACTOR`, eseguire. Le analisi si attivano in base al dispatcher.
 
 ## Pipeline Python
 

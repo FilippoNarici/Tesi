@@ -26,20 +26,22 @@ Espandere l'approccio puntuale 1D della polarimetria classica a un'analisi matri
 │   └── CLAUDE.md                       # Guida nidificata (stato capitoli, stile)
 ├── python/                             # Codice di analisi
 │   ├── CLAUDE.md                       # Guida nidificata (mappa script, insidie)
-│   ├── final\_utils.py                 # Libreria: RAW, Stokes, maschere, retardance, Poincaré
-│   ├── final\_polarimeter.py           # Pipeline principale: Stokes + plot 3×3
-│   ├── final\_thesis\_figure.py        # Generazione PDF per tesi (stile pubblicazione)
-│   ├── final\_thesis\_figure\_all.py   # Batch runner: 7 dataset × 3 canali × 9 parametri
-│   ├── final\_umap.py                  # UMAP 2D dei vettori di Stokes (interattivo + batch)
-│   ├── final\_delta\_histogram.py      # Istogrammi δ pubblicabili (PDF + HTML)
-│   ├── final\_slice\_debug.py          # Slice diagonale δ multistrato (PNG diagnostica)
-│   ├── final\_slice\_figure.py         # Slice δ publication-style (PDF + HTML)
-│   ├── final\_fit\_plot\_strati.py    # Fit retardance-vs-strati + dispersione 1/λ²
-│   ├── final\_monochrome\_approx.py    # Stima lunghezze d'onda centroide RGB
-│   ├── final\_fit.py                   # Debugger interattivo pixel-per-pixel
+│   ├── analisi.ipynb                   # Notebook principale: dispatcher analisi-per-dataset
+│   ├── polarimetro/                    # Package: split di final\_utils.py
+│   │   ├── \_\_init\_\_.py             # Re-export public API + namespace config
+│   │   ├── config.py                   # Costanti immutabili + is\_waveplate\_swapped
+│   │   ├── io\_raw.py                  # Load RAW/dark, downsample, saturation accumulator
+│   │   ├── stokes.py                   # Stokes pseudo-inversa, S3, dispersione quarzo
+│   │   ├── mask.py                     # generate\_background\_mask (Canny + flood-fill)
+│   │   ├── align.py                    # align\_reference\_frame + align\_poincare\_ellipticity
+│   │   ├── retardance.py               # DoLP/AoLP + retardance arctan2 [0°, 360°)
+│   │   ├── umap\_runner.py             # Helper fit UMAP + validity mask
+│   │   └── plotting.py                 # apply\_thesis\_style + mask\_overlay\_rgb
+│   ├── legacy/                         # Archivio script .py originali (riferimento storico)
+│   │   └── final\_*.py                 # 11 script (incluso final\_utils.py)
 │   ├── requirements.txt                # Dipendenze Python
 │   ├── spettri/                        # CSV di risposta sensore e sorgente
-│   ├── outputs/                        # CSV, PDF spettrale, cache npz UMAP (gitignored)
+│   ├── outputs/                        # CSV, PDF spettrale, cache npz UMAP/Stokes (gitignored)
 │   └── raw/                            # Dataset RAW DNG (non tracciato in git)
 ├── Images/                             # Immagini per la tesi
 │   ├── setup/                          # Foto setup sperimentale (vista\_NE/NW)
@@ -126,20 +128,18 @@ Quando si aggiunge uno script, un capitolo o una nuova cartella di figure, aggio
 
 ## Comandi rapidi
 
-Ambiente Python: `.venv` locale; installare con `pip install -r python/requirements.txt`.
+Ambiente Python: `.venv` locale alla radice del repo; installare con `pip install -r python/requirements.txt`.
 
-Pipeline principale su un dataset (modificare `TARGET_FOLDER` in `python/final_utils.py`): `python python/final_polarimeter.py`.
+Punto d'ingresso unico: aprire `python/analisi.ipynb` con Jupyter (o l'IDE) e impostare `DATASET`, `CHANNEL`, `DOWNSAMPLE_FACTOR` nella cella di configurazione. Il dispatcher attiva le celle pertinenti al dataset selezionato.
 
-Debugger interattivo pixel-per-pixel: `python python/final_fit.py`.
-Generazione figure per tesi (un dataset/canale): `python python/final_thesis_figure.py`.
-Batch figure tesi (7 dataset × 3 canali × 9 parametri): `python python/final_thesis_figure_all.py`.
-UMAP interattivo: `python python/final_umap.py [interactive|batch] [dataset] [R|G|B] [--color-by aolp|delta|both]`.
-Istogrammi δ pubblicabili: `python python/final_delta_histogram.py`.
-Slice diagonale δ multistrato: `python python/final_slice_figure.py` (pub) / `final_slice_debug.py` (diagnostica).
-Stima centroidi spettrali RGB: `python python/final_monochrome_approx.py`.
-Fit multistrato (nastro adesivo): `python python/final_fit_plot_strati.py`.
+Strumenti opzionali nel notebook (gated da flag in testa):
+* `RUN_SPECTRA = True` — rigenera centroidi spettrali RGB (`outputs/rgb_wavelengths.csv`).
+* `RUN_DEBUGGER = True` — apre debugger pixel-per-pixel interattivo.
+* `RUN_FULL_BATCH = True` — loop su 7 dataset × 3 canali senza preview, solo savefig (≈25-50 min a DS=4).
 
 Compilazione tesi: `pdflatex Thesis.tex && bibtex Thesis && pdflatex Thesis.tex && pdflatex Thesis.tex`.
+
+Riferimento storico: gli script `final_*.py` originali sono archiviati in `python/legacy/`. Non più mantenuti; usare il notebook + il package `polarimetro/`.
 
 ## Confine di interpretazione umana (regola cardine)
 

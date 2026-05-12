@@ -29,6 +29,10 @@ Images/generated/*/interactive/*.html
 # final_umap.py senza --no-cache.
 python/outputs/umap_*_cache.npz
 
+# Cache npz della cella Load+Stokes del notebook analisi.ipynb: contiene
+# Stokes + maschere + retardance. Rigenerabile al primo run del notebook.
+python/outputs/stokes_*.npz
+
 # Sottocartelle UMAP con timestamp generate dal vecchio export (formato
 # obsoleto, sostituito da Images/generated/<dataset>/aolp_umap/<CH>/).
 python/outputs/umap_*_-_canale_*/
