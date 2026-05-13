@@ -17,12 +17,58 @@ DELTA_VMIN = 0.0
 DELTA_VMAX = 360.0
 DELTA_EDGE_EXCLUDE_DEG = 20.0
 
-UMAP_SPARSE_STRIDE = 20
+UMAP_SPARSE_STRIDE = 20  # legacy: stride su pixel NATIVI (final_umap.py)
+UMAP_RANDOM_SAMPLE_N = 10000  # numero target di pixel campionati a caso fra i validi
 UMAP_FIT_SAMPLE = 20000
 UMAP_N_NEIGHBORS = 80
 UMAP_MIN_DIST = 0.008
 UMAP_METRIC = 'euclidean'
 RANDOM_STATE = 42
+
+
+def random_sample_mask(shape, base_valid, n_target=UMAP_RANDOM_SAMPLE_N, seed=RANDOM_STATE):
+    """Campiona random n_target pixel fra quelli marcati True in base_valid.
+
+    Restituisce una maschera booleana della stessa shape con n_target True
+    (o tutti i validi se sono meno di n_target).
+    """
+    valid_idx = np.argwhere(base_valid)
+    n_valid = valid_idx.shape[0]
+    if n_valid == 0:
+        return np.zeros(shape, dtype=bool)
+    n = min(n_target, n_valid)
+    rng = np.random.default_rng(seed)
+    chosen = rng.choice(n_valid, size=n, replace=False)
+    out = np.zeros(shape, dtype=bool)
+    rows = valid_idx[chosen, 0]
+    cols = valid_idx[chosen, 1]
+    out[rows, cols] = True
+    return out
+
+
+def plot_sample_diagnostic(ax, S0, sample_mask, bg_mask=None, title=None):
+    """Plot diagnostico: S0 in grayscale + pixel campionati come scatter rosso.
+
+    Mostra dove sono caduti i punti del campionamento random. Va passato un
+    asse matplotlib esistente (l'export del PDF/HTML resta a carico del chiamante).
+    """
+    import numpy as _np
+    H, W = S0.shape
+    s0_norm = _np.clip(S0 / (_np.nanpercentile(S0, 99.0) + 1e-9), 0.0, 1.0)
+    ax.imshow(s0_norm, cmap='gray', aspect='equal')
+    if bg_mask is not None:
+        from matplotlib.colors import ListedColormap
+        overlay = _np.zeros((H, W, 4))
+        overlay[bg_mask] = [0.0, 0.4, 1.0, 0.18]
+        ax.imshow(overlay)
+    yy, xx = _np.nonzero(sample_mask)
+    ax.scatter(xx, yy, s=0.3, c='red', alpha=0.85, edgecolors='none')
+    ax.set_xticks([]); ax.set_yticks([])
+    if title is not None:
+        ax.set_title(title, fontsize=9, pad=4)
+    ax.text(0.02, 0.98, f'N = {len(yy)}', transform=ax.transAxes,
+            va='top', ha='left', fontsize=7,
+            bbox=dict(facecolor='white', edgecolor='none', alpha=0.85, pad=2))
 
 
 def normalize_stokes(S0, S1, S2, S3):
