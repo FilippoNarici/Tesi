@@ -14,6 +14,11 @@ def get_wav_intensity_cache():
     return _WAV_INTENSITY_CACHE
 
 
+def reset_wav_intensity_cache():
+    global _WAV_INTENSITY_CACHE
+    _WAV_INTENSITY_CACHE = None
+
+
 def calculate_linear_stokes(angles_rad_2x, image_stack):
     print("Calculating linear Stokes parameters (S0, S1, S2)...")
     N, H, W = image_stack.shape

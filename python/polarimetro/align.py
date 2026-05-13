@@ -12,6 +12,11 @@ def get_poincare_bg_mask():
     return _POINCARE_BG_MASK_CACHE
 
 
+def reset_poincare_bg_mask_cache():
+    global _POINCARE_BG_MASK_CACHE
+    _POINCARE_BG_MASK_CACHE = None
+
+
 def align_reference_frame(S1, S2, bg_mask, enable=config.ENABLE_BACKGROUND_ALIGNMENT):
     """Rotazione S1/S2 attorno asse S3 (equatore Poincare) per azzerare s2_bg."""
     if not enable:

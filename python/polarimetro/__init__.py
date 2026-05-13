@@ -23,6 +23,7 @@ from .align import (
     align_poincare_ellipticity,
     align_reference_frame,
     get_poincare_bg_mask,
+    reset_poincare_bg_mask_cache,
 )
 from .io_raw import (
     get_saturation_mask,
@@ -41,8 +42,21 @@ from .stokes import (
     calculate_s3,
     get_wav_intensity_cache,
     quartz_birefringence,
+    reset_wav_intensity_cache,
     waveplate_retardance,
 )
+
+
+def reset_all_caches():
+    """Resetta tutte le cache modulari (saturazione + wav intensity + Poincare bg mask).
+
+    Da chiamare all'inizio della cella Load+Stokes per evitare contaminazione
+    fra run di dataset diversi.
+    """
+    reset_saturation_accumulator()
+    reset_wav_intensity_cache()
+    reset_poincare_bg_mask_cache()
+
 
 __all__ = [
     "load_rotation_sequence",
@@ -54,6 +68,9 @@ __all__ = [
     "calculate_dolp_aolp",
     "calculate_retardance_and_fast_axis",
     "reset_saturation_accumulator",
+    "reset_wav_intensity_cache",
+    "reset_poincare_bg_mask_cache",
+    "reset_all_caches",
     "get_saturation_mask",
     "quartz_birefringence",
     "waveplate_retardance",
