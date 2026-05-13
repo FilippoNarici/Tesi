@@ -55,6 +55,19 @@ Eseguito da un team di 4 agenti Claude (architect, core_cells, analysis_cells, o
 
 Punto d'ingresso unico ora: aprire `python/analisi.ipynb`, impostare `DATASET`/`CHANNEL`/`DOWNSAMPLE_FACTOR`, eseguire. Le analisi si attivano in base al dispatcher.
 
+## TODO notebook `analisi.ipynb` (annotati dall'utente 2026-05-12, sessione post-refactor)
+
+Letti i TODO inline (cell markdown / commenti codice) prima del revert. Otto voci concrete, ordinate per priorità implicita.
+
+- [ ] **N-A** — commentare il codice (rimandato a quando il notebook è completo nel suo design finale, non ora).
+- [ ] **N-B** — rinominare schema codici analisi: una lettera per operazione, niente sigle strane (`AB`, `E-ext` brutti); `C-delta` e `C-aolp` vanno bene. Tutto il dispatcher e i gating `if 'X' in active_analyses` da aggiornare in coerenza.
+- [ ] **N-C** — *(cella AB, alta priorità)* maschera unica per tutti i canali. Cella dedicata sopra le analisi, unifica i 3 canali (mediazione o uso parallelo) per edge detection più robusto. Ora abbiamo più dati di prima quindi la maschera può essere "super sicura" rispetto al pipeline corrente per-canale.
+- [ ] **N-D** *(cella C-aolp)* — collegato a `N-G`: stessa idea di clustering automatico anche su lambdamezzi.
+- [ ] **N-E** *(celle C-aolp e C-delta)* — la griglia UMAP appare sparsa. Verificare se lo stride viene applicato all'immagine downscalata (probabile baco); switch a campionamento random (~10000 punti) con debug plot che mostra dove i punti sono caduti.
+- [ ] **N-F** *(cella C-delta)* — bug cache: durante una run lambdamezzi è stata caricata la cache di strati (run precedente). Workaround: restart kernel risolve. Permanente: double-check cache (chiave includere `DATASET` e validare a lettura).
+- [ ] **N-G** *(cella C-delta)* — il selettore poligono interattivo non funziona in Jupyter. Trovare soluzione compatibile (plotly select? ipywidgets?). L'interattività serve solo per lambdamezzi/lambdaquarti; per `strati_v2` basta un clustering automatico che identifichi un cluster ben definito. Valutare split delle celle vs duplicazione codice.
+- [ ] **N-H** *(cella H fit-strati)* — eliminare i valori placeholder. Usare i dati dai fit precedenti del cella F (slice) come input per il fit retardance-vs-strati.
+
 ## Pipeline Python
 
 - [x] Committare lavori in sospeso: saturation accumulator in `final_polarimeter.py` e `final_utils.py` (2026-04-21)
