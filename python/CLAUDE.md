@@ -26,18 +26,19 @@ Cella **dispatcher**: `ANALYSES_PER_DATASET` mappa ogni dataset alle analisi att
 
 | Dataset | Analisi |
 |---------|---------|
-| `lambdaquarti_50deg` | AB, C-delta |
-| `lambdamezzi_50deg` | AB, C-delta |
-| `strati_v2` | AB, C-delta, F, H, E-ext |
-| `zucchero` | AB, C-aolp |
-| `barraon_v2`, `barraoff_v2`, `righello_v2` | AB |
+| `lambdaquarti_50deg` | A, B, C-delta |
+| `lambdamezzi_50deg` | A, B, C-delta |
+| `strati_v2` | A, B, C-delta, F, H, E-ext |
+| `zucchero` | A, B, C-aolp |
+| `barraon_v2`, `barraoff_v2`, `righello_v2` | A, B |
 
 Celle analisi (gated dal dispatcher):
 
 | Code | Cella | Output |
 |------|-------|--------|
-| Load+Stokes | Pipeline completa (load + S0/S1/S2 + S3 + bg_mask + align_reference_frame + align_poincare_ellipticity + DoLP/AoLP + retardance/theta) con cache `outputs/stokes_<DATASET>_DS<n>.npz` | Variabili in `stokes_data[ch]` |
-| AB | 9 mappe pubblicabili (S0, S1, S2, S3, DoLP, AoLP, δ, θ, mask) display + autosave | PDF in `Images/generated/<DATASET>/<CH>_<param>.pdf` + HTML interattivi |
+| Load+Stokes | Pipeline 2-pass (Pass A: load + S0/S1/S2 + S3 per canale; bg_mask unificata da mean(S0_R,S0_G,S0_B) se `UNIFIED_BG_MASK = len(ACTIVE_CHANNELS)>1`, altrimenti per-canale; Pass B: align_reference_frame + align_poincare_ellipticity + DoLP/AoLP + retardance/theta). Cache `outputs/stokes_<DATASET>_DS<n>.npz` (schema include `unified_mask`, invalida auto se cambia) | Variabili in `stokes_data[ch]` |
+| A | Maschera bg (display). Unica plot se `UNIFIED_BG_MASK`, altrimenti una per canale. Overlay 2-color (bg + Poincaré) | PDF in `Images/generated/<DATASET>/mask.pdf` (unified) o `<CH>_mask.pdf` (per-ch) |
+| B | 8 mappe pubblicabili (S0, S1, S2, S3, DoLP, AoLP, δ, θ) display + autosave | PDF in `Images/generated/<DATASET>/<CH>_<param>.pdf` + HTML interattivi |
 | C-aolp | UMAP batch colorato per AoLP (mappa + scatter + hist) | PDF in `Images/generated/<DATASET>/aolp_umap/<CH>/` |
 | C-delta | UMAP batch colorato per δ (cmap twilight ciclica) | PDF in `Images/generated/<DATASET>/delta_umap/<CH>/` |
 | E-ext | Istogramma δ pubblicabile con marker plateau strati | PDF + HTML in `Images/generated/<DATASET>/` |
