@@ -35,6 +35,14 @@ THESIS_FIGURE_PARAMS = "all"
 # Dataset → flag mappings
 WAVEPLATE_SWAPPED_DATASETS = {'lambdamezzi_50deg'}
 
+# Punti di ancoraggio di design per fit δ(λ) = k/λ su lamine d'onda.
+# Quartzo zero-order: δ = 2π · Δn · d / λ → δ ∝ 1/λ.
+# Valori nominali al picco di taratura (633 nm).
+WAVEPLATE_DESIGN_ANCHOR = {
+    'lambdamezzi_50deg':  {'wavelength_nm': 633.0, 'delta_deg': 180.0},
+    'lambdaquarti_50deg': {'wavelength_nm': 633.0, 'delta_deg':  90.0},
+}
+
 
 def is_waveplate_swapped(target_folder):
     """Returns True if dataset acquired with waveplate fast/slow swapped."""

@@ -1,6 +1,6 @@
 # TODO — Stato del progetto
 
-Ultimo aggiornamento: 2026-05-12 (refactor team `ipynb-refactor`: `python/analisi.ipynb` singolo + package `python/polarimetro/` + archivio `python/legacy/`)
+Ultimo aggiornamento: 2026-05-16 (refactor notebook: E-ext → E, D-aolp-fit esplicito in dispatcher, cell IDs hex → semantici, riordino E prima di F, drop TODO comment; chiuso N-B)
 
 Questo file è la singola fonte di verità sullo stato di avanzamento. Aggiornare ad ogni task completato. Per istruzioni operative vedere `CLAUDE.md`.
 
@@ -57,16 +57,10 @@ Punto d'ingresso unico ora: aprire `python/analisi.ipynb`, impostare `DATASET`/`
 
 ## TODO notebook `analisi.ipynb` (annotati dall'utente 2026-05-12, sessione post-refactor)
 
-Letti i TODO inline (cell markdown / commenti codice) prima del revert. Otto voci concrete, ordinate per priorità implicita.
+Letti i TODO inline (cell markdown / commenti codice) prima del revert. Ordinate per priorità implicita. Voci originali ridotte da 8 a 2 dopo cleanup 2026-05-16: archiviati N-C (mask unificata RGB), N-D (D-aolp HDBSCAN + median + D-aolp-fit `k/λ²`), N-E (random sampling con `random_sample_mask`), N-F (cache bug risolto), N-H (cella H ora richiede `STRATI_SLICE_RESULTS`, fit `k/λ²`); droppato N-G (selettore poligono Jupyter, infattibile).
 
 - [ ] **N-A** — commentare il codice (rimandato a quando il notebook è completo nel suo design finale, non ora).
-- [~] **N-B** — rinominare schema codici analisi: una lettera per operazione (2026-05-14). FATTO `AB` → split in `A` (maschera) + `B` (8 mappe). Ancora da fare: `E-ext` → ? (suggerimento `E`). `C-delta`/`C-aolp` lasciati.
-- [x] **N-C** — *(cella Load+Stokes + FULL BATCH)* maschera unica per tutti i canali (2026-05-14). Quando `len(ACTIVE_CHANNELS) > 1`, la pipeline esegue Pass A (load + Stokes + S3 per canale) → calcola `mean(S0_R, S0_G, S0_B)` → `generate_background_mask` UNA volta → Pass B (align + retardance per canale usando la stessa `bg_mask_shared`). Cache npz invalida automaticamente se cambia il flag `unified_mask`. Stessa logica replicata nel loop `FULL BATCH` (`BATCH_UNIFIED_MASK = True`). Quando si seleziona un singolo canale, mantiene comportamento per-canale (no extra load).
-- [ ] **N-D** *(cella C-aolp)* — collegato a `N-G`: stessa idea di clustering automatico anche su lambdamezzi.
-- [ ] **N-E** *(celle C-aolp e C-delta)* — la griglia UMAP appare sparsa. Verificare se lo stride viene applicato all'immagine downscalata (probabile baco); switch a campionamento random (~10000 punti) con debug plot che mostra dove i punti sono caduti.
-- [ ] **N-F** *(cella C-delta)* — bug cache: durante una run lambdamezzi è stata caricata la cache di strati (run precedente). Workaround: restart kernel risolve. Permanente: double-check cache (chiave includere `DATASET` e validare a lettura).
-- [ ] **N-G** *(cella C-delta)* — il selettore poligono interattivo non funziona in Jupyter. Trovare soluzione compatibile (plotly select? ipywidgets?). L'interattività serve solo per lambdamezzi/lambdaquarti; per `strati_v2` basta un clustering automatico che identifichi un cluster ben definito. Valutare split delle celle vs duplicazione codice.
-- [ ] **N-H** *(cella H fit-strati)* — eliminare i valori placeholder. Usare i dati dai fit precedenti del cella F (slice) come input per il fit retardance-vs-strati.
+- [x] **N-B** — rinominare schema codici analisi (2026-05-14, completato 2026-05-16): `AB` → split in `A` (maschera) + `B` (8 mappe); `E-ext` → `E`; `C-delta`/`C-aolp` mantengono il suffisso (semantica distinta della mappa colorata, due output cartelle separate). Aggiunti `D-aolp-fit`/`D-delta-fit` come codici espliciti nel dispatcher (no più gate implicito sulla presenza di `D-aolp` o `D-delta`).
 
 ## Pipeline Python
 

@@ -135,7 +135,6 @@ Punto d'ingresso unico: aprire `python/analisi.ipynb` con Jupyter (o l'IDE) e im
 Strumenti opzionali nel notebook (gated da flag in testa):
 * `RUN_SPECTRA = True` — rigenera centroidi spettrali RGB (`outputs/rgb_wavelengths.csv`).
 * `RUN_DEBUGGER = True` — apre debugger pixel-per-pixel interattivo.
-* `RUN_FULL_BATCH = True` — loop su 7 dataset × 3 canali senza preview, solo savefig (≈25-50 min a DS=4).
 
 Compilazione tesi: `pdflatex Thesis.tex && bibtex Thesis && pdflatex Thesis.tex && pdflatex Thesis.tex`.
 

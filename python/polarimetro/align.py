@@ -60,23 +60,31 @@ def align_reference_frame(S1, S2, bg_mask, enable=config.ENABLE_BACKGROUND_ALIGN
 def align_poincare_ellipticity(S0, S1, S3, bg_mask,
                                enable=config.ENABLE_BACKGROUND_ALIGNMENT,
                                downsample_factor=config.DEFAULT_DOWNSAMPLE_FACTOR,
-                               wav_holder_threshold=config.WAV_HOLDER_THRESHOLD):
-    """Rotazione S1/S3 attorno asse S2 per azzerare s3_bg (ellitticita' residua)."""
+                               wav_holder_threshold=config.WAV_HOLDER_THRESHOLD,
+                               wav_intensity=None,
+                               return_mask=False):
+    """Rotazione S1/S3 attorno asse S2 per azzerare s3_bg (ellitticita' residua).
+
+    `wav_intensity`: I(+45)+I(-45) per il canale; se None, fallback al
+    `_WAV_INTENSITY_CACHE` globale (thread-unsafe). Passare esplicito per
+    chiamate parallele.
+    `return_mask=True`: ritorna (S1_rot, S3_rot, bg_mask_s3) invece di tupla a 2.
+    """
     global _POINCARE_BG_MASK_CACHE
     _POINCARE_BG_MASK_CACHE = None
 
     if not enable:
         print("Poincare ellipticity rebasing disabled. Skipping.")
-        return S1, S3
+        return (S1, S3, bg_mask) if return_mask else (S1, S3)
 
     print("Rebasing Poincare sphere around S2 axis (ellipticity correction)...")
 
     if not np.any(bg_mask):
         print("  Warning: bg mask empty. Skipping.")
-        return S1, S3
+        return (S1, S3, bg_mask) if return_mask else (S1, S3)
 
     bg_mask_s3 = bg_mask
-    wav_cache = get_wav_intensity_cache()
+    wav_cache = wav_intensity if wav_intensity is not None else get_wav_intensity_cache()
     if wav_cache is not None and wav_cache.shape == bg_mask.shape:
         from skimage.morphology import dilation, disk
         wav_mean = wav_cache / 2.0
@@ -153,4 +161,4 @@ def align_poincare_ellipticity(S0, S1, S3, bg_mask,
     print(f"  s3_bg (cleaned) post: median={s3_bg_med_post:+.4f}, "
           f"std={s3_bg_std_post:.4f}")
 
-    return S1_rot, S3_rot
+    return (S1_rot, S3_rot, bg_mask_s3) if return_mask else (S1_rot, S3_rot)

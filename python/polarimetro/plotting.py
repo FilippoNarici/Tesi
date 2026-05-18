@@ -44,6 +44,113 @@ def save_and_show(fig, path, show=True, fmt='pdf'):
         plt.show()
 
 
+def plot_mask_overlay_figure(S0_bg, bg_mask, poincare_mask, wav_mean,
+                              title, out_pdf, show=True, fig_w=3.35):
+    """Costruisce figura overlay maschere bg + Poincaré e la salva.
+
+    Sopra `mask_overlay_rgb`, aggiunge titolo + legenda 3-patch:
+    grigio = entrambe (bg utile), blu = XOR (wav debug), rosso = nessuna
+    (sample). Chiude la figura.
+    """
+    from matplotlib.patches import Patch
+    overlay = mask_overlay_rgb(S0_bg, bg_mask, poincare_mask, wav_mean=wav_mean)
+    H, W, _ = overlay.shape
+    aspect = H / W
+    fig, ax = plt.subplots(figsize=(fig_w + 0.2, fig_w * aspect))
+    ax.imshow(overlay, aspect='equal')
+    ax.set_title(title, pad=6)
+    ax.axis('off')
+    handles = [
+        Patch(facecolor='#bfbfbf', edgecolor='none', label='entrambe (S0)'),
+        Patch(facecolor='#0040ff', edgecolor='none', label='XOR (wav debug)'),
+        Patch(facecolor='#ff0000', edgecolor='none', label='nessuna (sample)'),
+    ]
+    ax.legend(handles=handles, loc='lower right', fontsize=6,
+              framealpha=0.85, handlelength=1.2,
+              borderpad=0.3, labelspacing=0.25)
+    save_and_show(fig, out_pdf, show=show, fmt='pdf')
+    plt.close(fig)
+
+
+def resolve_sym_limits(data, vmin_spec, vmax_spec):
+    """Risolve specifiche `'sym99'` → ±(99-percentile di |data|), else passthrough."""
+    if vmin_spec == 'sym99':
+        bound = float(np.nanpercentile(np.abs(data), 99))
+        return -bound, bound
+    return vmin_spec, vmax_spec
+
+
+def mpl_cmap_to_plotly_scale(cmap, n=64):
+    """Converte cmap matplotlib (nome o oggetto) in scala plotly (lista [s, 'rgb(...)'])."""
+    cmap_obj = plt.get_cmap(cmap) if isinstance(cmap, str) else cmap
+    scale = []
+    for s in np.linspace(0.0, 1.0, n):
+        r, g, b, _ = cmap_obj(float(s))
+        scale.append([float(s), f"rgb({int(255*r)},{int(255*g)},{int(255*b)})"])
+    return scale
+
+
+def make_param_figure(data, *, title, unit, cmap, vmin, vmax, fig_w=3.35):
+    """Figura mappa parametro (imshow + colorbar). Restituisce fig (non chiude).
+
+    vmin/vmax accettano `'sym99'`. Caller fa save+close.
+    """
+    vmin_r, vmax_r = resolve_sym_limits(data, vmin, vmax)
+    H, W = data.shape
+    aspect = H / W
+    fig, ax = plt.subplots(figsize=(fig_w + 0.7, fig_w * aspect))
+    im = ax.imshow(data, cmap=cmap, vmin=vmin_r, vmax=vmax_r, aspect='equal')
+    ax.set_title(title, pad=6)
+    ax.axis('off')
+    cbar = fig.colorbar(im, ax=ax, fraction=0.046, pad=0.03)
+    if unit:
+        cbar.set_label(unit)
+    return fig
+
+
+def save_param_html(data, out_path, *, title, unit, cmap, vmin, vmax):
+    """Heatmap plotly interattivo (CDN). vmin/vmax accettano `'sym99'`.
+
+    Restituisce True se scritto, False se plotly assente o errore I/O.
+    """
+    try:
+        import plotly.graph_objects as go
+    except ImportError:
+        return False
+    vmin_r, vmax_r = resolve_sym_limits(data, vmin, vmax)
+    H, W = data.shape
+    fig = go.Figure(data=go.Heatmap(
+        z=data,
+        colorscale=mpl_cmap_to_plotly_scale(cmap),
+        zmin=vmin_r, zmax=vmax_r,
+        hovertemplate='x: %{x}<br>y: %{y}<br>valore: %{z:.4g}<extra></extra>',
+        colorbar=dict(title=unit or ''),
+    ))
+    fig.update_layout(
+        title=title,
+        xaxis=dict(scaleanchor='y', constrain='domain'),
+        yaxis=dict(autorange='reversed'),
+        width=min(1000, 80 + W),
+        height=min(900, 80 + H),
+        margin=dict(l=40, r=40, t=60, b=40),
+    )
+    try:
+        fig.write_html(out_path, include_plotlyjs='cdn', full_html=True)
+        return True
+    except Exception as e:
+        print(f"  (avviso: HTML plotly non scritto per {out_path}: {e})")
+        return False
+
+
+def fmt_sci(value):
+    """Notazione scientifica LaTeX `coeff · 10^{exp}` con 2 cifre coeff."""
+    if value == 0:
+        return "0"
+    exponent = int(np.floor(np.log10(abs(value))))
+    coeff = value / (10 ** exponent)
+    return rf"{coeff:.2f} \cdot 10^{{{exponent}}}"
+
+
 def mask_overlay_rgb(S0, bg_mask, poincare_mask, wav_mean=None):
     """Costruisce overlay (H, W, 3) per visualizzare le due maschere bg.
 

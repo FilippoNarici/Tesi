@@ -62,6 +62,49 @@ def _read_raw_channel_fullres(path, channel_index,
     return data
 
 
+def _read_raw_rgb_fullres(path, channel_indices=(0, 1, 2),
+                          track_saturation=True,
+                          use_raw_bayer=config.USE_RAW_BAYER):
+    """Legge il RAW una volta, ritorna dict {ch_idx: fullres float32 array}.
+
+    Aggiorna `_SATURATION_ACCUMULATOR` con OR sui canali richiesti (pixel
+    saturato in qualsiasi canale = saturato).
+    """
+    global _SATURATION_ACCUMULATOR
+    with rawpy.imread(path) as raw:
+        if use_raw_bayer:
+            ri = raw.raw_image_visible
+            if ri.ndim != 3 or ri.shape[2] < 3:
+                raise RuntimeError(
+                    f"Expected 4-plane RGBG raw layout, got shape {ri.shape}.")
+            data_per_ch = {int(ch): ri[:, :, ch].astype(np.float32)
+                           for ch in channel_indices}
+        else:
+            rgb = raw.postprocess(
+                use_camera_wb=False,
+                user_wb=[1.0, 1.0, 1.0, 1.0],
+                no_auto_bright=True,
+                gamma=(1, 1),
+                output_bps=16,
+            )
+            data_per_ch = {int(ch): rgb[:, :, ch].astype(np.float32)
+                           for ch in channel_indices}
+
+    if track_saturation and _SATURATION_ACCUMULATOR is not None:
+        threshold = (config.SENSOR_WHITE_LEVEL if use_raw_bayer else 65535.0) \
+                    * config.SATURATION_FRACTION
+        ref = next(iter(data_per_ch.values()))
+        sat_any = np.zeros_like(ref, dtype=bool)
+        for ch in channel_indices:
+            sat_any |= (data_per_ch[int(ch)] >= threshold)
+        if _SATURATION_ACCUMULATOR.shape != sat_any.shape:
+            _SATURATION_ACCUMULATOR = sat_any.copy()
+        else:
+            np.logical_or(_SATURATION_ACCUMULATOR, sat_any,
+                          out=_SATURATION_ACCUMULATOR)
+    return data_per_ch
+
+
 def reset_saturation_accumulator():
     global _SATURATION_ACCUMULATOR
     _SATURATION_ACCUMULATOR = np.zeros((1, 1), dtype=bool)

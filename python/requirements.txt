@@ -7,3 +7,4 @@ tqdm
 umap-learn
 plotly
 scikit-image
+scikit-learn
