@@ -1,12 +1,57 @@
 """Helper di plotting per figure della tesi.
 
-Mattoni atomici: stile rcParams pubblicazione, save+show, mask overlay RGB.
-La composizione di pannelli resta nelle celle del notebook.
+Mattoni atomici: stile rcParams pubblicazione, save+show, mask overlay RGB,
+configurazione mappe Stokes/derivati, cmap per canale e istogramma δ con
+plateau strati. La composizione finale dei pannelli resta nelle celle.
 """
 import os
 
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.colors import LinearSegmentedColormap
+
+
+# Configurazione delle 8 mappe pubblicate dalla cella B.
+STOKES_PARAM_CONFIG = {
+    'S0':    {'titolo': r'Intensità totale $S_0$',
+              'unita': 'conteggi (u.a.)', 'cmap': None,
+              'vmin': None, 'vmax': None},
+    'S1':    {'titolo': r'Parametro di Stokes $S_1$',
+              'unita': 'conteggi (u.a.)', 'cmap': 'bwr',
+              'vmin': 'sym99', 'vmax': 'sym99'},
+    'S2':    {'titolo': r'Parametro di Stokes $S_2$',
+              'unita': 'conteggi (u.a.)', 'cmap': 'bwr',
+              'vmin': 'sym99', 'vmax': 'sym99'},
+    'S3':    {'titolo': r'Parametro di Stokes $S_3$',
+              'unita': 'conteggi (u.a.)', 'cmap': 'bwr',
+              'vmin': 'sym99', 'vmax': 'sym99'},
+    'DoLP':  {'titolo': r'Grado di polarizzazione lineare (DoLP)',
+              'unita': None, 'cmap': 'viridis',
+              'vmin': 0, 'vmax': 1},
+    'AoLP':  {'titolo': r'Angolo di polarizzazione lineare (AoLP)',
+              'unita': '°', 'cmap': 'twilight',
+              'vmin': -90, 'vmax': 90},
+    'delta': {'titolo': r'Ritardo di fase $\delta$',
+              'unita': '°', 'cmap': 'twilight',
+              'vmin': 0, 'vmax': 360},
+    'theta': {'titolo': r'Asse veloce $\theta$',
+              'unita': '°', 'cmap': 'twilight',
+              'vmin': -90, 'vmax': 90},
+}
+
+STOKES_PARAM_ORDER = ('S0', 'S1', 'S2', 'S3', 'DoLP', 'AoLP', 'delta', 'theta')
+
+# cmap monocromatica nero→colore_canale per S0 (R, G, B).
+_S0_CMAPS_BY_INDEX = {
+    0: LinearSegmentedColormap.from_list('nero_rosso', ['black', 'red']),
+    1: LinearSegmentedColormap.from_list('nero_verde', ['black', 'green']),
+    2: LinearSegmentedColormap.from_list('nero_blu',   ['black', 'blue']),
+}
+
+
+def make_s0_cmap(channel_idx):
+    """Restituisce cmap nero→rosso/verde/blu per il canale dato."""
+    return _S0_CMAPS_BY_INDEX[channel_idx]
 
 
 def apply_thesis_style():
@@ -180,3 +225,112 @@ def mask_overlay_rgb(S0, bg_mask, poincare_mask, wav_mean=None):
     rgb[neither, 0] = S0n[neither]
 
     return np.clip(rgb, 0, 1)
+
+
+# Etichette plateau strati (1L..5..1R) → frazione y nell'asse per posizionare le label.
+# Step di 0.04 dal basso (1L) verso l'alto (1R) → griglia leggibile senza sovrapposizioni.
+STRATI_LABEL_Y_FRAC = {
+    '1L': 0.62, '2L': 0.66, '3L': 0.70, '4L': 0.74,
+    '5':  0.78,
+    '4R': 0.82, '3R': 0.86, '2R': 0.90, '1R': 0.94,
+}
+
+
+def plot_delta_strati_histogram(delta_values, layer_delta_wrap, labels,
+                                 *, title, out_pdf=None, show=True,
+                                 hist_bins=180, edge_exclude_deg=20.0,
+                                 figsize=(3.6, 2.6), cmap_name='twilight'):
+    """Istogramma δ ∈ [0°, 360°) con plateau strati come vline + etichetta.
+
+    `delta_values`: 1D array dei δ del sample (già filtrato bg+NaN).
+    `layer_delta_wrap`: array di δ wrap-360 per ogni plateau.
+    `labels`: lista di etichette stesso ordine di `layer_delta_wrap`
+        (es. '1L', '2L', ..., '5', ..., '1R'). Mappato in y via `STRATI_LABEL_Y_FRAC`.
+    `edge_exclude_deg`: zone grigie ai due estremi (0°/360°) dove il wrap rende
+        l'istogramma poco informativo; ymax calcolato escludendole.
+    Restituisce la figura (chiusa dopo il save).
+    """
+    cmap = plt.get_cmap(cmap_name)
+    counts, edges = np.histogram(delta_values, bins=hist_bins, range=(0.0, 360.0))
+    centers = 0.5 * (edges[:-1] + edges[1:])
+    widths = np.diff(edges)
+    bar_colors = [cmap(c / 360.0) for c in centers]
+
+    fig, ax = plt.subplots(figsize=figsize)
+    ax.bar(centers, counts, width=widths, color=bar_colors,
+            edgecolor='none', align='center')
+
+    if edge_exclude_deg > 0.0:
+        inner = ((centers > edge_exclude_deg)
+                 & (centers < 360.0 - edge_exclude_deg))
+        ymax = (float(counts[inner].max())
+                 if (inner.any() and counts[inner].size)
+                 else (float(counts.max()) if counts.size else 1.0))
+        ax.set_ylim(0, ymax * 1.45)
+        ax.axvspan(0.0, edge_exclude_deg, color='gray', alpha=0.08)
+        ax.axvspan(360.0 - edge_exclude_deg, 360.0, color='gray', alpha=0.08)
+    else:
+        ymax = float(np.percentile(counts, 99)) if counts.size else 1.0
+        ax.set_ylim(0, ymax * 1.35)
+
+    trans = ax.get_xaxis_transform()
+    for delta_wrap, lbl in zip(layer_delta_wrap, labels):
+        ax.axvline(float(delta_wrap), color='black', lw=0.7,
+                    linestyle='--', alpha=0.6)
+        yfrac = STRATI_LABEL_Y_FRAC.get(lbl, 0.94)
+        ax.text(float(delta_wrap), yfrac, lbl, transform=trans,
+                 ha='center', va='top', fontsize=6, rotation=90,
+                 color='black',
+                 bbox=dict(facecolor='white', alpha=0.85,
+                           edgecolor='none', pad=0.6))
+
+    ax.set_xlim(0.0, 360.0)
+    ax.set_xlabel(r'$\delta$ (°)')
+    ax.set_ylabel('# pixel sample')
+    ax.set_title(title, pad=4, fontsize=9)
+    ax.grid(True, axis='y', linestyle=':', alpha=0.4)
+
+    save_and_show(fig, out_pdf, show=show, fmt='pdf')
+    plt.close(fig)
+    return counts, edges, bar_colors
+
+
+def save_delta_strati_histogram_html(delta_values, layer_delta_wrap,
+                                      layer_delta_unwrap, labels,
+                                      out_html, *, title,
+                                      hist_bins=180, cmap_name='twilight'):
+    """Variante interattiva plotly di `plot_delta_strati_histogram`.
+
+    Mostra hover con δ wrap + δ unwrap di ogni plateau. Restituisce True
+    se scritto, False se plotly manca o I/O fallisce.
+    """
+    try:
+        import plotly.graph_objects as go
+    except ImportError:
+        return False
+    cmap = plt.get_cmap(cmap_name)
+    counts, edges = np.histogram(delta_values, bins=hist_bins, range=(0.0, 360.0))
+    centers = 0.5 * (edges[:-1] + edges[1:])
+    widths = np.diff(edges)
+    bar_rgb = [f'rgb({int(255*c[0])},{int(255*c[1])},{int(255*c[2])})'
+                for c in (cmap(v / 360.0) for v in centers)]
+
+    fig = go.Figure()
+    fig.add_trace(go.Bar(x=centers, y=counts, width=widths,
+                          marker_color=bar_rgb, name='counts'))
+    for delta_wrap, delta_unw, lbl in zip(layer_delta_wrap, layer_delta_unwrap, labels):
+        fig.add_vline(x=float(delta_wrap), line_dash='dash', line_color='black',
+                       annotation_text=f'{lbl} (δ_unw={delta_unw:.0f}°)',
+                       annotation_position='top')
+    fig.update_layout(
+        title=title,
+        xaxis_title='δ (°)', yaxis_title='# pixel sample',
+        xaxis=dict(range=[0, 360]),
+        template='plotly_white', width=780, height=420,
+    )
+    try:
+        fig.write_html(out_html, include_plotlyjs='cdn')
+        return True
+    except Exception as e:
+        print(f"  (avviso: HTML hist δ non scritto: {e})")
+        return False

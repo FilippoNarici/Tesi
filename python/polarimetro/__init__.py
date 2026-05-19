@@ -18,7 +18,16 @@ Pipeline ordine obbligato:
     delta, theta = calculate_retardance_and_fast_axis(S0, S1, S2, S3, bg_mask,
                                                       target_folder=...)
 """
-from . import config  # noqa: F401
+from . import (  # noqa: F401
+    clustering_plot,
+    config,
+    dispersion,
+    photoelasticity,
+    pipeline,
+    plotting,
+    slice_fit,
+    umap_runner,
+)
 from .align import (
     align_poincare_ellipticity,
     align_reference_frame,
@@ -79,4 +88,11 @@ __all__ = [
     "get_wav_intensity_cache",
     "get_poincare_bg_mask",
     "config",
+    "clustering_plot",
+    "dispersion",
+    "photoelasticity",
+    "pipeline",
+    "plotting",
+    "slice_fit",
+    "umap_runner",
 ]

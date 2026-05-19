@@ -27,16 +27,21 @@ Espandere l'approccio puntuale 1D della polarimetria classica a un'analisi matri
 ├── python/                             # Codice di analisi
 │   ├── CLAUDE.md                       # Guida nidificata (mappa script, insidie)
 │   ├── analisi.ipynb                   # Notebook principale: dispatcher analisi-per-dataset
-│   ├── polarimetro/                    # Package: split di final\_utils.py
-│   │   ├── \_\_init\_\_.py             # Re-export public API + namespace config
-│   │   ├── config.py                   # Costanti immutabili + is\_waveplate\_swapped
+│   ├── polarimetro/                    # Package: tutta la logica numerica
+│   │   ├── \_\_init\_\_.py             # Re-export public API + namespace dei sotto-moduli
+│   │   ├── config.py                   # Costanti, is\_waveplate\_swapped, WAVEPLATE\_DESIGN\_ANCHOR
 │   │   ├── io\_raw.py                  # Load RAW/dark, downsample, saturation accumulator
 │   │   ├── stokes.py                   # Stokes pseudo-inversa, S3, dispersione quarzo
 │   │   ├── mask.py                     # generate\_background\_mask (Canny + flood-fill)
 │   │   ├── align.py                    # align\_reference\_frame + align\_poincare\_ellipticity
 │   │   ├── retardance.py               # DoLP/AoLP + retardance arctan2 [0°, 360°)
-│   │   ├── umap\_runner.py             # Helper fit UMAP + validity mask
-│   │   └── plotting.py                 # apply\_thesis\_style + mask\_overlay\_rgb
+│   │   ├── pipeline.py                 # Orchestratore Pass A + Pass B (cella Load+Stokes)
+│   │   ├── umap\_runner.py             # Fit UMAP + clustering HDBSCAN AoLP/δ
+│   │   ├── clustering\_plot.py         # Plot 3-pannelli cluster vincente (D-aolp + D-delta)
+│   │   ├── dispersion.py               # Fit k/λ^p + plot dispersione spettrale
+│   │   ├── slice\_fit.py               # Slice diagonale δ + plateau + fit through-origin (F)
+│   │   ├── photoelasticity.py          # Phase correlation + centerline + warp (cella I)
+│   │   └── plotting.py                 # Stile tesi, mask overlay, mappe Stokes, hist strati
 │   ├── legacy/                         # Archivio script .py originali (riferimento storico)
 │   │   └── final\_*.py                 # 11 script (incluso final\_utils.py)
 │   ├── requirements.txt                # Dipendenze Python
