@@ -1,6 +1,6 @@
 # TODO — Stato del progetto
 
-Ultimo aggiornamento: 2026-05-16 (refactor notebook: E-ext → E, D-aolp-fit esplicito in dispatcher, cell IDs hex → semantici, riordino E prima di F, drop TODO comment; chiuso N-B)
+Ultimo aggiornamento: 2026-05-19 (rewrite end-to-end cap5_analisi.tex allineato a pipeline `polarimetro` + notebook `analisi.ipynb`: nuove sez. organizzazione pipeline 2-pass, UMAP/HDBSCAN diagnostica, slice + fit dispersione `k/λ^p`, fotoelasticità warp, AvaSpec 2048 + Ghosh quartz; riscritta sez. visualizzazione)
 
 Questo file è la singola fonte di verità sullo stato di avanzamento. Aggiornare ad ogni task completato. Per istruzioni operative vedere `CLAUDE.md`.
 
@@ -12,7 +12,7 @@ Questo file è la singola fonte di verità sullo stato di avanzamento. Aggiornar
 | 2 | Fondamenti teorici | ~90% | Denso, ben citato |
 | 3 | Apparato sperimentale | ~95% | Figure setup presenti |
 | 4 | Raccolta dati e campioni | ~85% | Formattazione tabella campioni |
-| 5 | Analisi dati | ~95% | Pipeline allineata 2026-05-11 (dark frame, saturazione, mascheramento Canny + flood-fill multi-comp, allineamento via fit superfici 2D, ribasamento Poincaré attorno S2, retardance `arctan2` [0°,360°), `WAVEPLATE_AXES_SWAPPED`). Aperti: voce BibTeX Canny 1986; descrizione sorgente spettrale (AvaSpec 2048). |
+| 5 | Analisi dati | ~98% | Rewrite end-to-end 2026-05-19 allineato a pipeline `polarimetro` + notebook `analisi.ipynb`: aggiunte sez. organizzazione pipeline 2-pass + cache npz, dispersione quarzo Ghosh, sez. nuove UMAP/HDBSCAN diagnostica, slice + fit dispersione `k/λ^p`, fotoelasticità warp ΔS3, riscrittura sez. visualizzazione (8 PDF per canale, no più 3×3). AvaSpec 2048 descritto. Aperti: voci BibTeX Canny1986, McInnes2018 UMAP, Campello2013 HDBSCAN, Ghosh1999 quartz (placeholder `% TODO` inline). |
 | 6 | Risultati e discussione | ~75% | Tutte le figure sono placeholder (77 PDF già esistono in `Images/generated/`); tabelle retardance da rimisurare con pipeline arctan2; istogrammi δ pronti come supporto alle misure per-strato |
 | 7 | Conclusioni | ~70% | Reggere meglio il passaggio agli sviluppi futuri; menzionare UMAP come esplorazione raffinabile (v. sotto) |
 
