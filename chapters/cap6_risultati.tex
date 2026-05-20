@@ -1,22 +1,41 @@
 % Capitolo 6: Risultati e discussione
 
-In questo capitolo si presentano i risultati ottenuti con il polarimetro a immagine. I campioni sono organizzati per tipo di validazione: prima i test di accuratezza su campioni a ritardanza nota, poi la verifica della linearità della risposta, infine la dimostrazione della versatilità del sistema su fenomeni di natura distinta.
+In questo capitolo si presentano i risultati ottenuti con il polarimetro a immagine. L'esposizione segue l'ordine logico della validazione: si parte da una panoramica qualitativa dei dati prodotti dal sistema su un campione fotoelastico di prova, si passa ai test di accuratezza su campioni a ritardanza nota (le lamine d'onda), alla verifica della linearità della risposta su un campione a ritardanza crescente (il nastro stratificato), e infine alla dimostrazione della versatilità del sistema su fenomeni di natura distinta, l'attività ottica e la fotoelasticità sotto carico.
 
 % ---------------------------------------------------------------------------
-% TODO: Questa cosa assolutamente non vera, non ho mai fatto misurazioni senza nessun campione, le uniche due "validazioni" sono lambda / 4 e lambda / 2 che seguono, ciò che è vero è che la regione di sfondo estratta via la maschera presenta all'incirca Dolp 1 e Aolp 0
-\section{Validazione preliminare e presentazione delle mappe}
-\label{sec:validazione}
+\section{Panoramica dei dati e validazione qualitativa}
+\label{sec:panoramica_righello}
 
-Prima di analizzare campioni birifrangenti, il sistema è stato validato misurando la luce polarizzata di sfondo emessa dal display LCD senza alcun campione interposto. Dopo l'allineamento del sistema di riferimento descritto nella \cref{sec:allineamento}, la regione di sfondo presenta $\mathrm{DoLP} \approx 1$ (luce del display fortemente polarizzata linearmente), $\mathrm{AoLP} \approx 0^\circ$ per definizione della procedura di allineamento, e $S_3 \approx 0$ in assenza di componente circolare significativa. La dispersione dei valori in questa regione fornisce una stima dell'incertezza di misura del sistema: lo scarto interquartile del DoLP quantifica la ripetibilità su pixel equivalenti, mentre la deviazione standard dell'AoLP quantifica l'incertezza angolare.
+Il primo campione analizzato, e il banco di prova qualitativo iniziale del polarimetro, è un comune righello in materiale polimerico trasparente. I materiali plastici formati per stampaggio a iniezione conservano tensioni interne congelate nel processo di fabbricazione, che inducono una birifrangenza residua; osservata in luce polarizzata, questa si manifesta come un caratteristico pattern di frange fotoelastiche. Il campione non richiede preparazione né sollecitazione esterna, e la presenza immediata delle frange offre una verifica diretta che la catena di acquisizione e ricostruzione produce mappe polarimetriche sensate. Per questa ragione lo si presenta in apertura, sia come validazione qualitativa del funzionamento del sistema sia come panoramica del tipo di dato che il polarimetro restituisce.
 
-Per ciascun campione la pipeline produce le mappe bidimensionali di $S_0$, $S_1$, $S_2$, $S_3$ e delle grandezze derivate (DoLP, AoLP, $\delta$, $\alpha$), esportate come PDF vettoriali singoli per canale colore secondo le convenzioni di visualizzazione descritte nella \cref{sec:rappresentazione_output}.
+Prima di procedere conviene fissare il riferimento di polarizzazione in ingresso. In ogni acquisizione lo sfondo libero attorno al campione, da cui la pipeline ricava il riferimento tramite il fit di superficie descritto nella \cref{sec:allineamento}, presenta $\mathrm{DoLP} \approx 1$, $\mathrm{AoLP} \approx 0^\circ$ e $S_3 \approx 0$, coerentemente con la luce linearmente polarizzata emessa dal display LCD. Lo sfondo non è mai stato acquisito in modo isolato, ma il fit sulla porzione visibile è ampiamente sufficiente a fissare tale riferimento, rispetto al quale sono misurate tutte le grandezze polarimetriche dei campioni.
+
+La \cref{fig:righello_overview} riporta, sul canale rosso, le sei grandezze che riassumono lo stato di polarizzazione pixel per pixel: l'intensità totale $S_0$, le tre componenti normalizzabili $S_1$, $S_2$, $S_3$ del vettore di Stokes, il grado di polarizzazione lineare DoLP e l'angolo di polarizzazione lineare AoLP. L'insieme fornisce al lettore una prima panoramica del dato polarimetrico bidimensionale e del modo in cui un singolo fenomeno fisico si distribuisce fra i diversi parametri.
 
 \begin{figure}[htbp]
     \centering
-    \fbox{\parbox{0.85\textwidth}{\centering\vspace{2cm}Figura: Mappa DoLP della regione di sfondo dopo allineamento. Il valore medio atteso è $\mathrm{DoLP} \approx 1$.\vspace{2cm}}}
-    \caption{Mappa del grado di polarizzazione lineare (DoLP) nella regione di sfondo, utilizzata per la validazione del sistema.}
-    \label{fig:validazione_dolp}
+    \subfloat[$S_0$]{\includegraphics[width=0.32\textwidth]{Images/generated/righello_v2/R_S0.pdf}}\hfill
+    \subfloat[$S_1$]{\includegraphics[width=0.32\textwidth]{Images/generated/righello_v2/R_S1.pdf}}\hfill
+    \subfloat[$S_2$]{\includegraphics[width=0.32\textwidth]{Images/generated/righello_v2/R_S2.pdf}}\\
+    \subfloat[$S_3$]{\includegraphics[width=0.32\textwidth]{Images/generated/righello_v2/R_S3.pdf}}\hfill
+    \subfloat[DoLP]{\includegraphics[width=0.32\textwidth]{Images/generated/righello_v2/R_DoLP.pdf}}\hfill
+    \subfloat[AoLP]{\includegraphics[width=0.32\textwidth]{Images/generated/righello_v2/R_AoLP.pdf}}
+    \caption{Panoramica dei parametri polarimetrici per il righello in plastica trasparente, canale rosso. Le frange fotoelastiche dovute alle tensioni residue di stampaggio sono visibili nelle mappe di $S_1$, $S_2$ e in particolare del DoLP, dove le bande scure ($\mathrm{DoLP} \approx 0$) corrispondono ai punti in cui la ritardanza è un multiplo intero di $\pi$.}
+    \label{fig:righello_overview}
 \end{figure}
+
+Le frange sono più leggibili nella mappa del DoLP: le bande scure, dove $\mathrm{DoLP} \approx 0$, segnano i luoghi in cui la ritardanza accumulata è un multiplo intero di $\pi$ e lo stato emergente torna linearmente polarizzato come quello incidente. La loro distribuzione spaziale ricalca l'andamento delle tensioni interne lungo il corpo del righello. Poiché la ritardanza dipende dalla lunghezza d'onda, lo stesso campo di sforzo produce frange più fitte alle lunghezze d'onda corte: la \cref{fig:righello_dolp_rgb} confronta la mappa del DoLP sui tre canali colore, e la frequenza spaziale delle frange cresce visibilmente dal rosso al blu, coerentemente con l'aumento della ritardanza al diminuire di $\lambda$.
+
+\begin{figure}[htbp]
+    \centering
+    \subfloat[Canale R ($\lambda_\mathrm{eff} \approx \SI{626}{\nano\meter}$)]{\includegraphics[width=0.32\textwidth]{Images/generated/righello_v2/R_DoLP.pdf}}\hfill
+    \subfloat[Canale G ($\lambda_\mathrm{eff} \approx \SI{536}{\nano\meter}$)]{\includegraphics[width=0.32\textwidth]{Images/generated/righello_v2/G_DoLP.pdf}}\hfill
+    \subfloat[Canale B ($\lambda_\mathrm{eff} \approx \SI{466}{\nano\meter}$)]{\includegraphics[width=0.32\textwidth]{Images/generated/righello_v2/B_DoLP.pdf}}
+    \caption{Mappe del DoLP del righello sui tre canali del sensore. La frequenza spaziale delle frange fotoelastiche aumenta dal rosso al blu, manifestazione diretta della crescita della ritardanza al diminuire della lunghezza d'onda.}
+    \label{fig:righello_dolp_rgb}
+\end{figure}
+
+L'esito è qualitativo ma significativo: senza alcuna calibrazione quantitativa il polarimetro restituisce mappe coerenti che rivelano la birifrangenza residua del materiale e la sua dipendenza spettrale, confermando il corretto funzionamento dell'intera catena di misura prima dei test di accuratezza presentati nelle sezioni successive.
 
 % ---------------------------------------------------------------------------
 \section{Accuratezza della ricostruzione: lamine d'onda}
@@ -25,57 +44,118 @@ Per ciascun campione la pipeline produce le mappe bidimensionali di $S_0$, $S_1$
 \subsection{Lamina \texorpdfstring{$\lambda/4$}{lambda/4} zero-order}
 \label{subsec:risultati_qw}
 
-% TODO: non so se si dica da qualche altra parte ma sia lamine che polarizzatori hanno lungo il lato una scala graduata degli angoli ogni 10 gradi e potevano essere ruotate manualmente (ovviamente con la solita inversione di segno)
-% TODO: questa cosa sulla struttura ad anello secondo me è un artefatto della lettura di claude dell'immagine, l'immagine vera presenta un chiaro cerchio centrale con ritardanza uniforme (la lamina) la montatura della lamina e lo sfondo con circa 0 delta
-La lamina quarto d'onda zero-order ($\lambda_0 = \SI{633}{\nano\meter}$), orientata a circa \SI{50}{\degree}, è stata analizzata sui tre canali colore. Le mappe di ritardanza presentano una struttura a due zone concentriche: un cerchio interno con ritardanza prossima alla saturazione della scala e un anello esterno con ritardanza inferiore. Questa non-uniformità radiale non è attesa per una lamina ideale; le cause probabili sono una variazione spaziale dello spessore del cristallo oppure un effetto di incidenza obliqua dei raggi periferici. La rumorosità delle mappe aumenta progressivamente dal canale rosso al canale blu, coerentemente con la maggiore correzione cromatica applicata al segnale di $S_3$ e con il minor rapporto segnale-rumore a lunghezze d'onda lontane da $\lambda_0$.
+La lamina quarto d'onda zero-order in $\alpha$-quarzo ($\lambda_0 = \SI{633}{\nano\meter}$), orientata a circa \SI{50}{\degree}, è stata analizzata sui tre canali colore con la stessa procedura impiegata per la lamina $\lambda/2$. Questo campione ha un ruolo privilegiato nella validazione: la lamina utilizzata come sample è dello stesso tipo della lamina $\lambda/4$ impiegata come analizzatore di $S_3$ in tutte le misure del lavoro (\cref{sec:determinazione-s3}). Il valore di ritardanza atteso per il sample coincide pertanto con il ritardo $\delta(\lambda)$ che la pipeline assume nel fattore di correzione cromatica $1/\sin\delta(\lambda)$ applicato a $S_3$. La misura diretta del sample fornisce dunque un controllo di auto-consistenza della correzione di $S_3$ stessa, con l'avvertenza che la misura del sample fa a sua volta uso di $S_3$ corretto con la medesima lamina: una coincidenza fra ritardanza misurata e ritardanza assunta indica coerenza interna del modello dispersivo, mentre una divergenza segnala un'inconsistenza da imputare al modello o alla stima della lunghezza d'onda effettiva.
+
+La struttura del campione è visibile nelle mappe di intensità $S_0$ in \cref{fig:qw_s0}: il disco centrale corrisponde alla lamina a ritardanza uniforme, l'anello scuro alla montatura circolare che la sostiene, e lo sfondo libero alla luce diretta del display LCD, dove la ritardanza è prossima a zero.
 
 \begin{figure}[htbp]
     \centering
-    \fbox{\parbox{0.85\textwidth}{\centering\vspace{2cm}Figura: Mappe di ritardanza $\delta$ della lamina $\lambda/4$ per i tre canali colore.\vspace{2cm}}}
-    \caption{Mappe di ritardanza della lamina $\lambda/4$ zero-order sui canali rosso, verde e blu. Si osserva la struttura a due zone concentriche e l'aumento della rumorosità verso il blu.}
-    \label{fig:qw_retardance}
+    \subfloat[Canale R ($\lambda_\mathrm{eff} \approx \SI{626}{\nano\meter}$)]{\includegraphics[width=0.32\textwidth]{Images/generated/lambdaquarti_50deg/R_S0.pdf}}\hfill
+    \subfloat[Canale G ($\lambda_\mathrm{eff} \approx \SI{536}{\nano\meter}$)]{\includegraphics[width=0.32\textwidth]{Images/generated/lambdaquarti_50deg/G_S0.pdf}}\hfill
+    \subfloat[Canale B ($\lambda_\mathrm{eff} \approx \SI{466}{\nano\meter}$)]{\includegraphics[width=0.32\textwidth]{Images/generated/lambdaquarti_50deg/B_S0.pdf}}
+    \caption{Mappe di intensità $S_0$ per la lamina $\lambda/4$ sui tre canali del sensore. Il disco centrale corrisponde alla lamina, l'anello scuro alla montatura, lo sfondo all'illuminazione diretta del display LCD.}
+    \label{fig:qw_s0}
 \end{figure}
 
-La \cref{tab:qw_ritardanza} riporta il confronto tra i valori misurati e quelli attesi dal modello di dispersione per una lamina zero-order, $\delta(\lambda) = 90^\circ \cdot 633/\lambda$.
+Le mappe dell'orientazione dell'asse veloce $\theta$ e della ritardanza $\delta$ sono riportate per i tre canali in \cref{fig:qw_theta_delta}. L'asse veloce è uniforme entro il disco della lamina, coerente con l'orientazione fisica nominale di \SI{50}{\degree}; la ritardanza è uniforme nello stesso disco e cresce dal canale rosso al canale blu, secondo la dispersione $\delta \propto 1/\lambda$ attesa per una lamina zero-order. Le code di rumore aumentano verso il blu, dove il rapporto segnale-rumore di $S_3$ peggiora a causa della maggiore correzione cromatica applicata.
+
+\begin{figure}[htbp]
+    \centering
+    \subfloat[$\theta$ — canale R]{\includegraphics[width=0.32\textwidth]{Images/generated/lambdaquarti_50deg/R_theta.pdf}}\hfill
+    \subfloat[$\theta$ — canale G]{\includegraphics[width=0.32\textwidth]{Images/generated/lambdaquarti_50deg/G_theta.pdf}}\hfill
+    \subfloat[$\theta$ — canale B]{\includegraphics[width=0.32\textwidth]{Images/generated/lambdaquarti_50deg/B_theta.pdf}}\\
+    \subfloat[$\delta$ — canale R]{\includegraphics[width=0.32\textwidth]{Images/generated/lambdaquarti_50deg/R_delta.pdf}}\hfill
+    \subfloat[$\delta$ — canale G]{\includegraphics[width=0.32\textwidth]{Images/generated/lambdaquarti_50deg/G_delta.pdf}}\hfill
+    \subfloat[$\delta$ — canale B]{\includegraphics[width=0.32\textwidth]{Images/generated/lambdaquarti_50deg/B_delta.pdf}}
+    \caption{Mappe dell'orientazione dell'asse veloce $\theta$ (riga superiore) e della ritardanza $\delta$ (riga inferiore) per la lamina $\lambda/4$, sui tre canali del sensore. L'asse veloce è uniforme entro il disco della lamina; la ritardanza cresce dal rosso al blu secondo la dispersione $\delta \propto 1/\lambda$ di una lamina zero-order.}
+    \label{fig:qw_theta_delta}
+\end{figure}
+
+La stima quantitativa della ritardanza segue la stessa pipeline di clustering della \cref{sec:umap_clustering}: il cluster vincente HDBSCAN sull'embedding UMAP individua i pixel del disco della lamina e ne fornisce la mediana $\tilde\delta_{\mathrm{win}}$. Le tre stime per-canale sono raccolte nella \cref{tab:qw_ritardanza} e fittate con la legge di dispersione $\delta(\lambda) = k/\lambda$ di una lamina zero-order, con ancoraggio rigido al punto di design $(\lambda_0 = \SI{633}{\nano\meter},\,\delta_0 = 90^\circ)$. Il risultato del fit è in \cref{fig:qw_delta_fit}.
 
 \begin{table}[htbp]
     \centering
-    \caption{Ritardanza misurata e teorica per la lamina $\lambda/4$ (zero-order, $\lambda_0 = \SI{633}{\nano\meter}$) sui tre canali del sensore.}
+    \caption{Ritardanza della lamina $\lambda/4$ (zero-order, $\lambda_0 = \SI{633}{\nano\meter}$) estratta dalla mediana del cluster vincente HDBSCAN sull'embedding UMAP, confrontata con il valore teorico $\delta_\mathrm{teorico} = 90^\circ \cdot \Delta n(\lambda)/\Delta n(\lambda_0) \cdot \lambda_0/\lambda$ secondo il modello di Sellmeier di Ghosh per l'$\alpha$-quarzo. Questi stessi valori teorici sono il ritardo $\delta(\lambda)$ assunto nella correzione $1/\sin\delta$ di $S_3$.}
     \label{tab:qw_ritardanza}
     \begin{tabular}{lcccc}
         \hline
-        \textbf{Canale} & $\lambda_\mathrm{eff}$ [\si{\nano\meter}] & $\delta_\mathrm{misurato}$ [\si{\degree}] & $\delta_\mathrm{teorico}$ [\si{\degree}] & Scarto [\si{\degree}] \\
+        \textbf{Canale} & $\lambda_\mathrm{eff}$ [\si{\nano\meter}] & $\tilde\delta_\mathrm{win}$ [\si{\degree}] & $\delta_\mathrm{teorico}$ [\si{\degree}] & Scarto [\si{\degree}] \\
         \hline
-        Rosso & 626 & 86  & 91.0  & $-5.0$ \\
-        Verde & 536 & 102 & 106.3 & $-4.3$ \\
-        Blu   & 466 & 120 & 122.2 & $-2.2$ \\
+        Rosso & 626 & $87{,}1$  & $90{,}9$  & $-3{,}8$ \\
+        Verde & 536 & $108{,}9$ & $107{,}5$ & $+1{,}4$ \\
+        Blu   & 466 & $129{,}8$ & $126{,}9$ & $+2{,}9$ \\
         \hline
     \end{tabular}
 \end{table}
 
-I valori misurati sono sistematicamente inferiori al teorico di $2$--$\SI{5}{\degree}$. Un fit del tipo $\delta = a/\lambda$ restituisce $R^2 = 0.916$ e un coefficiente ottimale leggermente inferiore a $90^\circ \cdot \SI{633}{\nano\meter}$: la lamina reale introduce un ritardo nominale inferiore a $\lambda/4$ alla lunghezza d'onda di progetto, plausibile entro le tolleranze di fabbricazione.
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.55\textwidth]{Images/generated/lambdaquarti_50deg/delta_lambda_fit.pdf}
+    \caption{Fit di dispersione $\delta(\lambda) = k/\lambda$ sulla lamina $\lambda/4$. I tre punti colorati sono le stime $\tilde\delta_{\mathrm{win}}$ del cluster vincente HDBSCAN per ciascun canale; il diamante nero è il punto di design $(\lambda_0 = \SI{633}{\nano\meter},\,\delta_0 = 90^\circ)$. La curva tratteggiata è il fit non lineare ai minimi quadrati.}
+    \label{fig:qw_delta_fit}
+\end{figure}
 
 \subsection{Lamina \texorpdfstring{$\lambda/2$}{lambda/2} zero-order}
 \label{subsec:risultati_hw}
 
-La lamina mezz'onda zero-order ($\lambda_0 = \SI{633}{\nano\meter}$), orientata a circa \SI{50}{\degree}, è stata analizzata con la stessa procedura. La ritardanza viene estratta tramite $\arctan2(\sin\delta, \cos\delta)$ con range $[0^\circ, 360^\circ)$, come descritto nella \cref{subsec:modello_retardance}. Per la lamina $\lambda/2$ analizzata a lunghezze d'onda inferiori a quella di progetto, la ritardanza reale supera $180^\circ$: per il canale verde ($\lambda_\mathrm{eff} \approx \SI{536}{\nano\meter}$) e blu ($\lambda_\mathrm{eff} \approx \SI{466}{\nano\meter}$) si ottengono rispettivamente $\delta \approx 213^\circ$ e $\delta \approx 245^\circ$. Poiché $\arctan2$ utilizza il segno di $\sin\delta$ — ricavato dal parametro $S_3$ — per distinguere $\delta$ da $360^\circ - \delta$, la ricostruzione produce direttamente il valore in $[0^\circ, 360^\circ)$ senza necessità di correzione a posteriori.
+La lamina mezz'onda zero-order in $\alpha$-quarzo ($\lambda_0 = \SI{633}{\nano\meter}$), orientata a circa \SI{50}{\degree}, è stata analizzata sui tre canali colore con l'obiettivo di validare la ricostruzione della ritardanza in un regime di forte dispersione cromatica, oltre la lunghezza d'onda di progetto. La struttura macroscopica del campione è visibile nelle mappe di intensità $S_0$ in \cref{fig:hw_s0}: si distingue il disco centrale della lamina, la montatura metallica circolare che la sostiene e lo sfondo libero illuminato dal display LCD. Il contrasto fra le tre acquisizioni RGB riflette unicamente la trasmissività spettrale del sistema sorgente-lamina-sensore e non dipende dallo stato di polarizzazione locale.
+
+\begin{figure}[htbp]
+    \centering
+    \subfloat[Canale R ($\lambda_\mathrm{eff} \approx \SI{626}{\nano\meter}$)]{\includegraphics[width=0.32\textwidth]{Images/generated/lambdamezzi_50deg/R_S0.pdf}}\hfill
+    \subfloat[Canale G ($\lambda_\mathrm{eff} \approx \SI{536}{\nano\meter}$)]{\includegraphics[width=0.32\textwidth]{Images/generated/lambdamezzi_50deg/G_S0.pdf}}\hfill
+    \subfloat[Canale B ($\lambda_\mathrm{eff} \approx \SI{466}{\nano\meter}$)]{\includegraphics[width=0.32\textwidth]{Images/generated/lambdamezzi_50deg/B_S0.pdf}}
+    \caption{Mappe di intensità $S_0$ per la lamina $\lambda/2$ sui tre canali del sensore. Il disco centrale corrisponde alla lamina, l'anello scuro alla montatura, lo sfondo all'illuminazione diretta del display LCD.}
+    \label{fig:hw_s0}
+\end{figure}
+
+Nella prima fase delle acquisizioni la lamina è stata inserita sul supporto con orientazione fisica ruotata di $90^\circ$ rispetto alla convenzione adottata per gli altri dataset: assi rapido e lento risultano scambiati. La situazione è equivalente, sul piano delle componenti di Stokes uscenti, a una riflessione del vettore di Stokes attorno all'asse equatoriale $S_1$. Per riportare i risultati alla convenzione standard si applica in coda alla pipeline la trasformazione $\delta \mapsto 360^\circ - \delta$ e $\alpha \mapsto \alpha - 90^\circ$, attivata da un flag di configurazione che riconosce il nome del dataset (\cref{subsec:waveplate_swap}); la correzione è inerte su tutti gli altri campioni e non altera la forma delle altre mappe.
+
+Per validare la ricostruzione si analizzano le mappe dell'orientazione dell'asse veloce $\theta$ e della ritardanza $\delta$, riportate per i tre canali colore in \cref{fig:hw_theta_delta}. L'asse veloce risulta uniforme entro il disco della lamina, su valore coerente con l'orientazione fisica nominale di \SI{50}{\degree}; la ritardanza è anch'essa uniforme nello stesso disco, e il suo valore aumenta passando dal canale rosso al canale blu, come atteso dalla dispersione del ritardo di fase di una lamina zero-order in cui $\delta \propto 1/\lambda$ a meno della debole dipendenza spettrale della birifrangenza $\Delta n(\lambda)$ del quarzo. L'algoritmo di estrazione discusso nella \cref{subsec:modello_retardance} restituisce $\delta$ nell'intervallo $[0^\circ, 360^\circ)$ tramite $\arctan_2(\sin\delta, \cos\delta)$, sfruttando il segno di $\sin\delta$ ricavato dal parametro $S_3$ per discriminare $\delta$ da $360^\circ - \delta$. La ricostruzione cattura così il superamento di $180^\circ$ atteso per la lamina $\lambda/2$ analizzata a lunghezze d'onda inferiori a quella di progetto, senza necessità di correzioni di avvolgimento a posteriori.
+
+\begin{figure}[htbp]
+    \centering
+    \subfloat[$\theta$ — canale R]{\includegraphics[width=0.32\textwidth]{Images/generated/lambdamezzi_50deg/R_theta.pdf}}\hfill
+    \subfloat[$\theta$ — canale G]{\includegraphics[width=0.32\textwidth]{Images/generated/lambdamezzi_50deg/G_theta.pdf}}\hfill
+    \subfloat[$\theta$ — canale B]{\includegraphics[width=0.32\textwidth]{Images/generated/lambdamezzi_50deg/B_theta.pdf}}\\
+    \subfloat[$\delta$ — canale R]{\includegraphics[width=0.32\textwidth]{Images/generated/lambdamezzi_50deg/R_delta.pdf}}\hfill
+    \subfloat[$\delta$ — canale G]{\includegraphics[width=0.32\textwidth]{Images/generated/lambdamezzi_50deg/G_delta.pdf}}\hfill
+    \subfloat[$\delta$ — canale B]{\includegraphics[width=0.32\textwidth]{Images/generated/lambdamezzi_50deg/B_delta.pdf}}
+    \caption{Mappe dell'orientazione dell'asse veloce $\theta$ (riga superiore) e della ritardanza $\delta$ (riga inferiore) per la lamina $\lambda/2$, sui tre canali del sensore. L'asse veloce è uniforme entro il disco della lamina, in accordo con l'orientazione fisica di \SI{50}{\degree}; la ritardanza cresce dal rosso al blu coerentemente con la legge di dispersione $\delta \propto 1/\lambda$ di una lamina zero-order. La \emph{colormap} ciclica \texttt{twilight} sull'intero giro $[0^\circ, 360^\circ)$ è impiegata per $\delta$.}
+    \label{fig:hw_theta_delta}
+\end{figure}
+
+Per ottenere una stima quantitativa della ritardanza non condizionata da scelte soggettive della regione di interesse si è ricorsi alla pipeline di clustering descritta nella \cref{sec:umap_clustering}: il vettore di feature $(s_1, s_2, s_3, \mathrm{DoLP})$ viene proiettato in due dimensioni tramite UMAP e l'embedding viene segmentato con HDBSCAN. Il cluster di sfondo, che concentra la maggior parte della massa statistica, identifica la posizione angolare di riferimento sul cerchio di $\delta$; il cluster vincente, individuato dallo score $\mathcal{S}_k = f_k \cdot R_k \cdot (\Delta\delta_k)^2$, coincide con i pixel della lamina e fornisce direttamente la stima $\tilde\delta_{\mathrm{win}}$. La quadratura della distanza angolare penalizza i grandi cluster centrati sulla mediana globale, sterilizzando il rischio di selezionare lo sfondo come falso positivo. Le tre stime $\tilde\delta_R$, $\tilde\delta_G$, $\tilde\delta_B$ così ottenute alle rispettive lunghezze d'onda centroidi sono raccolte nella \cref{tab:hw_ritardanza} e fittate con la legge di dispersione $\delta(\lambda) = k/\lambda$ propria di una lamina zero-order (\cref{eq:fit_dispersione} con $p=1$), aggiungendo come ancoraggio rigido il punto di design $(\lambda_0 = \SI{633}{\nano\meter},\,\delta_0 = 180^\circ)$ dichiarato dal costruttore. Il risultato del fit è riportato in \cref{fig:hw_delta_fit}.
 
 \begin{table}[htbp]
     \centering
-    \caption{Ritardanza misurata per la lamina $\lambda/2$ (zero-order, $\lambda_0 = \SI{633}{\nano\meter}$) sui tre canali del sensore. I valori sono estratti direttamente nell'intervallo $[0^\circ, 360^\circ)$ tramite $\arctan2$.}
-    \label{tab:wrapping_hw}
-    \begin{tabular}{lccc}
+    \caption{Ritardanza della lamina $\lambda/2$ (zero-order, $\lambda_0 = \SI{633}{\nano\meter}$) estratta dalla mediana del cluster vincente HDBSCAN sull'embedding UMAP, confrontata con il valore teorico $\delta_\mathrm{teorico} = 180^\circ \cdot \Delta n(\lambda)/\Delta n(\lambda_0) \cdot \lambda_0/\lambda$ calcolato secondo il modello di Sellmeier di Ghosh per l'$\alpha$-quarzo.}
+    \label{tab:hw_ritardanza}
+    \begin{tabular}{lcccc}
         \hline
-        \textbf{Canale} & $\lambda_\mathrm{eff}$ [\si{\nano\meter}] & $\delta_\mathrm{misurato}$ [\si{\degree}] & $\delta_\mathrm{teorico}$ [\si{\degree}] \\
+        \textbf{Canale} & $\lambda_\mathrm{eff}$ [\si{\nano\meter}] & $\tilde\delta_\mathrm{win}$ [\si{\degree}] & $\delta_\mathrm{teorico}$ [\si{\degree}] & Scarto [\si{\degree}] \\
         \hline
-        Rosso & 626 & 180 & 182 \\
-        Verde & 536 & 214 & 213 \\
-        Blu   & 466 & 250 & 245 \\
+        Rosso & 626 & $183{,}1$ & $181{,}8$ & $+1{,}3$ \\
+        Verde & 536 & $202{,}8$ & $214{,}9$ & $-12{,}1$ \\
+        Blu   & 466 & $224{,}1$ & $253{,}7$ & $-29{,}6$ \\
         \hline
     \end{tabular}
 \end{table}
 
-L'accordo tra i valori misurati e quelli teorici conferma la coerenza della risposta del polarimetro sui tre canali spettrali. Un fit della forma $\delta = \delta_0 \cdot \lambda_0 / \lambda$ sui valori misurati restituisce $R^2 = 0.989$.
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.55\textwidth]{Images/generated/lambdamezzi_50deg/delta_lambda_fit.pdf}
+    \caption{Fit di dispersione zero-order $\delta(\lambda) = k/\lambda$ sulla lamina $\lambda/2$, adottato come modello iniziale. I tre punti colorati sono le stime $\tilde\delta_{\mathrm{win}}$ del cluster vincente HDBSCAN per ciascun canale alla rispettiva $\lambda_\mathrm{eff}$; il diamante nero è il punto di design $(\lambda_0 = \SI{633}{\nano\meter},\,\delta_0 = 180^\circ)$ dichiarato dal costruttore, vincolato rigidamente nel fit. La deviazione crescente dei punti dalla curva verso le lunghezze d'onda corte motiva l'ipotesi di lamina multi-ordine discussa nel testo.}
+    \label{fig:hw_delta_fit}
+\end{figure}
+
+I tre valori misurati non seguono la legge attesa per una lamina zero-order. Lo scarto rispetto al modello cresce in modulo dal rosso ($\SI{+1.3}{\degree}$) al verde ($\SI{-12.1}{\degree}$) al blu ($\SI{-29.6}{\degree}$), con la ritardanza misurata sistematicamente inferiore alla previsione. Il prodotto $\delta\cdot\lambda$, che per una lamina zero-order resterebbe pressoché costante a meno della debole dispersione della birifrangenza, decresce in modo monotono verso il blu: la ritardanza cresce con $1/\lambda$ più lentamente di quanto un ritardatore a singolo ordine in dispersione normale consenta, comportamento che la legge $\delta = 180^\circ\,\lambda_0/\lambda$ non riproduce.
+
+Le possibili cause sono state vagliate una per una. Un errore sistematico della catena di analisi è escluso dalla validazione offerta dalla lamina $\lambda/4$ (\cref{subsec:risultati_qw}), che condivide con questa misura il modello di Stokes, la correzione cromatica di $S_3$ e le lunghezze d'onda effettive, e riproduce il proprio riferimento entro $\SI{4}{\degree}$ su tutti i canali, blu compreso. Una depolarizzazione differenziale del campione è esclusa dal grado di polarizzazione totale misurato all'interno dei due dischi, che risulta identico fra le due lamine a ciascun canale (circa $0{,}77$ al blu per entrambe) e dunque attribuibile al sistema di illuminazione e non allo spessore di materiale attraversato. La natura cristallina delle lamine, parte di un kit didattico, esclude infine i ritardatori polimerici a dispersione anomala.
+
+L'elemento dirimente è lo spessore, dell'ordine del millimetro, a fronte dei circa $\SI{17.6}{\micro\meter}$ di una lamina $\lambda/4$ zero-order in quarzo a $\SI{633}{\nano\meter}$. Si formula pertanto l'ipotesi che la lamina $\lambda/2$ sia un ritardatore multi-ordine, nel quale la ritardanza totale $\delta_\mathrm{tot}(\lambda) = 360^\circ\,\Delta n(\lambda)\,d/\lambda$ attraversa molti multipli di $360^\circ$ e la misura ne restituisce il solo residuo $\delta_\mathrm{tot}\bmod 360^\circ$. Per un simile ritardatore la dispersione del valore avvolto non segue più la legge zero-order, e il riferimento adottato in prima battuta perde validità. Un fit del modello multi-ordine ai tre valori misurati individua uno spessore efficace di circa $\SI{0.38}{\milli\meter}$ (ordine $\sim 5$) con scarto quadratico medio di $\SI{7}{\degree}$, contro i $\SI{18}{\degree}$ del modello zero-order; lo stesso fit applicato alla lamina $\lambda/4$ restituisce $\sim\SI{17.6}{\micro\meter}$, coincidente con l'ordine zero. L'ambiguità di avvolgimento impedisce di fissare univocamente ordine e spessore, ma l'ipotesi multi-ordine descrive i dati in modo nettamente migliore.
+
+Si conclude, in via di ipotesi, che la lamina $\lambda/2$ del kit sia un ritardatore ad alto ordine: la pipeline ne misura correttamente la ritardanza avvolta, e l'apparente disaccordo con il modello zero-order riflette l'ambiguità di avvolgimento modulo $360^\circ$ propria dei campioni ad alto ritardo (\cref{subsec:modello_retardance}), più che un limite di accuratezza del polarimetro.
 
 % ---------------------------------------------------------------------------
 \section{Linearità e risoluzione spaziale: nastro adesivo}
@@ -86,71 +166,112 @@ Le lamine d'onda, con ritardanza uniforme e nota, hanno confermato l'accuratezza
 \subsection{Nastro adesivo stratificato}
 \label{subsec:nastro_adesivo}
 
-Il campione consiste in un vetrino con strati sovrapposti di nastro adesivo in configurazione simmetrica $1$-$2$-$3$-$4$-$5$-$4$-$3$-$2$-$1$. La simmetria è sfruttata come controllo interno di consistenza: i valori di ritardanza nelle regioni sinistra e destra con lo stesso numero di strati concordano entro $\pm\SI{10}{\degree}$ su tutti i canali.
+Il campione consiste in un vetrino con strati sovrapposti di nastro adesivo polimerico in configurazione simmetrica a gradino $1$-$2$-$3$-$4$-$5$-$4$-$3$-$2$-$1$, dove il numero indica gli strati attraversati dalla luce in ciascuna regione. A differenza delle lamine d'onda, la ritardanza non è qui uniforme ma cresce a gradini discreti con il numero di strati, e già il primo strato introduce un ritardo prossimo a $\SI{240}{\degree}$ al rosso: l'accumulo su cinque strati supera abbondantemente il giro completo, e la ritardanza misurata nell'intervallo $[0^\circ, 360^\circ)$ avvolge più volte. Il campione mette quindi alla prova due capacità distinte del sistema: la risoluzione spaziale necessaria a separare regioni adiacenti a diverso spessore, e la possibilità di ricostruire una risposta lineare nonostante l'avvolgimento modulo $360^\circ$. La simmetria della pila funge da controllo interno: regioni omologhe a sinistra e a destra del centro devono restituire la stessa ritardanza.
 
 \begin{figure}[htbp]
     \centering
-    \fbox{\parbox{0.85\textwidth}{\centering\vspace{2cm}Figura: Mappa di ritardanza $\delta$ per strati sovrapposti di nastro adesivo.\vspace{2cm}}}
-    \caption{Mappa di ritardanza per il campione a strati di nastro adesivo. Le regioni a diverso numero di strati sono chiaramente distinguibili.}
-    \label{fig:nastro_retardance}
+    \subfloat[Canale R ($\lambda_\mathrm{eff} \approx \SI{626}{\nano\meter}$)]{\includegraphics[width=0.32\textwidth]{Images/generated/strati_v2/R_S0.pdf}}\hfill
+    \subfloat[Canale G ($\lambda_\mathrm{eff} \approx \SI{536}{\nano\meter}$)]{\includegraphics[width=0.32\textwidth]{Images/generated/strati_v2/G_S0.pdf}}\hfill
+    \subfloat[Canale B ($\lambda_\mathrm{eff} \approx \SI{466}{\nano\meter}$)]{\includegraphics[width=0.32\textwidth]{Images/generated/strati_v2/B_S0.pdf}}
+    \caption{Mappe di intensità $S_0$ del nastro adesivo stratificato sui tre canali del sensore. I gradini di spessore della pila simmetrica $1$-$2$-$3$-$4$-$5$-$4$-$3$-$2$-$1$ sono distinguibili come bande a diversa trasmissività.}
+    \label{fig:nastro_s0}
 \end{figure}
 
-Il canale rosso mostra un pattern ciclico con periodo 3~strati: la ritardanza si annulla per $N = 3$ e torna a valori compatibili con $\SI{120}{\degree}$ per $N = 2$ e $N = 5$. Questo comportamento è compatibile con due valori di ritardanza per singolo strato: $\delta_\mathrm{singolo} = \SI{120}{\degree}$ oppure $\SI{240}{\degree}$. L'ambiguità viene risolta dal canale verde: con $\delta_\mathrm{singolo} = \SI{240}{\degree}$, lo scaling cromatico $1/\lambda$ prevede circa $\SI{280}{\degree}$/strato al verde, in accordo con le misure; la soluzione $\SI{120}{\degree}$ è incompatibile. La ritardanza per singolo strato è quindi $\delta_\mathrm{singolo} \approx \SI{240}{\degree}$ a $\SI{626}{\nano\meter}$.
+La mappa di ritardanza riflette direttamente la struttura a gradini, ma il valore letto in ciascuna banda è il residuo $\delta_\mathrm{vero} \bmod 360^\circ$: con un ritardo per strato prossimo a $\SI{240}{\degree}$, la successione dei valori misurati al crescere del numero di strati non è monotòna ma salta all'interno dell'intervallo $[0^\circ, 360^\circ)$ a ogni superamento del giro. L'istogramma della ritardanza sul campione presenta perciò un insieme discreto di picchi, uno per ciascun valore avvolto distinto, e la lettura strato per strato non è ricavabile dalla sola mappa. Per recuperare la ritardanza accumulata si ricorre all'analisi lungo una slice diagonale descritta nella \cref{sec:slice_dispersione}: una banda rettilinea spessa, orientata lungo la direzione di crescita della pila, viene campionata mediando circolarmente la ritardanza sulla larghezza, i plateau corrispondenti ai singoli strati vengono individuati per soglia sul gradiente ed etichettati da \texttt{1L} a \texttt{5} fino a \texttt{1R}, e un \emph{unwrap} cumulativo separato sul lato sinistro e destro ricostruisce la ritardanza vera prima dell'avvolgimento. Su questa si esegue il fit lineare attraverso l'origine $\delta = m\,n$.
 
-Poiché $\arctan2$ opera in $[0^\circ, 360^\circ)$, la misura di una ritardanza accumulata $\delta_\mathrm{vero}$ produce il risultato $\delta_\mathrm{vero} \bmod 360^\circ$: valori separati da un multiplo intero di $360^\circ$ restano indistinguibili (ad esempio, $\delta = 180^\circ$ e $\delta = 540^\circ$ producono identicamente $\sin\delta = 0$, $\cos\delta = -1$, e quindi un output di $180^\circ$). La colonna ``Atteso'' nelle tabelle riporta $N \cdot \delta_\mathrm{singolo} \bmod 360^\circ$, ovvero il valore che il metodo è in grado di misurare.
+Il canale rosso costituisce il riferimento. La slice individua i nove plateau attesi (\cref{fig:nastro_slice_r}), con mediane che avvolgono da $\SI{247.6}{\degree}$ del primo strato fino a riavvolgersi più volte; l'istogramma in \cref{fig:nastro_hist_r} mostra la corrispondente struttura discreta dei valori avvolti sul campione. Dopo l'unwrap, i punti $(n, \delta)$ giacciono su una retta con pendenza $m_R = \SI{240.2}{\degree}$/strato, coefficiente di determinazione $R^2 = 0{,}9994$ e scarto quadratico medio di $\SI{7.7}{\degree}$.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{Images/generated/strati_v2/R_slice.pdf}
+    \caption{Analisi della slice diagonale sul canale rosso. A sinistra la mappa di $\delta$ con la traccia della slice; al centro il profilo della ritardanza media lungo la slice con i plateau dei singoli strati evidenziati; a destra il fit lineare attraverso l'origine $\delta = m\,n$ dopo l'\emph{unwrap} cumulativo per lato.}
+    \label{fig:nastro_slice_r}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.62\textwidth]{Images/generated/strati_v2/R_hist_delta.pdf}
+    \caption{Istogramma della ritardanza $\delta$ sul campione di nastro, canale rosso. Le linee verticali marcano le mediane dei plateau della slice, etichettate per strato; la distribuzione discreta riflette l'avvolgimento modulo $360^\circ$.}
+    \label{fig:nastro_hist_r}
+\end{figure}
+
+Il canale verde (\cref{fig:nastro_slice_g,fig:nastro_hist_g}) ripete la procedura con un ritardo per strato maggiore, $m_G = \SI{280.8}{\degree}$/strato ($R^2 = 0{,}9988$, rms $\SI{12.9}{\degree}$), coerente con l'aumento atteso della ritardanza al diminuire della lunghezza d'onda.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{Images/generated/strati_v2/G_slice.pdf}
+    \caption{Analisi della slice diagonale sul canale verde, con la stessa struttura a tre pannelli della \cref{fig:nastro_slice_r}.}
+    \label{fig:nastro_slice_g}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.62\textwidth]{Images/generated/strati_v2/G_hist_delta.pdf}
+    \caption{Istogramma della ritardanza $\delta$ sul campione di nastro, canale verde, con le mediane dei plateau della slice.}
+    \label{fig:nastro_hist_g}
+\end{figure}
+
+Il canale blu (\cref{fig:nastro_slice_b,fig:nastro_hist_b}) presenta il ritardo per strato più elevato, $m_B = \SI{316.8}{\degree}$/strato ($R^2 = 0{,}9987$, rms $\SI{14.8}{\degree}$); lo scarto quadratico medio cresce dal rosso al blu di pari passo con il peggioramento del rapporto segnale-rumore alle lunghezze d'onda corte.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{Images/generated/strati_v2/B_slice.pdf}
+    \caption{Analisi della slice diagonale sul canale blu, con la stessa struttura a tre pannelli della \cref{fig:nastro_slice_r}.}
+    \label{fig:nastro_slice_b}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.62\textwidth]{Images/generated/strati_v2/B_hist_delta.pdf}
+    \caption{Istogramma della ritardanza $\delta$ sul campione di nastro, canale blu, con le mediane dei plateau della slice.}
+    \label{fig:nastro_hist_b}
+\end{figure}
+
+La \cref{tab:nastro_plateau} raccoglie le mediane di ritardanza dei nove plateau, così come misurate (avvolte in $[0^\circ, 360^\circ)$), per i tre canali; la non-monotonia delle colonne è la manifestazione diretta dell'avvolgimento. La \cref{tab:nastro_slope} riassume invece le pendenze ricavate dal fit lineare dopo l'unwrap.
 
 \begin{table}[htbp]
     \centering
-    \caption{Ritardanza misurata e attesa per il nastro adesivo stratificato, canale rosso ($\delta_\mathrm{singolo} = \SI{240}{\degree}$/strato). L'atteso è $N \cdot 240^\circ \bmod 360^\circ$, corrispondente all'output in $[0^\circ, 360^\circ)$.}
-    \label{tab:nastro_rosso}
-    \begin{tabular}{cccc}
+    \caption{Mediana della ritardanza $\delta$ misurata (avvolta in $[0^\circ, 360^\circ)$) per ciascun plateau della slice, sui tre canali. Le etichette indicano il numero di strati e il lato (L sinistro, R destro) rispetto al centro della pila.}
+    \label{tab:nastro_plateau}
+    \begin{tabular}{lccccccccc}
         \hline
-        $N$ & $\delta_\mathrm{vero}$ [\si{\degree}] & Atteso $(\bmod\SI{360}{\degree})$ [\si{\degree}] & Misurato [\si{\degree}] \\
+        \textbf{Canale} & 1L & 2L & 3L & 4L & 5 & 4R & 3R & 2R & 1R \\
         \hline
-        1 & 240  & 240 & 132 \\
-        2 & 480  & 120 & 113 \\
-        3 & 720  & 0   & $\sim 0$ \\
-        4 & 960  & 240 & 128 \\
-        5 & 1200 & 120 & 126 \\
+        Rosso & $247{,}6$ & $130{,}7$ & $15{,}1$  & $242{,}1$ & $117{,}1$ & $235{,}7$ & $354{,}9$ & $111{,}5$ & $237{,}6$ \\
+        Verde & $290{,}9$ & $196{,}3$ & $120{,}2$ & $52{,}9$  & $338{,}8$ & $42{,}4$  & $105{,}6$ & $174{,}0$ & $282{,}9$ \\
+        Blu   & $322{,}8$ & $296{,}0$ & $256{,}9$ & $182{,}2$ & $148{,}5$ & $170{,}5$ & $210{,}2$ & $270{,}8$ & $316{,}5$ \\
         \hline
     \end{tabular}
 \end{table}
 
 \begin{table}[htbp]
     \centering
-    \caption{Ritardanza misurata e attesa per il nastro adesivo stratificato, canale verde ($\delta_\mathrm{singolo} \approx \SI{280}{\degree}$/strato). L'atteso è $N \cdot 280^\circ \bmod 360^\circ$, corrispondente all'output in $[0^\circ, 360^\circ)$.}
-    \label{tab:nastro_verde}
-    \begin{tabular}{cccc}
-        \hline
-        $N$ & $\delta_\mathrm{vero}$ [\si{\degree}] & Atteso $(\bmod\SI{360}{\degree})$ [\si{\degree}] & Misurato [\si{\degree}] \\
-        \hline
-        1 & 280  & 280 & 83 \\
-        2 & 560  & 200 & $\sim 156$ \\
-        3 & 840  & 120 & $\sim 116$ \\
-        4 & 1120 & 40  & $\sim 56$ \\
-        5 & 1400 & 320 & $\sim 60$ \\
-        \hline
-    \end{tabular}
-\end{table}
-
-% TODO: I valori "Misurato" nelle tabelle nastro_rosso e nastro_verde sono stati ottenuti con la pipeline precedente (arccos). Con il nuovo metodo arctan2 in [0°,360°) i valori attesi cambiano (es. N=1 rosso: 132° → ~240°; N=2 verde: 156° → ~200°). Rifare le misurazioni con il codice aggiornato e aggiornare le tabelle.
-
-L'accordo tra modello e dati è buono su entrambi i canali, con scarti tipici dell'ordine di $\SI{10}{\degree}$--$\SI{15}{\degree}$. La \cref{tab:nastro_singolo} riassume la ritardanza per singolo strato sui tre canali: il rapporto $\delta_\mathrm{blu}/\delta_\mathrm{rosso} = 305/240 = 1.27$ è inferiore al rapporto geometrico $\lambda_\mathrm{rosso}/\lambda_\mathrm{blu} = 626/466 = 1.34$, quantificando la riduzione della birifrangenza $\Delta n$ nel blu coerente con la dispersione normale dei polimeri.
-
-\begin{table}[htbp]
-    \centering
-    \caption{Ritardanza per singolo strato di nastro adesivo sui tre canali, confrontata con lo scaling puramente geometrico $1/\lambda$.}
-    \label{tab:nastro_singolo}
+    \caption{Ritardo di fase per singolo strato di nastro adesivo, ricavato dal fit lineare attraverso l'origine $\delta = m\,n$ sui plateau della slice dopo \emph{unwrap}.}
+    \label{tab:nastro_slope}
     \begin{tabular}{lcccc}
         \hline
-        \textbf{Canale} & $\lambda_\mathrm{eff}$ [\si{\nano\meter}] & $\delta_\mathrm{singolo}$ [\si{\degree}] & $\delta$ da $1/\lambda$ [\si{\degree}] & Scostamento \\
+        \textbf{Canale} & $\lambda_\mathrm{eff}$ [\si{\nano\meter}] & $m$ [\si{\degree}/strato] & $R^2$ & rms [\si{\degree}] \\
         \hline
-        Rosso & 626 & $240 \pm 15$ & (riferimento)  & -- \\
-        Verde & 536 & $275 \pm 15$ & 280            & $-2\%$ \\
-        Blu   & 466 & $305 \pm 20$ & 323            & $-6\%$ \\
+        Rosso & 626 & $240{,}2$ & $0{,}9994$ & $7{,}7$  \\
+        Verde & 536 & $280{,}8$ & $0{,}9988$ & $12{,}9$ \\
+        Blu   & 466 & $316{,}8$ & $0{,}9987$ & $14{,}8$ \\
         \hline
     \end{tabular}
 \end{table}
+
+La linearità della risposta è eccellente su tutti e tre i canali, con $R^2 > 0{,}998$: il sistema ricostruisce una ritardanza accumulata fino a oltre $\SI{1500}{\degree}$ mantenendo la proporzionalità diretta con il numero di strati, una volta risolto l'avvolgimento tramite l'unwrap geometrico della slice. La simmetria della pila è rispettata entro pochi gradi sulla maggior parte dei plateau, confermando la coerenza spaziale della ricostruzione.
+
+Un'eccezione merita di essere segnalata. Confrontando i valori srotolati delle regioni omologhe a tre strati, l'asimmetria fra lato sinistro e destro è contenuta sul rosso ($\SI{735.1}{\degree}$ contro $\SI{714.9}{\degree}$, differenza $\SI{20.2}{\degree}$) e sul verde ($\SI{840.2}{\degree}$ contro $\SI{825.6}{\degree}$, $\SI{14.6}{\degree}$), ma sale a $\SI{46.7}{\degree}$ sul blu ($\SI{976.9}{\degree}$ contro $\SI{930.2}{\degree}$). L'anomalia è specifica del singolo strato (il terzo) e del singolo canale (il blu): non si manifesta negli altri strati né sugli altri canali, ed è perciò incompatibile con un'asimmetria fisica generica del campione, che si propagherebbe in modo proporzionale alla pendenza su tutti gli strati e tutti i canali. Le verifiche condotte hanno escluso un difetto di allineamento dei frame, una depolarizzazione locale e un'asimmetria della distribuzione dei vettori di Stokes nelle due regioni. La causa resta a oggi non spiegata; fra le ipotesi residue compatibili con la specificità in lunghezza d'onda figurano una registrazione cromatica imperfetta del canale blu, che mapperebbe l'ancora della slice su posizioni fisiche leggermente diverse, e un'interferenza sottile selettiva in lunghezza d'onda negli strati di adesivo. La questione è documentata come aperta e non incide sulla determinazione della pendenza media, ricavata dal fit complessivo sui nove plateau.
+
+La dipendenza della ritardanza per strato dalla lunghezza d'onda è riassunta dai due grafici di \cref{fig:nastro_fit}. Il primo riporta i valori srotolati di $\delta$ in funzione del numero di strati per i tre canali, con le rispettive rette di fit attraverso l'origine; il secondo riporta le tre pendenze $m_c$ in funzione della lunghezza d'onda, con il fit di dispersione $m(\lambda) = k/\lambda$. Il fit restituisce $k = 1{,}49\cdot10^{5}~\si{\degree\nano\meter}$/strato con $R^2 = 0{,}993$. Il rapporto fra le pendenze agli estremi spettrali, $m_B/m_R = 316{,}8/240{,}2 = 1{,}319$, è leggermente inferiore al rapporto puramente geometrico $\lambda_R/\lambda_B = 626/466 = 1{,}343$: lo scarto quantifica la riduzione della birifrangenza $\Delta n$ del polimero verso il rosso rispetto al puro scaling $1/\lambda$, coerente con la dispersione normale del materiale.
+
+\begin{figure}[htbp]
+    \centering
+    \subfloat[Ritardanza srotolata in funzione del numero di strati, tre canali, con fit lineare attraverso l'origine.]{\includegraphics[width=0.46\textwidth]{Images/generated/strati_fit/fit_strati_linear.pdf}}\hfill
+    \subfloat[Pendenza per strato in funzione della lunghezza d'onda, con fit di dispersione $m(\lambda) = k/\lambda$.]{\includegraphics[width=0.46\textwidth]{Images/generated/strati_fit/fit_lambda_inverse.pdf}}
+    \caption{Dipendenza spettrale della ritardanza del nastro adesivo. A sinistra la linearità $\delta = m\,n$ sui tre canali; a destra la dispersione delle pendenze, ben descritta dalla legge $m \propto 1/\lambda$ propria di un materiale a birifrangenza debolmente dispersiva.}
+    \label{fig:nastro_fit}
+\end{figure}
 
 % ---------------------------------------------------------------------------
 \section{Versatilità del sistema}
@@ -161,59 +282,97 @@ Dopo aver verificato che il polarimetro produce mappe coerenti per campioni biri
 \subsection{Soluzione di saccarosio}
 \label{subsec:soluzione_zucchero}
 
-L'attività ottica agisce su $S_1$ e $S_2$ senza coinvolgere $S_3$, producendo una rotazione uniforme dell'AoLP. La mappa sul canale blu mostra chiaramente questo effetto: la regione esterna alla boccetta è a $\sim\SI{0}{\degree}$ per costruzione, mentre l'interno della soluzione presenta una rotazione positiva uniforme. All'interno della boccetta si distingue la cannuccia in plastica usata per la preparazione, che produce variazioni locali di AoLP per birifrangenza da stress propria.
+La soluzione di saccarosio in acqua è otticamente attiva: il saccarosio destrogiro ruota il piano di polarizzazione della luce trasmessa di un angolo proporzionale al cammino ottico e alla concentrazione. A differenza della birifrangenza, l'attività ottica agisce sulle sole componenti lineari $S_1$ e $S_2$ senza coinvolgere $S_3$, e si manifesta come una rotazione rigida e spazialmente uniforme dell'angolo di polarizzazione lineare. La soluzione è contenuta in una boccetta a facce piane parallele di spessore interno $L = \SI{13}{\milli\meter}$; lo sfondo libero, allineato a $\mathrm{AoLP} \approx \SI{0}{\degree}$ per costruzione (\cref{sec:allineamento}), fornisce il riferimento rispetto al quale si misura la rotazione.
 
 \begin{figure}[htbp]
     \centering
-    \fbox{\parbox{0.85\textwidth}{\centering\vspace{2cm}Figura: Mappa AoLP (canale blu) per la soluzione di saccarosio.\vspace{2cm}}}
-    \caption{Angolo di polarizzazione lineare (AoLP) per la soluzione di saccarosio, canale blu. La differenza rispetto al valore di sfondo ($\SI{0}{\degree}$) corrisponde alla rotazione ottica indotta dall'attività ottica del saccarosio destrogiro.}
-    \label{fig:zucchero_aolp}
+    \subfloat[Canale R ($\lambda_\mathrm{eff} \approx \SI{626}{\nano\meter}$)]{\includegraphics[width=0.32\textwidth]{Images/generated/zucchero/R_S0.pdf}}\hfill
+    \subfloat[Canale G ($\lambda_\mathrm{eff} \approx \SI{536}{\nano\meter}$)]{\includegraphics[width=0.32\textwidth]{Images/generated/zucchero/G_S0.pdf}}\hfill
+    \subfloat[Canale B ($\lambda_\mathrm{eff} \approx \SI{466}{\nano\meter}$)]{\includegraphics[width=0.32\textwidth]{Images/generated/zucchero/B_S0.pdf}}
+    \caption{Mappe di intensità $S_0$ della soluzione di saccarosio sui tre canali del sensore. Si distinguono la boccetta con la soluzione e la cannuccia in plastica impiegata nella preparazione, che introduce una birifrangenza da stress propria visibile localmente nelle mappe di polarizzazione.}
+    \label{fig:zucchero_s0}
 \end{figure}
 
-La \cref{tab:saccarosio_ord} riporta la rotazione ottica misurata sui tre canali colore. La rotazione aumenta al diminuire di $\lambda$, coerentemente con la dispersione rotatoria ottica del saccarosio destrogiro.
+La rotazione ottica è piccola, dell'ordine di pochi gradi, e la regione utile della soluzione va distinta dallo sfondo e dai contributi spuri della cannuccia. La stima viene quindi affidata alla procedura di clustering non parziale descritta nella \cref{sec:umap_clustering}, applicata questa volta all'angolo di polarizzazione lineare: l'embedding UMAP dei descrittori di Stokes viene segmentato con HDBSCAN, e il cluster vincente — quello che combina dimensione apprezzabile, bassa dispersione angolare interna e distanza angolare significativa dal cluster dominante dello sfondo — identifica i pixel della soluzione, restituendone la rotazione mediana $\tilde\psi_{\mathrm{win}}$. La procedura è ripetuta sui tre canali (\cref{fig:zucchero_winner_r,fig:zucchero_winner_g,fig:zucchero_winner_b}), fornendo tre stime indipendenti alle rispettive lunghezze d'onda.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{Images/generated/zucchero/R_aolp_winner.pdf}
+    \caption{Identificazione del cluster vincente sul canale rosso: embedding UMAP colorato per AoLP (sinistra), mappa spaziale con il cluster della soluzione evidenziato (centro) e istogramma dell'AoLP (destra). La mediana del cluster vincente fornisce la rotazione ottica $\tilde\psi_{\mathrm{win}} = \SI{3.85}{\degree}$.}
+    \label{fig:zucchero_winner_r}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{Images/generated/zucchero/G_aolp_winner.pdf}
+    \caption{Cluster vincente sul canale verde, con la stessa struttura a tre pannelli della \cref{fig:zucchero_winner_r}. La rotazione misurata è $\tilde\psi_{\mathrm{win}} = \SI{4.92}{\degree}$.}
+    \label{fig:zucchero_winner_g}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{Images/generated/zucchero/B_aolp_winner.pdf}
+    \caption{Cluster vincente sul canale blu, con la stessa struttura a tre pannelli della \cref{fig:zucchero_winner_r}. La rotazione misurata è $\tilde\psi_{\mathrm{win}} = \SI{6.14}{\degree}$, la più ampia dei tre canali.}
+    \label{fig:zucchero_winner_b}
+\end{figure}
+
+La rotazione cresce al diminuire della lunghezza d'onda, da $\SI{3.85}{\degree}$ al rosso a $\SI{6.14}{\degree}$ al blu, manifestazione della dispersione rotatoria ottica. Il fit con il modello di Drude semplificato $\psi(\lambda) = k/\lambda^2$ (\cref{fig:zucchero_fit}) restituisce $k = 1{,}39\cdot10^{6}~\si{\degree\nano\meter\squared}$ con $R^2 = 0{,}94$. Il rapporto fra le rotazioni agli estremi spettrali, $\psi_B/\psi_R = 6{,}14/3{,}85 = 1{,}60$, è inferiore al rapporto $(\lambda_R/\lambda_B)^2 = 1{,}81$ atteso dal modello $1/\lambda^2$ puro, indicazione che alle lunghezze d'onda di lavoro la dispersione del saccarosio si discosta dalla pura legge inversa quadratica, come noto in presenza della risonanza nell'ultravioletto.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.55\textwidth]{Images/generated/zucchero/aolp_lambda_fit.pdf}
+    \caption{Fit di dispersione rotatoria $\psi(\lambda) = k/\lambda^2$ (modello di Drude semplificato) sulle tre rotazioni del cluster vincente. I punti colorati sono le stime per canale alle rispettive $\lambda_\mathrm{eff}$; la curva tratteggiata è il fit non lineare ai minimi quadrati.}
+    \label{fig:zucchero_fit}
+\end{figure}
+
+La rotazione misurata permette una stima della concentrazione tramite la legge di Biot, $\psi = [\alpha]_\lambda\,L\,c$, dove $[\alpha]_\lambda$ è il potere rotatorio specifico del saccarosio, $L$ il cammino ottico e $c$ la concentrazione in massa per unità di volume. Il valore tabulato alla riga D del sodio, $[\alpha]_{589} = +66{,}5~\si{\degree}\,\si{\milli\liter}\,\si{\gram}^{-1}\,\si{\deci\meter}^{-1}$, viene riportato alle lunghezze d'onda di lavoro tramite lo stesso scaling di Drude, $[\alpha]_\lambda = [\alpha]_{589}\,(589/\lambda)^2$. Invertendo la legge di Biot con $L = \SI{0.13}{\deci\meter}$ si ottengono le tre stime di concentrazione raccolte nella \cref{tab:zucchero_conc}.
 
 \begin{table}[htbp]
     \centering
-    \caption{Rotazione ottica misurata per la soluzione di saccarosio ($l = \SI{13}{\milli\meter}$) sui tre canali del sensore.}
-    \label{tab:saccarosio_ord}
-    \begin{tabular}{lcc}
+    \caption{Rotazione ottica del cluster vincente, potere rotatorio specifico riportato alla lunghezza d'onda di lavoro e concentrazione stimata via legge di Biot per la soluzione di saccarosio ($L = \SI{13}{\milli\meter}$).}
+    \label{tab:zucchero_conc}
+    \begin{tabular}{lcccc}
         \hline
-        \textbf{Canale} & $\lambda_\mathrm{eff}$ [\si{\nano\meter}] & $\Delta\mathrm{AoLP}$ [\si{\degree}] \\
+        \textbf{Canale} & $\lambda_\mathrm{eff}$ [\si{\nano\meter}] & $\tilde\psi_{\mathrm{win}}$ [\si{\degree}] & $[\alpha]_\lambda$ [\si{\degree}\,\si{\milli\liter}\,\si{\gram}$^{-1}$\,\si{\deci\meter}$^{-1}$] & $c$ [\si{\gram\per\milli\liter}] \\
         \hline
-        Rosso & 626 & 3.4 \\
-        Verde & 536 & 4.9 \\
-        Blu   & 466 & 6.7 \\
+        Rosso & 626 & $3{,}85$ & $58{,}9$  & $0{,}50$ \\
+        Verde & 536 & $4{,}92$ & $80{,}3$  & $0{,}47$ \\
+        Blu   & 466 & $6{,}14$ & $106{,}2$ & $0{,}45$ \\
         \hline
     \end{tabular}
 \end{table}
 
-Un fit con il modello di Drude semplificato $\alpha_\mathrm{rot} = a/\lambda^2$ restituisce $a = \SI{1420554}{\nano\meter\squared\degree}$ con $R^2 = 0.986$. La concentrazione ottica ricavata combinando la legge di Biot con il modello di Drude risulta $c_\mathrm{ott} \approx \SI{0.47}{\gram\per\milli\liter}$, significativamente inferiore alla concentrazione gravimetrica $c_\mathrm{grav} \approx \SI{1.22}{\gram\per\milli\liter}$. La discrepanza di un fattore ${\sim}2.6$ è attribuibile alla non applicabilità del modello di Drude semplificato a concentrazioni prossime alla saturazione, dove il potere rotatorio specifico $[\alpha]$ diminuisce apprezzabilmente rispetto al valore tabulato per soluzioni diluite. Nonostante la discrepanza quantitativa, la misura conferma la capacità del sistema di rilevare l'attività ottica e di riprodurre la legge di dispersione rotatoria.
-
-\subsection{Righello in plastica trasparente}
-\label{subsec:risultati_righello}
-
-Il righello in materiale polimerico trasparente è stato analizzato sul canale rosso. Le mappe di $S_1$ e $S_2$ mostrano un pattern a striature alternate all'interno del righello, coerente con la rotazione dell'asse delle tensioni principali lungo il corpo del campione. Il DoLP è il parametro più leggibile: le bande scure ($\mathrm{DoLP} \approx 0$) corrispondono ai punti in cui la ritardanza è un multiplo intero di $\pi$. La frequenza spaziale delle frange aumenta verso la sommità del righello, coerentemente con la concentrazione degli sforzi residui in prossimità del punto di iniezione dello stampaggio.
-
-\begin{figure}[htbp]
-    \centering
-    \fbox{\parbox{0.85\textwidth}{\centering\vspace{2cm}Figura: Griglia $3 \times 3$ dei parametri polarimetrici per il righello.\vspace{2cm}}}
-    \caption{Parametri polarimetrici per il righello in plastica trasparente (canale rosso). Le frange isocrome sono visibili nelle mappe di $S_1$, $S_2$ e DoLP.}
-    \label{fig:righello_stokes}
-\end{figure}
+Le tre stime concordano entro pochi punti percentuali, fornendo un valore medio $c_\mathrm{ott} \approx \SI{0.47}{\gram\per\milli\liter}$. La consistenza della concentrazione ricavata indipendentemente da tre canali colore distinti, ciascuno con la propria correzione di dispersione, costituisce il risultato significativo della misura: il sistema recupera un valore quantitativo coerente combinando la legge di Biot con la dispersione rotatoria. La soluzione è stata preparata mescolando zucchero e acqua senza un controllo gravimetrico accurato, per cui non è disponibile un riferimento di concentrazione affidabile con cui validare l'accuratezza assoluta; il valore ricavato è comunque del tutto plausibile per una soluzione zuccherina concentrata e dimostra la capacità del polarimetro di misurare l'attività ottica in modo quantitativo e spettralmente coerente.
 
 \subsection{Trave a sbalzo}
 \label{subsec:risultati_cantilever}
 
-La trave in materiale trasparente è stata analizzata sul canale rosso in due condizioni: scarica e sotto carico.
+La fotoelasticità è la comparsa di birifrangenza in un materiale otticamente isotropo sottoposto a sforzo meccanico: gli assi della birifrangenza indotta si allineano con le direzioni principali dello sforzo e il ritardo è proporzionale alla differenza degli sforzi principali. Il campione è una barra in materiale polimerico trasparente a sezione quadrata di lato $\SI{8}{\milli\meter}$, vincolata a un'estremità come trave a sbalzo e caricata all'estremità libera con un parallelepipedo metallico di massa circa $\SI{900}{\gram}$, corrispondente a una forza applicata dell'ordine di $\SI{9}{\newton}$; la distanza fra il punto di applicazione del carico e l'estremo del vincolo è di circa $\SI{73}{\milli\meter}$. Questi dati geometrici sono riportati a titolo di contesto e non vengono impiegati per un'analisi quantitativa. Le acquisizioni sono state ripetute nelle due condizioni di trave scarica (\texttt{barraoff\_v2}) e sotto carico (\texttt{barraon\_v2}).
+
+L'orientazione del campione condiziona fortemente la leggibilità del segnale. La barra è stata posizionata con il proprio asse longitudinale parallelo alla direzione di polarizzazione della luce incidente; poiché in una trave inflessa lo sforzo principale è diretto lungo l'asse, gli assi della birifrangenza indotta risultano quasi paralleli (o perpendicolari) alla polarizzazione di ingresso. In questa configurazione l'angolo $\alpha$ fra asse veloce e polarizzazione è prossimo a $0^\circ$, e la conversione della polarizzazione lineare in componente circolare, governata dal fattore $\sin 2\alpha\,\sin\delta$ (\cref{eq:s3_ritardatore}), è fortemente soppressa. La stessa condizione rende degenere l'estrazione della ritardanza, che il peso di stabilità della pipeline (\cref{subsec:ambiguita_numeriche}) spinge verso zero quando $\sin^2 2\alpha \to 0$. Gli effetti birifrangenti sono perciò poco evidenti e l'estrazione di grandezze quantitative non è affidabile. Anche disponendo della geometria della barra, il modulo elastico del polimero e il coefficiente fotoelastico del materiale non sono noti, e l'orientazione sfavorevole rispetto alla polarizzazione sopprime comunque il segnale: per queste ragioni non si tenta una stima del campo di sforzo e l'analisi resta qualitativa, concentrandosi sulla componente $S_3$.
 
 \begin{figure}[htbp]
     \centering
-    \fbox{\parbox{0.85\textwidth}{\centering\vspace{2cm}Figura: Mappe $S_3$ della trave a sbalzo, confronto scarica/sotto carico.\vspace{2cm}}}
-    \caption{Mappa di $S_3$ per la trave a sbalzo: (a) senza carico, (b) sotto carico. La comparsa di un segnale $S_3$ significativo sotto carico evidenzia la birifrangenza indotta dallo stress.}
-    \label{fig:cantilever_s3}
+    \subfloat[Canale R ($\lambda_\mathrm{eff} \approx \SI{626}{\nano\meter}$)]{\includegraphics[width=0.32\textwidth]{Images/generated/barraon_v2/R_S0.pdf}}\hfill
+    \subfloat[Canale G ($\lambda_\mathrm{eff} \approx \SI{536}{\nano\meter}$)]{\includegraphics[width=0.32\textwidth]{Images/generated/barraon_v2/G_S0.pdf}}\hfill
+    \subfloat[Canale B ($\lambda_\mathrm{eff} \approx \SI{466}{\nano\meter}$)]{\includegraphics[width=0.32\textwidth]{Images/generated/barraon_v2/B_S0.pdf}}
+    \caption{Mappe di intensità $S_0$ della trave a sbalzo sotto carico sui tre canali del sensore. Si distinguono il corpo della barra, il vincolo a sinistra e il supporto destro impiegato come riferimento per la registrazione.}
+    \label{fig:barra_s0}
 \end{figure}
 
-Sotto carico, l'interno della trave mostra un segnale $S_3$ positivo significativo e uniforme lungo tutto il corpo; in prossimità del vincolo si osservano variazioni brusche e frange che cambiano segno rapidamente, coerenti con la concentrazione degli sforzi alla base. La comparsa di $S_3$ finito indica che la birifrangenza indotta dallo stress converte parte della polarizzazione lineare in componente circolare, effetto atteso per un ritardatore con asse a $\SI{45}{\degree}$ rispetto alla polarizzazione incidente. Senza carico, la trave appare quasi neutra, con segnale $S_3$ residuo compatibile con tensioni di stampaggio preesistenti o con il rumore del sensore. Il gradiente di sfondo presente in entrambe le immagini è un artefatto sistematico attribuibile a non-uniformità spaziale della lamina $\lambda/4$ o del display LCD, non al campione.
+Per isolare la variazione indotta dal carico, le acquisizioni con e senza peso vanno riportate alla stessa geometria: la trave sotto carico si flette e il campo di vista subisce un piccolo spostamento rigido fra le due riprese. Si applica perciò la procedura descritta nella \cref{sec:fotoelasticita}: un allineamento globale per correlazione di fase calcolato sul solo supporto destro, dove la flessione è trascurabile, seguito da una deformazione colonna-per-colonna che riporta la centerline della trave carica su quella della trave scarica. La mappa differenziale $\Delta S_3 = S_3^{\mathrm{on,\,warped}} - S_3^{\mathrm{off}}$, calcolata indipendentemente sui tre canali (\cref{fig:barra_ds3}), elimina la componente comune dovuta all'illuminazione e alla geometria, isolando il solo contributo dello stato di sforzo.
+
+\begin{figure}[htbp]
+    \centering
+    \subfloat[Canale R]{\includegraphics[width=0.32\textwidth]{Images/generated/barraon_v2/R_diff_s3_warped.pdf}}\hfill
+    \subfloat[Canale G]{\includegraphics[width=0.32\textwidth]{Images/generated/barraon_v2/G_diff_s3_warped.pdf}}\hfill
+    \subfloat[Canale B]{\includegraphics[width=0.32\textwidth]{Images/generated/barraon_v2/B_diff_s3_warped.pdf}}
+    \caption{Mappa differenziale $\Delta S_3 = S_3^{\mathrm{on,\,warped}} - S_3^{\mathrm{off}}$ fra trave carica e scarica, sui tre canali del sensore, dopo registrazione e deformazione colonna-per-colonna. Il differenziale isola il contributo della birifrangenza indotta dal carico.}
+    \label{fig:barra_ds3}
+\end{figure}
+
+% TODO (utente): inserire la lettura qualitativa specifica delle mappe DeltaS3 (dove compare il segnale sotto carico, segno, eventuale localizzazione presso il vincolo). Confine di interpretazione umana: la descrizione spaziale delle mappe spetta all'utente.
+La mappa differenziale evidenzia, sia pur debolmente, la comparsa di un segnale $S_3$ associato al carico, assente nella configurazione scarica: il confronto conferma in via qualitativa la natura fotoelastica del campione e la sensibilità del polarimetro alla birifrangenza indotta da sforzo, pur nei limiti imposti dall'orientazione sfavorevole della barra rispetto alla polarizzazione incidente.
 
 % ---------------------------------------------------------------------------
 \section{Discussione}

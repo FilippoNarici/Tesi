@@ -1,6 +1,6 @@
 # TODO — Stato del progetto
 
-Ultimo aggiornamento: 2026-05-19 (rewrite end-to-end cap5_analisi.tex allineato a pipeline `polarimetro` + notebook `analisi.ipynb`: nuove sez. organizzazione pipeline 2-pass, UMAP/HDBSCAN diagnostica, slice + fit dispersione `k/λ^p`, fotoelasticità warp, AvaSpec 2048 + Ghosh quartz; riscritta sez. visualizzazione)
+Ultimo aggiornamento: 2026-05-20 (revisione cap6 COMPLETA in bozza per tutti i 7 sample: righello apertura/panoramica, lamine λ/4+λ/2, nastro strati, zucchero, trave. Figure reali, dati pipeline corrente. Rimossa vecchia sec:validazione falsa. TUTTE le sezioni DA RIVEDERE MANUALMENTE. Vedi memory `project_waveplate_multiorder.md`, `feedback_chapters_manual_review.md`)
 
 Questo file è la singola fonte di verità sullo stato di avanzamento. Aggiornare ad ogni task completato. Per istruzioni operative vedere `CLAUDE.md`.
 
@@ -13,7 +13,7 @@ Questo file è la singola fonte di verità sullo stato di avanzamento. Aggiornar
 | 3 | Apparato sperimentale | ~95% | Figure setup presenti |
 | 4 | Raccolta dati e campioni | ~85% | Formattazione tabella campioni |
 | 5 | Analisi dati | ~98% | Rewrite end-to-end 2026-05-19 allineato a pipeline `polarimetro` + notebook `analisi.ipynb`: aggiunte sez. organizzazione pipeline 2-pass + cache npz, dispersione quarzo Ghosh, sez. nuove UMAP/HDBSCAN diagnostica, slice + fit dispersione `k/λ^p`, fotoelasticità warp ΔS3, riscrittura sez. visualizzazione (8 PDF per canale, no più 3×3). AvaSpec 2048 descritto. Aperti: voci BibTeX Canny1986, McInnes2018 UMAP, Campello2013 HDBSCAN, Ghosh1999 quartz (placeholder `% TODO` inline). |
-| 6 | Risultati e discussione | ~75% | Tutte le figure sono placeholder (77 PDF già esistono in `Images/generated/`); tabelle retardance da rimisurare con pipeline arctan2; istogrammi δ pronti come supporto alle misure per-strato |
+| 6 | Risultati e discussione | ~90% | Tutti i 7 sample revisionati 2026-05-20 (BOZZA, DA RIVEDERE): righello (apertura/panoramica), lamine λ/4+λ/2, nastro strati, zucchero, trave. Figure reali subfloat, dati da pipeline corrente. Rimossa vecchia sec:validazione (misura a vuoto falsa). Ordine: righello → lamine → nastro → versatilità (zucchero, trave). λ/2 ipotesi multi-ordine; anomalia 3R-B aperta; barra solo qualitativa. Resta da rivedere manualmente tutto + chiudere TODO interni (lettura ΔS3 barra). |
 | 7 | Conclusioni | ~70% | Reggere meglio il passaggio agli sviluppi futuri; menzionare UMAP come esplorazione raffinabile (v. sotto) |
 
 ## Consegnabili mancanti (livello tesi)
@@ -25,6 +25,8 @@ Questo file è la singola fonte di verità sullo stato di avanzamento. Aggiornar
 
 ## Revisione cap6 per-sample (in corso)
 
+> **DA RIVEDERE MANUALMENTE**: tutte le sezioni `.tex` redatte dall'AI vanno verificate manualmente dall'utente prima della consegna (prosa, numeri, figure, interpretazione fisica). Lo stato "[x]" nella tabella indica "bozza scritta dall'AC", non "approvato".
+
 Flusso iterativo, un campione alla volta. Per ogni sample:
 
 1. AI produce sintesi: cosa è scritto attualmente nel `.tex`, quali figure sono già incluse, quali PDF candidati esistono in `Images/generated/<dataset>/`.
@@ -34,13 +36,12 @@ Flusso iterativo, un campione alla volta. Per ogni sample:
 
 | Sample | Stato revisione | Note |
 |--------|-----------------|------|
-| lambdaquarti_50deg | [ ] | — |
-| lambdamezzi_50deg | [ ] | — |
-| strati_v2 | [ ] | dipende da B2 (retardance rimisurate) e B4 (istogrammi δ) |
-| zucchero | [ ] | UMAP AoLP appena rigenerato (R/G/B) |
-| barraon_v2 | [ ] | — |
-| barraoff_v2 | [ ] | — |
-| righello_v2 | [ ] | — |
+| lambdaquarti_50deg | [x] bozza, DA RIVEDERE (2026-05-20) | Validazione zero-order riuscita. S0 3-panel + θ/δ 3×2 + tab winner HDBSCAN + fit k/λ. δ_win R 87,1 / G 108,9 / B 129,8° vs Ghosh 90,9/107,5/126,9° (scarto ≤4°). Lamina = analizzatore S3 → auto-validazione pipeline. |
+| lambdamezzi_50deg | [x] bozza, DA RIVEDERE (2026-05-20) | δ_win R 183,1 / G 202,8 / B 224,1° (con swap). IPOTESI multi-ordine ~0,38mm (fit RMS 7° vs 18° zero-order). Scarto −30° al blu = ambiguità wrap, non errore. Swap confermata corretta (test no-swap). Prosa = narrazione investigativa da assunzione zero-order. Vedi memory `project_waveplate_multiorder.md`. |
+| strati_v2 | [x] bozza, DA RIVEDERE (2026-05-20) | Riscritta da zero. S0 3-panel + slice 3-panel + istogramma δ per ogni canale (textbook interleaved) + tab plateau (9×3) + tab slope + 2 plot wavelength (fit_strati_linear, fit_lambda_inverse). Slope R/G/B = 240,2 / 280,8 / 316,8°/strato (R²>0,998). Dispersione k=1,49·10⁵, m_B/m_R=1,319 vs geom 1,343. Anomalia 3R-B documentata come APERTA (vedi memory `project_strati_3R_B_anomaly.md`). Niente più tabelle arccos. |
+| zucchero | [x] bozza, DA RIVEDERE (2026-05-20) | Riscritta da zero. S0 3-panel + aolp_winner 3-panel per canale + fit Drude ψ=k/λ² + tab concentrazione. ΔAoLP_win R/G/B = 3,85 / 4,92 / 6,14°. k=1,39·10⁶, R²=0,94. Stima c_ott≈0,47 g/mL (legge Biot, [α]_589=66,5, L=13mm, scaling Drude), consistente sui 3 canali. NIENTE confronto gravimetrico (mix non controllato, c_grav vecchio 1,22 era inventato). |
+| barraon_v2 + barraoff_v2 | [x] bozza, DA RIVEDERE (2026-05-20) | Riscritta da zero (`subsec:risultati_cantilever`). Trave a sbalzo sez. quadrata 8mm, L≈73mm, carico ~900g (~9N) — dati di contesto, niente quantitativo (modulo+coeff fotoelastico ignoti, orientazione sfavorevole). Framing: asse barra ∥ polarizzazione → α≈0 → S3 soppresso + δ degenere → analisi solo qualitativa su S3. Figure: S0 3-panel (barraon) + ΔS3 3-panel (warped(on)−off). Catena I (phase-corr + warp, cap5). Lasciato `% TODO` utente per lettura spaziale specifica ΔS3 (confine interpretazione). |
+| righello_v2 | [x] bozza, DA RIVEDERE (2026-05-20) | Spostato come PRIMA analisi del cap6 (`sec:panoramica_righello`): validazione qualitativa + panoramica dato polarimetrico. Sostituisce la vecchia `sec:validazione` (narrativa "misura a vuoto" FALSA, rimossa; fatti sfondo DoLP≈1/AoLP≈0/S3≈0 tenuti come riferimento dal fit sulla parte visibile). Figure: overview 6-param (S0,S1,S2,S3,DoLP,AoLP) canale R + DoLP 3-panel R/G/B (frange più fitte al blu). Frange fotoelastiche da stampaggio, frequenza ∝ 1/λ. |
 
 ## Refactor notebook + package (team `ipynb-refactor`, 2026-05-11/12)
 

@@ -90,7 +90,7 @@ Elementi tecnici stabili:
 
 Insidie che cambiano il risultato se ignorate:
 * **Retardance in [0°, 360°) via `arctan2`** — da aprile 2026. Tabelle storiche basate su `arccos` vanno rimisurate.
-* **Ambiguità di wrap modulo-360°** per campioni ad alto ritardo (nastro multistrato): richiede interpretazione umana; vedi `chapters/cap6_risultati.tex`.
+* **Ambiguità di wrap modulo-360°** per campioni ad alto ritardo (nastro multistrato; lamina `lambdamezzi_50deg`): richiede interpretazione umana; vedi `chapters/cap6_risultati.tex`. La λ/2 del kit Optosci è **multi-ordine** (spessore mm, ipotesi ~0,38mm/ordine ~5): il modello zero-order `δ=k/λ` ancorato a 180° è riferimento improprio, lo scarto crescente verso il blu è wrap non errore. La λ/4 (`lambdaquarti_50deg`) è invece zero-order vera (~17,6μm) ed è lo stesso tipo della lamina-analizzatore di S3 → auto-validazione della pipeline. Dettaglio in memory `project_waveplate_multiorder.md`.
 * **Lamina λ/4 zero-order a 633 nm** → correzione `sin(δ(λ))` per altre λ via modello di Ghosh del quarzo (`quartz_birefringence`, `waveplate_retardance`).
 * **`WAVEPLATE_AXES_SWAPPED`** in `python/final_utils.py`: flag automatico per il dataset `lambdamezzi_50deg` che applica lo swap di sfera di Poincaré.
 * **Saturazione** — soglia al 98% del white level (4095 counts); accumulatore OR globale attraverso tutti i frame; pixel clippati mascherati a NaN nelle uscite finali. Ricordarsi di chiamare `reset_saturation_accumulator()` a inizio pipeline.
