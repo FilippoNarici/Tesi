@@ -23,6 +23,20 @@ Questo file è la singola fonte di verità sullo stato di avanzamento. Aggiornar
 - [ ] Espansione bibliografia: target 10–15 voci nuove (attualmente 6, quasi tutti libri di testo)
 - [ ] Menzione UMAP in cap7 come esplorazione raffinabile (decisione 2026-04-22: i risultati attuali non giustificano una sottosezione in cap6)
 
+## TODO inline nei file `.tex` (raccolti 2026-05-20)
+
+Commenti `% TODO` presenti nei sorgenti LaTeX, da risolvere:
+
+- [ ] `chapters/cap1_introduzione.tex:8` — rimuovere gli em-dash (troppo AI-like).
+- [ ] `chapters/cap4_campioni.tex:9` — tabella campioni troppo stretta, terza colonna wrappata male: sistemare layout.
+- [ ] `chapters/cap5_analisi.tex:77` — voce BibTeX **Ghosh1999** (G. Ghosh, Opt. Commun. 163(1-3):95–102, 1999, DOI:10.1016/S0030-4018(99)00091-7).
+- [ ] `chapters/cap5_analisi.tex:86` — voce BibTeX **Canny1986** (J. Canny, IEEE TPAMI 8(6):679–698, 1986, DOI:10.1109/TPAMI.1986.4767851).
+- [ ] `chapters/cap5_analisi.tex:203` — voce BibTeX **McInnes2018** (UMAP, arXiv:1802.03426).
+- [ ] `chapters/cap5_analisi.tex:206` — voce BibTeX **Campello2013** (HDBSCAN, PAKDD 2013, DOI:10.1007/978-3-642-37456-2_14).
+- [ ] `chapters/cap6_risultati.tex:374` — **lettura qualitativa ΔS3 barra** (dove compare il segnale sotto carico, segno, localizzazione al vincolo): confine di interpretazione umana, spetta all'utente.
+- [ ] `Thesis.tex:216` — Appendice A: inserire listati dei principali script Python.
+- [ ] `Thesis.tex:244` — sostituire con ringraziamenti reali (utente).
+
 ## Revisione cap6 per-sample (in corso)
 
 > **DA RIVEDERE MANUALMENTE**: tutte le sezioni `.tex` redatte dall'AI vanno verificate manualmente dall'utente prima della consegna (prosa, numeri, figure, interpretazione fisica). Lo stato "[x]" nella tabella indica "bozza scritta dall'AC", non "approvato".
