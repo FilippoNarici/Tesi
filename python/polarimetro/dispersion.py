@@ -55,52 +55,6 @@ def fit_inverse_lambda(lambdas_nm, values, power=1):
     }
 
 
-def fit_multiorder_waveplate(lambdas_nm, deltas_deg, dn_func,
-                             design_wavelength_nm=633.0,
-                             d_min_nm=5.0e3, d_max_nm=2.0e6, d_step_nm=20.0):
-    """Fit brute-force dello spessore `d` di una lamina d'onda multi-ordine.
-
-    Modello: la ritardanza totale e' `delta_tot(lambda) = 360 * dn(lambda) * d
-    / lambda` (gradi), mentre la misura restituisce il solo residuo
-    `delta_tot mod 360`. Si scandisce `d` in `[d_min_nm, d_max_nm]` con passo
-    `d_step_nm` e si minimizza il residuo circolare RMS fra il predetto avvolto
-    e i `deltas_deg` misurati.
-
-    `dn_func(lambda_nm)` restituisce la birifrangenza Delta_n alla lunghezza
-    d'onda data (es. `polarimetro.quartz_birefringence`).
-
-    Restituisce dict: `d_nm`, `order` (ordine a `design_wavelength_nm`),
-    `rms_deg`, `pred_deg` (predetto avvolto ai lambda misurati), `lambdas`,
-    `deltas`, `dn`, `design_wavelength_nm`.
-    """
-    lambdas = np.asarray(lambdas_nm, dtype=float)
-    meas = np.asarray(deltas_deg, dtype=float)
-    if lambdas.size < 2:
-        return {'d_nm': float('nan'), 'order': float('nan'),
-                'rms_deg': float('nan'), 'pred_deg': None,
-                'lambdas': lambdas, 'deltas': meas, 'dn': None,
-                'design_wavelength_nm': design_wavelength_nm}
-    dn = np.array([dn_func(float(l)) for l in lambdas])
-    dn0 = dn_func(float(design_wavelength_nm))
-    ds = np.arange(d_min_nm, d_max_nm, d_step_nm)
-
-    def _circ_dist(a, b):
-        return np.abs((a - b + 180.0) % 360.0 - 180.0)
-
-    best_d, best_rms, best_pred = float('nan'), float('inf'), None
-    for d in ds:
-        pred = (360.0 * dn * d / lambdas) % 360.0
-        rms = float(np.sqrt(np.mean(_circ_dist(pred, meas) ** 2)))
-        if rms < best_rms:
-            best_d, best_rms, best_pred = float(d), rms, pred
-    order = 360.0 * dn0 * best_d / float(design_wavelength_nm) / 360.0
-    return {
-        'd_nm': best_d, 'order': order, 'rms_deg': best_rms,
-        'pred_deg': best_pred, 'lambdas': lambdas, 'deltas': meas,
-        'dn': dn, 'design_wavelength_nm': float(design_wavelength_nm),
-    }
-
-
 def plot_dispersion_fit(fit, *,
                          channel_labels,
                          design_point=None,
