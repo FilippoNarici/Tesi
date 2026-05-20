@@ -1,0 +1,209 @@
+"""
+Stokes Parameter Fit from RAW Images
+Calculates the full Stokes vector (S0, S1, S2, S3), DoLP, AoLP, Retardance, and Fast Axis.
+"""
+
+import numpy as np
+import matplotlib
+import matplotlib.pyplot as plt
+from matplotlib.colors import LinearSegmentedColormap
+
+# Import shared functions and configs
+import final_utils as utils
+
+try:
+    matplotlib.use('TkAgg')
+except:
+    pass
+
+# =============================================================================
+# PLOTTING
+# =============================================================================
+
+def plot_all_parameters(S0, S1, S2, S3, DoLP, AoLP, delta, theta, bg_mask, channel_idx):
+    """Plots all 9 parameters in a 3x3 grid."""
+    print("\nGenerating plots...")
+
+    # Set colormap for S0 based on target channel (0: Red, 1: Green, 2: Blue)
+    if channel_idx == 0:
+        cmap_s0 = LinearSegmentedColormap.from_list('black_red', ['black', 'red'])
+    elif channel_idx == 1:
+        cmap_s0 = LinearSegmentedColormap.from_list('black_green', ['black', 'green'])
+    elif channel_idx == 2:
+        cmap_s0 = LinearSegmentedColormap.from_list('black_blue', ['black', 'blue'])
+    else:
+        cmap_s0 = 'gray'
+
+    # Adjusted to a 3x3 grid to gracefully accommodate the mask
+    fig, axes = plt.subplots(3, 3, figsize=(18, 14))
+    fig.suptitle("Full Stokes, Polarization, & Retardance Parameters", fontsize=16)
+
+    # --- ROW 1: S0, S1, S2 ---
+    im0 = axes[0, 0].imshow(S0, cmap=cmap_s0)
+    axes[0, 0].set_title('S0 (Total Intensity)')
+    axes[0, 0].axis('off')
+    fig.colorbar(im0, ax=axes[0, 0], fraction=0.046, pad=0.04)
+
+    s1_max = np.percentile(np.abs(S1), 99)
+    im1 = axes[0, 1].imshow(S1, cmap='bwr', vmin=-s1_max, vmax=s1_max)
+    axes[0, 1].set_title('S1 (Horizontal/Vertical)')
+    axes[0, 1].axis('off')
+    fig.colorbar(im1, ax=axes[0, 1], fraction=0.046, pad=0.04)
+
+    s2_max = np.percentile(np.abs(S2), 99)
+    im2 = axes[0, 2].imshow(S2, cmap='bwr', vmin=-s2_max, vmax=s2_max)
+    axes[0, 2].set_title('S2 (±45° Diagonal)')
+    axes[0, 2].axis('off')
+    fig.colorbar(im2, ax=axes[0, 2], fraction=0.046, pad=0.04)
+
+    # --- ROW 2: S3, DoLP, AoLP ---
+    if S3 is not None:
+        s3_max = np.percentile(np.abs(S3), 99)
+        im3 = axes[1, 0].imshow(S3, cmap='bwr', vmin=-s3_max, vmax=s3_max)
+        axes[1, 0].set_title('S3 (Circular Left/Right)')
+        axes[1, 0].axis('off')
+        fig.colorbar(im3, ax=axes[1, 0], fraction=0.046, pad=0.04)
+    else:
+        axes[1, 0].text(0.5, 0.5, 'S3 Data Missing', ha='center', va='center')
+        axes[1, 0].axis('off')
+
+    im_dolp = axes[1, 1].imshow(DoLP, cmap='viridis', vmin=0, vmax=1)
+    axes[1, 1].set_title('DoLP (Linear Polarization %)')
+    axes[1, 1].axis('off')
+    fig.colorbar(im_dolp, ax=axes[1, 1], fraction=0.046, pad=0.04)
+
+    im_aolp = axes[1, 2].imshow(AoLP, cmap='twilight', vmin=-90, vmax=90)
+    axes[1, 2].set_title('AoLP (Linear Angle)')
+    axes[1, 2].axis('off')
+    fig.colorbar(im_aolp, ax=axes[1, 2], fraction=0.046, pad=0.04, label='Degrees')
+
+    # --- ROW 3: Fast Axis (Theta), Retardance (Delta), Mask ---
+    if theta is not None and delta is not None:
+        im_theta = axes[2, 0].imshow(theta, cmap='twilight', vmin=-90, vmax=90)
+        axes[2, 0].set_title('Fast Axis (Theta)')
+        axes[2, 0].axis('off')
+        fig.colorbar(im_theta, ax=axes[2, 0], fraction=0.046, pad=0.04, label='Degrees')
+
+        im_delta = axes[2, 1].imshow(delta, cmap='twilight', vmin=0, vmax=360)
+        axes[2, 1].set_title('Retardance (Delta)')
+        axes[2, 1].axis('off')
+        fig.colorbar(im_delta, ax=axes[2, 1], fraction=0.046, pad=0.04, label='Degrees')
+    else:
+        axes[2, 0].text(0.5, 0.5, 'Requires S3', ha='center', va='center')
+        axes[2, 0].axis('off')
+        axes[2, 1].text(0.5, 0.5, 'Requires S3', ha='center', va='center')
+        axes[2, 1].axis('off')
+
+    # Debug mask overlay: 3 stati.
+    #  * grayscale S0 = pixel coperti da entrambe (bg utile sia per allineamento
+    #                   sia per fit beta Poincare)
+    #  * grayscale wav debug = pixel XOR (bg_mask ma esclusi da bg_s3): mostra
+    #                          l'intensita' wav media per verificare la soglia
+    #  * rosso pieno = pixel non coperti da nessuna (sample / fuori scena)
+    S0_norm = (S0 - np.min(S0)) / (np.max(S0) - np.min(S0) + 1e-8)
+    bg_s3 = utils._POINCARE_BG_MASK_CACHE
+    if bg_s3 is None or bg_s3.shape != bg_mask.shape:
+        bg_s3 = np.zeros_like(bg_mask)
+
+    both = bg_mask & bg_s3
+    xor = bg_mask ^ bg_s3
+    neither = (~bg_mask) & (~bg_s3)
+
+    rgb = np.zeros((*bg_mask.shape, 3), dtype=np.float32)
+    rgb[both, 0] = S0_norm[both]
+    rgb[both, 1] = S0_norm[both]
+    rgb[both, 2] = S0_norm[both]
+    if utils._WAV_INTENSITY_CACHE is not None \
+            and utils._WAV_INTENSITY_CACHE.shape == bg_mask.shape:
+        wav_mean = utils._WAV_INTENSITY_CACHE / 2.0
+        wav_n = wav_mean / (float(wav_mean.max()) + 1e-8)
+        # gradient nero -> blu
+        rgb[xor, 2] = wav_n[xor]
+    else:
+        rgb[xor, 0] = 0.5 * S0_norm[xor]
+    rgb[neither, 0] = S0_norm[neither]
+
+    axes[2, 2].imshow(np.clip(rgb, 0, 1))
+    axes[2, 2].set_title(
+        'BG masks: bw=entrambe (S0), blu=XOR (wav debug), rosso=nessuna')
+    axes[2, 2].axis('off')
+
+    plt.tight_layout()
+    plt.show()
+
+# =============================================================================
+# MAIN EXECUTION
+# =============================================================================
+
+def main():
+    print("--- Starting Stokes Fit ---")
+
+    # Arm the saturation accumulator so every RAW frame loaded after this point
+    # contributes to the global clipped-photosite mask.
+    utils.reset_saturation_accumulator()
+
+    # 1. Linear Stokes Parameters (S0, S1, S2)
+    angles, stack = utils.load_rotation_sequence(
+        utils.POL_SUBFOLDER,
+        utils.TARGET_CHANNEL_IDX,
+        downsample_factor=utils.DOWNSAMPLE_FACTOR,
+        invert_angles=True
+    )
+
+    if stack is None or angles is None:
+        print("Interruption: Linear polarization data could not be loaded.")
+        return
+
+    S0, S1, S2 = utils.calculate_linear_stokes(angles, stack)
+
+    # 2. Extract Wavelength for the active channel
+    wavelength = utils.get_channel_wavelength(utils.WAVELENGTHS_CSV, utils.TARGET_CHANNEL_IDX)
+
+    # 3. Circular Stokes Parameter (S3) with Wavelength Correction
+    S3 = utils.calculate_s3(utils.WAV_SUBFOLDER, utils.TARGET_CHANNEL_IDX, utils.DOWNSAMPLE_FACTOR, wavelength)
+
+    # 4. Generate Masks
+    # bg_mask_ref: true background (outside sample holder, S3≈0). Used for alignment
+    # and retardance reference state (s1_in, s3_in). The S3-refined intersection is
+    # intentionally NOT used here: for waveplate-as-sample the intersection catches
+    # only edge pixels of the aperture which carry wrong S3 values, contaminating s3_in.
+    bg_mask_ref = utils.generate_background_mask(S0)
+
+    # bg_mask_display: restricted to the active measurement-waveplate circle, used only
+    # for the debug overlay in the 3x3 plot.
+    bg_mask_display = utils.generate_background_mask(S0, S3)
+
+    # Align the reference frame using the clean (unrefined) background
+    S1_aligned, S2_aligned = utils.align_reference_frame(S1, S2, bg_mask_ref)
+
+    # Rebase the Poincare sphere around the S2 axis to zero residual s3 on bg
+    # (LCD ellipticity + waveplate imperfection).  Rewrites S1 and S3 so all
+    # downstream plots reflect the corrected basis.
+    S1_aligned, S3 = utils.align_poincare_ellipticity(S0, S1_aligned, S3, bg_mask_ref)
+
+    # 5. Polarization & Retardance Math (reference state from clean background)
+    DoLP, AoLP = utils.calculate_dolp_aolp(S0, S1_aligned, S2_aligned)
+    delta_degrees, theta_degrees = utils.calculate_retardance_and_fast_axis(S0, S1_aligned, S2_aligned, S3, bg_mask_ref)
+
+    # Retrieve the aggregated saturation mask covering both the 36 linear frames
+    # and the 2 waveplate frames, downsampled onto the analysis grid.
+    sat_mask = utils.get_saturation_mask(utils.DOWNSAMPLE_FACTOR)
+    if sat_mask is not None:
+        n_sat = int(sat_mask.sum())
+        if n_sat:
+            frac = 100.0 * n_sat / sat_mask.size
+            print(f"Saturation: {n_sat} clipped blocks "
+                  f"({frac:.2f}% of pixels) excluded from polarimetric maps.")
+            for arr in (DoLP, AoLP, delta_degrees, theta_degrees):
+                if arr is not None:
+                    arr[sat_mask] = np.nan
+        else:
+            print("Saturation: no clipped photosites detected.")
+
+    # 6. Plotting - debug mask uses the S3-refined region for visual clarity
+    plot_all_parameters(S0, S1_aligned, S2_aligned, S3, DoLP, AoLP, delta_degrees, theta_degrees, bg_mask_display, utils.TARGET_CHANNEL_IDX)
+
+    print("--- Finished ---")
+
+if __name__ == "__main__":
+    main()

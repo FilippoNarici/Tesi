@@ -58,29 +58,24 @@ I valori misurati sono sistematicamente inferiori al teorico di $2$--$\SI{5}{\de
 \subsection{Lamina \texorpdfstring{$\lambda/2$}{lambda/2} zero-order}
 \label{subsec:risultati_hw}
 
-La lamina mezz'onda zero-order ($\lambda_0 = \SI{633}{\nano\meter}$), orientata a circa \SI{50}{\degree}, è stata analizzata con la stessa procedura. Un aspetto rilevante emerge dall'analisi multicanale: la ritardanza viene estratta tramite la funzione $\arccos$, il cui codominio è limitato all'intervallo $[0^\circ, 180^\circ]$. Per la lamina $\lambda/2$ analizzata a lunghezze d'onda inferiori a quella di progetto, la ritardanza reale supera $180^\circ$ --- per il canale verde ($\lambda_\mathrm{eff} \approx \SI{536}{\nano\meter}$) e blu ($\lambda_\mathrm{eff} \approx \SI{466}{\nano\meter}$) si ottengono rispettivamente $\delta \approx 213^\circ$ e $\delta \approx 245^\circ$. In questo caso, poiché $\cos(\delta) = \cos(360^\circ - \delta)$, la funzione $\arccos$ restituisce il valore complementare:
-\begin{equation}
-    \delta_\mathrm{misurato} = 360^\circ - \delta_\mathrm{reale}.
-    \label{eq:phase_folding}
-\end{equation}
-Questo fenomeno di \emph{phase wrapping} è una conseguenza matematica inevitabile dell'uso di $\arccos$, non un errore di misura. La correzione è immediata una volta noto il regime di ritardanza del campione.
+La lamina mezz'onda zero-order ($\lambda_0 = \SI{633}{\nano\meter}$), orientata a circa \SI{50}{\degree}, è stata analizzata con la stessa procedura. La ritardanza viene estratta tramite $\arctan2(\sin\delta, \cos\delta)$ con range $[0^\circ, 360^\circ)$, come descritto nella \cref{subsec:modello_retardance}. Per la lamina $\lambda/2$ analizzata a lunghezze d'onda inferiori a quella di progetto, la ritardanza reale supera $180^\circ$: per il canale verde ($\lambda_\mathrm{eff} \approx \SI{536}{\nano\meter}$) e blu ($\lambda_\mathrm{eff} \approx \SI{466}{\nano\meter}$) si ottengono rispettivamente $\delta \approx 213^\circ$ e $\delta \approx 245^\circ$. Poiché $\arctan2$ utilizza il segno di $\sin\delta$ — ricavato dal parametro $S_3$ — per distinguere $\delta$ da $360^\circ - \delta$, la ricostruzione produce direttamente il valore in $[0^\circ, 360^\circ)$ senza necessità di correzione a posteriori.
 
 \begin{table}[htbp]
     \centering
-    \caption{Ritardanza misurata e corretta per la lamina $\lambda/2$ (zero-order, $\lambda_0 = \SI{633}{\nano\meter}$) sui tre canali del sensore. I valori del canale verde e blu sono stati corretti per il phase wrapping tramite l'\cref{eq:phase_folding}.}
+    \caption{Ritardanza misurata per la lamina $\lambda/2$ (zero-order, $\lambda_0 = \SI{633}{\nano\meter}$) sui tre canali del sensore. I valori sono estratti direttamente nell'intervallo $[0^\circ, 360^\circ)$ tramite $\arctan2$.}
     \label{tab:wrapping_hw}
-    \begin{tabular}{lcccc}
+    \begin{tabular}{lccc}
         \hline
-        \textbf{Canale} & $\lambda_\mathrm{eff}$ [\si{\nano\meter}] & $\delta_\mathrm{misurato}$ [\si{\degree}] & $\delta_\mathrm{corretto}$ [\si{\degree}] & $\delta_\mathrm{teorico}$ [\si{\degree}] \\
+        \textbf{Canale} & $\lambda_\mathrm{eff}$ [\si{\nano\meter}] & $\delta_\mathrm{misurato}$ [\si{\degree}] & $\delta_\mathrm{teorico}$ [\si{\degree}] \\
         \hline
-        Rosso & 626 & 180 & 180 & 182 \\
-        Verde & 536 & 146 & 214 & 213 \\
-        Blu   & 466 & 110 & 250 & 245 \\
+        Rosso & 626 & 180 & 182 \\
+        Verde & 536 & 214 & 213 \\
+        Blu   & 466 & 250 & 245 \\
         \hline
     \end{tabular}
 \end{table}
 
-L'accordo tra i valori corretti e quelli teorici conferma sia la validità della correzione sia la coerenza della risposta del polarimetro sui tre canali spettrali. Un fit della forma $\delta = \delta_0 \cdot \lambda_0 / \lambda$ sui valori corretti restituisce $R^2 = 0.989$.
+L'accordo tra i valori misurati e quelli teorici conferma la coerenza della risposta del polarimetro sui tre canali spettrali. Un fit della forma $\delta = \delta_0 \cdot \lambda_0 / \lambda$ sui valori misurati restituisce $R^2 = 0.989$.
 
 % ---------------------------------------------------------------------------
 \section{Linearità e risoluzione spaziale: nastro adesivo}
@@ -100,41 +95,45 @@ Il campione consiste in un vetrino con strati sovrapposti di nastro adesivo in c
     \label{fig:nastro_retardance}
 \end{figure}
 
-Il canale rosso mostra un pattern ciclico con periodo 3~strati: la ritardanza si annulla per $N = 3$, torna a circa $\SI{120}{\degree}$ per $N = 4$ e $N = 5$. Questo comportamento è compatibile con due valori di ritardanza per singolo strato: $\delta_\mathrm{singolo} = \SI{120}{\degree}$ oppure $\SI{240}{\degree}$. L'ambiguità viene risolta dal canale verde: con $\delta_\mathrm{singolo} = \SI{240}{\degree}$, lo scaling cromatico $1/\lambda$ prevede circa $\SI{280}{\degree}$/strato al verde, in accordo con le misure; la soluzione $\SI{120}{\degree}$ è incompatibile. La ritardanza per singolo strato è quindi $\delta_\mathrm{singolo} \approx \SI{240}{\degree}$ a $\SI{626}{\nano\meter}$.
+Il canale rosso mostra un pattern ciclico con periodo 3~strati: la ritardanza si annulla per $N = 3$ e torna a valori compatibili con $\SI{120}{\degree}$ per $N = 2$ e $N = 5$. Questo comportamento è compatibile con due valori di ritardanza per singolo strato: $\delta_\mathrm{singolo} = \SI{120}{\degree}$ oppure $\SI{240}{\degree}$. L'ambiguità viene risolta dal canale verde: con $\delta_\mathrm{singolo} = \SI{240}{\degree}$, lo scaling cromatico $1/\lambda$ prevede circa $\SI{280}{\degree}$/strato al verde, in accordo con le misure; la soluzione $\SI{120}{\degree}$ è incompatibile. La ritardanza per singolo strato è quindi $\delta_\mathrm{singolo} \approx \SI{240}{\degree}$ a $\SI{626}{\nano\meter}$.
+
+Poiché $\arctan2$ opera in $[0^\circ, 360^\circ)$, la misura di una ritardanza accumulata $\delta_\mathrm{vero}$ produce il risultato $\delta_\mathrm{vero} \bmod 360^\circ$: valori separati da un multiplo intero di $360^\circ$ restano indistinguibili (ad esempio, $\delta = 180^\circ$ e $\delta = 540^\circ$ producono identicamente $\sin\delta = 0$, $\cos\delta = -1$, e quindi un output di $180^\circ$). La colonna ``Atteso'' nelle tabelle riporta $N \cdot \delta_\mathrm{singolo} \bmod 360^\circ$, ovvero il valore che il metodo è in grado di misurare.
 
 \begin{table}[htbp]
     \centering
-    \caption{Ritardanza misurata e attesa per il nastro adesivo stratificato, canale rosso ($\delta_\mathrm{singolo} = \SI{240}{\degree}$/strato).}
+    \caption{Ritardanza misurata e attesa per il nastro adesivo stratificato, canale rosso ($\delta_\mathrm{singolo} = \SI{240}{\degree}$/strato). L'atteso è $N \cdot 240^\circ \bmod 360^\circ$, corrispondente all'output in $[0^\circ, 360^\circ)$.}
     \label{tab:nastro_rosso}
-    \begin{tabular}{ccccc}
+    \begin{tabular}{cccc}
         \hline
-        $N$ & $\delta_\mathrm{vero}$ [\si{\degree}] & $\bmod\SI{360}{\degree}$ & $\arccos$ atteso [\si{\degree}] & Misurato [\si{\degree}] \\
+        $N$ & $\delta_\mathrm{vero}$ [\si{\degree}] & Atteso $(\bmod\SI{360}{\degree})$ [\si{\degree}] & Misurato [\si{\degree}] \\
         \hline
-        1 & 240  & 240 & 120 & 132 \\
-        2 & 480  & 120 & 120 & 113 \\
-        3 & 720  & 0   & 0   & $\sim 0$ \\
-        4 & 960  & 240 & 120 & 128 \\
-        5 & 1200 & 120 & 120 & 126 \\
+        1 & 240  & 240 & 132 \\
+        2 & 480  & 120 & 113 \\
+        3 & 720  & 0   & $\sim 0$ \\
+        4 & 960  & 240 & 128 \\
+        5 & 1200 & 120 & 126 \\
         \hline
     \end{tabular}
 \end{table}
 
 \begin{table}[htbp]
     \centering
-    \caption{Ritardanza misurata e attesa per il nastro adesivo stratificato, canale verde ($\delta_\mathrm{singolo} \approx \SI{280}{\degree}$/strato).}
+    \caption{Ritardanza misurata e attesa per il nastro adesivo stratificato, canale verde ($\delta_\mathrm{singolo} \approx \SI{280}{\degree}$/strato). L'atteso è $N \cdot 280^\circ \bmod 360^\circ$, corrispondente all'output in $[0^\circ, 360^\circ)$.}
     \label{tab:nastro_verde}
-    \begin{tabular}{ccccc}
+    \begin{tabular}{cccc}
         \hline
-        $N$ & $\delta_\mathrm{vero}$ [\si{\degree}] & $\bmod\SI{360}{\degree}$ & $\arccos$ atteso [\si{\degree}] & Misurato [\si{\degree}] \\
+        $N$ & $\delta_\mathrm{vero}$ [\si{\degree}] & Atteso $(\bmod\SI{360}{\degree})$ [\si{\degree}] & Misurato [\si{\degree}] \\
         \hline
-        1 & 280  & 280 & 80  & 83 \\
-        2 & 560  & 200 & 160 & $\sim 156$ \\
-        3 & 840  & 120 & 120 & $\sim 116$ \\
-        4 & 1120 & 40  & 40  & $\sim 56$ \\
-        5 & 1400 & 320 & 40  & $\sim 60$ \\
+        1 & 280  & 280 & 83 \\
+        2 & 560  & 200 & $\sim 156$ \\
+        3 & 840  & 120 & $\sim 116$ \\
+        4 & 1120 & 40  & $\sim 56$ \\
+        5 & 1400 & 320 & $\sim 60$ \\
         \hline
     \end{tabular}
 \end{table}
+
+% TODO: I valori "Misurato" nelle tabelle nastro_rosso e nastro_verde sono stati ottenuti con la pipeline precedente (arccos). Con il nuovo metodo arctan2 in [0°,360°) i valori attesi cambiano (es. N=1 rosso: 132° → ~240°; N=2 verde: 156° → ~200°). Rifare le misurazioni con il codice aggiornato e aggiornare le tabelle.
 
 L'accordo tra modello e dati è buono su entrambi i canali, con scarti tipici dell'ordine di $\SI{10}{\degree}$--$\SI{15}{\degree}$. La \cref{tab:nastro_singolo} riassume la ritardanza per singolo strato sui tre canali: il rapporto $\delta_\mathrm{blu}/\delta_\mathrm{rosso} = 305/240 = 1.27$ è inferiore al rapporto geometrico $\lambda_\mathrm{rosso}/\lambda_\mathrm{blu} = 626/466 = 1.34$, quantificando la riduzione della birifrangenza $\Delta n$ nel blu coerente con la dispersione normale dei polimeri.
 

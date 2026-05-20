@@ -1,18 +1,27 @@
 % Capitolo 5: Analisi dei dati
 
-% TODO: Aggiornare con la versione più recente dello script
-Le 38 immagini RAW acquisite per ogni campione vengono elaborate in sequenza per ricavare i parametri di Stokes e le grandezze polarimetriche derivate. L'intera catena di analisi è stata implementata in Python, sfruttando le librerie \texttt{numpy}, \texttt{rawpy} e \texttt{scipy}.
+Le 38 immagini RAW acquisite per ogni campione vengono elaborate in sequenza per ricavare i parametri di Stokes e le grandezze polarimetriche derivate. L'intera catena di analisi è stata implementata in Python, sfruttando le librerie \texttt{numpy}, \texttt{rawpy}, \texttt{scipy} e \texttt{scikit-image} per le operazioni di morfologia e di rivelazione dei bordi.
 
 % ---------------------------------------------------------------------------
 \section{Dalla immagine grezza alla matrice di intensità}
 \label{sec:preelaborazione}
 
-Il primo passo consiste nel caricamento di ciascun file DNG e nella conversione in matrice numerica. La demosaicizzazione viene eseguita tramite \texttt{rawpy} con bilanciamento del bianco della fotocamera e curva di trasferimento lineare, producendo un array $H \times W \times 3$ in RGB a 16~bit. Si estrae poi il singolo canale colore di interesse come matrice $H \times W$ in virgola mobile a 32~bit.
+Per ciascun file DNG si accede direttamente al piano di Bayer del sensore, senza demosaicizzazione né bilanciamento del bianco: dei quattro fotositi del super-pixel di Bayer si estrae quello associato al canale colore di interesse, ottenendo un array bidimensionale in virgola mobile a singola precisione con risoluzione pari a metà di quella nativa del sensore lungo entrambi gli assi. Questa scelta evita la diafonia cromatica introdotta dalla matrice di colore della fotocamera nei flussi di demosaicizzazione standard, preservando la proporzionalità lineare tra il valore numerico letto e il numero di fotoelettroni raccolti dal singolo fotosito. Sul medesimo piano vengono applicate due correzioni preliminari, descritte di seguito, prima dell'eventuale riduzione di risoluzione spaziale.
+
+\subsection{Sottrazione del frame oscuro}
+\label{subsec:dark_frame}
+
+Il sensore CMOS presenta un piedistallo di lettura non nullo anche in assenza di luce, somma del rumore di lettura e della corrente di buio dei fotositi. Per stimarlo si acquisisce un frame con l'obiettivo coperto al medesimo tempo di esposizione utilizzato per le misure polarimetriche, e lo si sottrae a ciascuna delle 38 immagini grezze. La sottrazione viene eseguita alla risoluzione nativa del sensore, prima di qualsiasi operazione di riduzione spaziale, perché il piedistallo è una proprietà locale del singolo fotosito e si propagherebbe in maniera non lineare attraverso una media a blocchi. Il frame oscuro è caricato una sola volta dalla pipeline e mantenuto in cache fra le 38 chiamate per minimizzare il costo di lettura.
+
+\subsection{Mascheramento dei pixel saturi}
+\label{subsec:saturazione}
+
+Quando un fotosito raggiunge il livello di bianco dichiarato nei metadati del file DNG, pari a $4095$~conteggi per la lettura lineare a $12$~bit, la risposta del sensore tronca l'andamento sinusoidale della legge di Malus. I pixel saturi, se inclusi nella ricostruzione ai minimi quadrati, distorcono sistematicamente i parametri $S_0$, $S_1$ e $S_2$ ricavati, in misura proporzionale alla frazione di angoli per i quali la saturazione si verifica. Si adotta una soglia conservativa al $98\%$ del livello di bianco, corrispondente a circa $4013$~conteggi, e si costruisce un accumulatore booleano alla risoluzione nativa del sensore che traccia, in disgiunzione logica su tutte le 38 immagini, ogni fotosito che almeno una volta abbia superato la soglia. L'accumulatore viene poi ricampionato sulla griglia di analisi e i pixel coinvolti vengono marcati come non disponibili (\texttt{NaN}) nelle mappe finali dei parametri di Stokes. La conservazione dell'informazione di saturazione alla risoluzione nativa è essenziale: un singolo fotosito clippato all'interno di un blocco $f \times f$ comprometterebbe il valor medio del blocco, e una soglia stabilita dopo il downsampling non sarebbe in grado di rilevarlo.
 
 \subsection{Riduzione della risoluzione spaziale}
 \label{subsec:downsampling}
 
-Le immagini del sensore hanno una risoluzione nativa dell'ordine di $4000 \times 3000$~pixel. Poiché l'elaborazione richiede lo stack simultaneo di 38 immagini, si applica un downsampling con fattore $f$ configurabile: l'immagine viene suddivisa in blocchi non sovrapposti di $f \times f$~pixel, ciascuno sostituito dal valor medio delle intensità contenute. Valori tipici sono $f = 10$--$20$, corrispondenti a risoluzioni risultanti dell'ordine di $400 \times 300$ e $200 \times 150$~pixel rispettivamente. Il compromesso introdotto è la perdita di dettagli spaziali fini, irrilevante per i campioni macroscopici analizzati in questo lavoro.
+Le immagini del sensore hanno una risoluzione nativa dell'ordine di $4000 \times 3000$~pixel. Poiché l'elaborazione richiede lo stack simultaneo di 38 immagini, si applica un downsampling con fattore $f$ configurabile: l'immagine, già corretta dal frame oscuro, viene suddivisa in blocchi non sovrapposti di $f \times f$~pixel, ciascuno sostituito dal valor medio delle intensità contenute. Valori tipici sono $f = 4$--$20$, corrispondenti a risoluzioni risultanti comprese tra $1000 \times 750$ e $200 \times 150$~pixel. Il compromesso introdotto è la perdita di dettagli spaziali fini, irrilevante per i campioni macroscopici analizzati in questo lavoro.
 
 % ---------------------------------------------------------------------------
 \section{Lunghezze d'onda effettive dei canali colore}
@@ -55,28 +64,58 @@ Il parametro $S_3$, che quantifica la componente di polarizzazione circolare, no
 dove $\delta(\lambda)$ è il ritardo di fase effettivo della lamina alla lunghezza d'onda di lavoro, calcolato secondo la \cref{eq:dispersione-qwp}. Anche l'orientazione della lamina viene invertita per coerenza con la convenzione destrorsa. Il fattore correttivo $1/\sin\delta(\lambda)$ compensa la dipendenza cromatica della lamina zero-order; per il canale rosso ($\lambda_{\mathrm{eff}} \approx \SI{600}{\nano\meter}$) il fattore è circa $1.05$, modesto ma non trascurabile per misure quantitative.
 
 % ---------------------------------------------------------------------------
-\section{Selezione della regione utile}
+\section{Segmentazione della regione di sfondo}
 \label{sec:mascheramento}
-% TODO: Chiarire questo, rileggere codice per essere sicuri
-Solo una porzione del campo visivo è effettivamente illuminata dal fascio che attraversa l'apparato. Le regioni non illuminate contengono rumore di fondo che, se incluso nell'analisi, introdurrebbe artefatti nelle mappe dei parametri normalizzati. È pertanto necessaria una maschera binaria che isoli l'area utile.
 
-La maschera viene generata a partire dalla mappa di intensità $S_0$. Si calcola un profilo di illuminazione locale tramite filtro gaussiano e si identificano come bordi i pixel con intensità inferiore al $95\%$ del profilo locale. I bordi vengono dilatati morfologicamente per chiudere eventuali discontinuità, le cavità interne riempite, e si conserva la componente connessa di area maggiore con un margine di sicurezza. Quando è disponibile anche la mappa di $S_3$, la maschera viene ulteriormente ristretta all'area effettivamente coperta dall'apertura circolare della lamina $\lambda/4$, che è più piccola del campo illuminato: il risultato è l'intersezione delle due regioni.
+Solo una porzione del campo visivo è effettivamente attraversata dal fascio polarimetrico utile. Le regioni occupate dal campione e dal suo supporto vanno separate dallo sfondo libero, poiché quest'ultimo costituisce il riferimento sperimentale dello stato di polarizzazione in ingresso ed entra direttamente nei fit di calibrazione descritti nelle sezioni successive. Una contaminazione anche parziale dello sfondo con pixel di campione propaga errori sistematici alle correzioni di rotazione del sistema di riferimento e di ribasamento della sfera di Poincaré, e da queste all'intera mappa di ritardanza. Per questo motivo la maschera binaria che identifica lo sfondo è generata da una procedura conservativa, calibrata per sopportare le geometrie eterogenee dei campioni considerati senza richiedere parametri specifici di volta in volta.
+
+La maschera si costruisce a partire dalla sola mappa di intensità $S_0$, attraverso una catena di operazioni morfologiche e di segmentazione progettata per essere invariante rispetto alla risoluzione di lavoro: tutti i raggi degli elementi strutturanti sono espressi come frazioni del lato maggiore dell'immagine, oppure come quantità in pixel nativi riscalate per il fattore di downsampling $f$. Dapprima si normalizza $S_0$ nell'intervallo $[0, 1]$ tramite riscalamento min-max. Una soglia di scurità al $30\%$ del massimo classifica come appartenenti al campione tutti i pixel sufficientemente scuri, intercettando per via diretta supporti opachi e montature anche dove il contrasto con lo sfondo è ridotto. In parallelo, il rivelatore di bordi di Canny~\cite{Canny1986} con deviazione gaussiana% TODO: verificare/aggiungere voce BibTeX Canny1986 (J.~Canny, IEEE TPAMI 8(6):679--698, 1986, DOI:10.1109/TPAMI.1986.4767851) $\sigma = 1{,}5$~px e soglie isteretiche assolute $T_{\mathrm{low}} = 0{,}05$ e $T_{\mathrm{high}} = 0{,}15$ sull'ampiezza del gradiente individua le discontinuità di intensità che delimitano il campione. I bordi rilevati vengono dilatati con un elemento strutturante a disco di raggio pari a circa lo $0{,}4\%$ del lato maggiore dell'immagine, in modo da fondere segmenti vicini ma non perfettamente allineati in una barriera continua. L'unione fra bordi dilatati e prior di scurità definisce la barriera ostruttiva, sulla quale si applica una chiusura morfologica di raggio dimezzato per cucire eventuali interruzioni residue.
+
+Lo sfondo si identifica come il complemento di tale barriera mediante una procedura di \emph{flood fill} dal bordo dell'immagine. Si etichettano le componenti connesse del complemento, si selezionano quelle che toccano almeno un lato dell'immagine e si conservano nell'unione tutte le componenti la cui area è pari ad almeno il $20\%$ di quella della componente bordo-tangente di area massima. La logica multi-componente è essenziale per campioni verticali estesi che attraversano l'intero campo di vista, come la bottiglia del campione di soluzione zuccherina, i quali dividerebbero altrimenti lo sfondo legittimo in due regioni disgiunte; al contempo, la soglia del $20\%$ esclude piccoli inganni dovuti a fughe interne al campione associate a bordi di Canny incompleti. La maschera del campione si ottiene per complemento, riempiendone le eventuali cavità interne con un'operazione di \texttt{binary\_fill\_holes} per assorbire residui di sfondo intrappolati nel campione, seguita da un'apertura morfologica con disco di piccolo raggio per regolarizzare il contorno.
+
+Per intercettare segmentazioni anomale prima che inquinino le statistiche di sfondo, si valuta la compattezza geometrica $\kappa = 4\pi A / P^2$ della componente di campione di area massima, dove $A$ è l'area e $P$ il perimetro misurato come dilatazione a 4-connessione meno la maschera stessa. Forme regolari prossime al cerchio danno $\kappa \to 1$, mentre contorni frastagliati abbassano $\kappa$ sotto $0{,}05$, valore che attiva un avviso esplicito di segmentazione probabilmente compromessa. Infine la maschera di sfondo viene erosa con un disco di raggio scalato come $100/f$ pixel ricampionati, equivalente a $100$~pixel nella risoluzione nativa, per garantire un margine di sicurezza dalla frontiera del campione. Se a valle del procedimento la frazione di pixel di sfondo risulta degenere (inferiore all'$1\%$ o superiore al $99{,}5\%$ del campo) la pipeline ricorre a un fallback basato sulla sola soglia di intensità, segnalando l'evento nel log di esecuzione.
 
 % ---------------------------------------------------------------------------
 \section{Allineamento del sistema di riferimento}
 \label{sec:allineamento}
 
-L'asse di polarizzazione di uscita del display LCD non è perfettamente allineato con l'asse di riferimento dell'analizzatore. Questo offset angolare si manifesta come una rotazione sistematica delle mappe di $S_1$ e $S_2$. La correzione viene effettuata misurando l'angolo di polarizzazione mediano nella regione di sfondo:
+L'asse di polarizzazione di uscita del display LCD non è perfettamente allineato con l'asse di riferimento dell'analizzatore. Questo offset angolare si manifesta come una rotazione sistematica delle mappe di $S_1$ e $S_2$, alla quale si sovrappongono variazioni spaziali lente dovute all'imperfetta uniformità del fascio di illuminazione e alla curvatura residua dei polarizzatori del pannello. Trattare la correzione come una rotazione scalare uniforme — ad esempio adoperando un angolo mediano sullo sfondo — lascia residui non trascurabili, in particolare ai bordi del campo. Si adotta pertanto una rotazione a campo locale, ricavata da un fit indipendente delle superfici di $S_1$ e $S_2$ sulla sola regione di sfondo.
+
+Sui pixel della maschera di sfondo si scrivono $S_1(x, y)$ e $S_2(x, y)$ come polinomi completi di grado due in coordinate normalizzate $(x_n, y_n) \in [-1, 1]^2$, con base $\{1,\; x_n,\; y_n,\; x_n^2,\; x_n y_n,\; y_n^2\}$. I coefficienti si determinano ai minimi quadrati separatamente per le due componenti, e i polinomi così fittati vengono valutati su tutto il dominio $H \times W$, producendo le superfici $\tilde{S}_1(x, y)$ e $\tilde{S}_2(x, y)$. L'angolo di offset spazialmente variabile si ricostruisce quindi tramite
 \begin{equation}
-    \alpha_{\mathrm{bg}} = \frac{1}{2} \arctan\!\left(\frac{\langle S_2 \rangle_{\mathrm{bg}}}{\langle S_1 \rangle_{\mathrm{bg}}}\right),
+    \alpha_{\mathrm{bg}}(x, y) = \frac{1}{2}\,\arctan_2\!\bigl(\tilde{S}_2(x, y),\; \tilde{S}_1(x, y)\bigr).
     \label{eq:angolo_offset}
 \end{equation}
-dove $\langle \cdot \rangle_{\mathrm{bg}}$ indica la mediana sui pixel della maschera di sfondo. I parametri $S_1$ e $S_2$ vengono quindi ruotati di $-\alpha_{\mathrm{bg}}$ tramite la matrice di rotazione nel piano $(S_1, S_2)$:
+La scelta di fittare le componenti cartesiane $S_1$ e $S_2$ in luogo dell'angolo direttamente è dettata dalla discontinuità di $\arctan_2$ in prossimità di $\pm 90^\circ$: un fit dell'angolo ravvolto produrrebbe salti spuri proprio nei casi in cui la polarizzazione di sfondo si trovi vicino alla frontiera di avvolgimento, mentre il fit separato delle due componenti elimina la discontinuità per costruzione. Il grado due offre un compromesso fra cattura della variazione spaziale residua e robustezza al rumore, sufficiente in tutti i campioni considerati grazie alla densità tipica di decine di migliaia di pixel di sfondo.
+
+I parametri $S_1$ e $S_2$ vengono infine ruotati di $-\alpha_{\mathrm{bg}}(x, y)$ tramite la matrice di rotazione nel piano $(S_1, S_2)$:
 \begin{equation}
     \begin{pmatrix} S_1' \\ S_2' \end{pmatrix} = \begin{pmatrix} \cos 2\alpha_{\mathrm{bg}} & \sin 2\alpha_{\mathrm{bg}} \\ -\sin 2\alpha_{\mathrm{bg}} & \cos 2\alpha_{\mathrm{bg}} \end{pmatrix} \begin{pmatrix} S_1 \\ S_2 \end{pmatrix}.
     \label{eq:rotazione_stokes}
 \end{equation}
-Dopo la correzione, la direzione di emissione del display LCD coincide per costruzione con l'asse zero del sistema di riferimento polarimetrico ($S_1' > 0$, $S_2' \approx 0$): tutti gli angoli polarimetrici derivati — AoLP, orientazione dell'asse veloce — sono misurati rispetto ad essa.
+Dopo la correzione, la direzione di emissione del display LCD coincide per costruzione con l'asse zero del sistema di riferimento polarimetrico, $S_1' > 0$ e $S_2' \approx 0$ in ogni punto dello sfondo, e tutti gli angoli polarimetrici derivati — AoLP e orientazione dell'asse veloce — sono misurati rispetto ad essa. Formalmente, la trasformazione corrisponde a una rotazione della sfera di Poincaré attorno all'asse $S_3$, e dunque non altera la componente circolare $S_3$ già stimata.
+
+% ---------------------------------------------------------------------------
+\section{Correzione dell'ellitticità residua del fascio incidente}
+\label{sec:ellitticita}
+
+La rotazione descritta nella \cref{sec:allineamento} azzera la componente $S_2$ dello sfondo ma lascia in generale una componente $S_3$ non nulla. Misure di calibrazione su tutti i campioni rivelano che lo stato di polarizzazione emesso dal display LCD presenta un'ellitticità residua di entità contenuta ma non trascurabile, dovuta alla combinazione di imperfezioni del polarizzatore di uscita del pannello e di micro-birifrangenza degli strati di vetro attraversati dal fascio. Il modello di inversione del ritardatore descritto nella sezione successiva è formulato per uno stato di ingresso puramente lineare con $s_{3,\mathrm{in}} = 0$: una violazione di questa ipotesi propaga un errore al primo ordine in $\beta$, dove $\beta$ è la latitudine dello stato incidente sulla sfera di Poincaré. Per ridurre l'errore residuo al secondo ordine si introduce una seconda rotazione, complementare alla precedente, che porta lo stato di sfondo dall'equatore inclinato all'equatore canonico della sfera.
+
+La rotazione viene effettuata attorno all'asse $S_2$ e agisce nel piano $(S_1, S_3)$:
+\begin{equation}
+    \begin{pmatrix} S_1'' \\ S_3'' \end{pmatrix} = \begin{pmatrix} \cos\beta(x, y) & \sin\beta(x, y) \\ -\sin\beta(x, y) & \cos\beta(x, y) \end{pmatrix} \begin{pmatrix} S_1' \\ S_3 \end{pmatrix}.
+    \label{eq:rotazione_poincare}
+\end{equation}
+L'angolo $\beta(x, y)$ è ricavato fittando, con la medesima base polinomiale di grado due in coordinate normalizzate adoperata nella \cref{sec:allineamento}, le mappe di $s_{1}$ e $s_{3}$ ristrette alla regione di sfondo, e definendo
+\begin{equation}
+    \beta(x, y) = \arctan_2\!\bigl(\tilde{s}_{3}(x, y),\; \tilde{s}_{1}(x, y)\bigr).
+    \label{eq:beta_poincare}
+\end{equation}
+La rotazione lascia invariata la componente $S_2$, già allineata, e preserva il modulo del vettore di Stokes per costruzione, conservando di conseguenza il grado di polarizzazione totale. La ritardanza $\delta$ del campione è geometricamente invariante rispetto alla scelta del piano equatoriale: rebasare la sfera di Poincaré non altera l'ampiezza del ritardo introdotto dal campione, ma allinea il modello matematico al riferimento sperimentale.
+
+La maschera utilizzata per il fit di $\beta$ richiede particolare attenzione. La sola maschera di sfondo prodotta dalla \cref{sec:mascheramento} include i pixel scuri associati al supporto e alla montatura della lamina $\lambda/4$, dove la differenza $I_{+45} - I_{-45}$ che entra nella \cref{eq:s3_formula} risulta numericamente degenere. Tali pixel passano i criteri di sfondo basati su $S_0$ ma trasportano un valore di $S_3$ dominato dal rumore. Per escluderli si calcola l'intensità media delle due immagini con lamina, $w(x, y) = \tfrac{1}{2}\bigl[I_{+45}(x, y) + I_{-45}(x, y)\bigr]$, e si definisce una maschera di supporto come l'insieme dei pixel dello sfondo per i quali $w(x, y) < W_{\mathrm{th}}\cdot \max_{\mathrm{bg}} w$, con $W_{\mathrm{th}} = 0{,}50$. A questa si unisce una banda lungo il perimetro dell'immagine, e il risultato viene dilatato con un disco di raggio pari a $150/f$ pixel ricampionati, equivalente a $150$~pixel nella risoluzione nativa, per assorbire la diffrazione di bordo della montatura della lamina. La maschera dedicata al fit di $\beta$ è la differenza fra la maschera di sfondo e quella di supporto così dilatata; un controllo automatico richiede che la maschera risultante conservi almeno il $10\%$ dei pixel di sfondo originali, in difetto del quale la pipeline ricade sulla maschera intera e segnala l'evento.
+
+L'ordine delle operazioni è obbligato dalla geometria della costruzione: si calcolano dapprima i parametri $S_0$, $S_1$ e $S_2$ tramite pseudo-inversa, quindi $S_3$ via lamina $\lambda/4$; si applica l'allineamento del sistema di riferimento sui pixel di sfondo che ribalta $S_1$ e $S_2$, e infine la rotazione di Poincaré qui descritta che ribalta $S_1$ e $S_3$. Le formule di estrazione della ritardanza vengono poi applicate sul terzetto $(S_1'', S_2', S_3'')$, dove sia $\langle S_2 \rangle_{\mathrm{bg}}$ sia $\langle S_3 \rangle_{\mathrm{bg}}$ sono ridotti a zero a meno del fit polinomiale, e l'ipotesi di stato lineare in ingresso è soddisfatta a meno di termini $\mathcal{O}(\beta^2)$.
 
 % ---------------------------------------------------------------------------
 \section{Grandezze polarimetriche derivate}
@@ -90,36 +129,60 @@ Dai parametri di Stokes allineati si calcolano il grado di polarizzazione linear
 Il DoLP è limitato all'intervallo $[0, 1]$: valori prossimi a $1$ indicano luce completamente polarizzata linearmente, valori prossimi a $0$ indicano luce non polarizzata o polarizzata circolarmente. L'AoLP è calcolato in gradi nell'intervallo $[-90^\circ, +90^\circ]$ e rappresenta la direzione dell'asse di polarizzazione lineare predominante in ciascun pixel.
 
 % ---------------------------------------------------------------------------
-\section{Estrazione della ritardanza e dell'asse veloce}
+\section{Estrazione della ritardanza e dell’asse veloce}
 \label{sec:retardance}
 
-La ritardanza $\delta$ e l'orientazione dell'asse veloce $\alpha$ vengono estratte combinando tutti e quattro i parametri di Stokes, con lo stato di polarizzazione in ingresso caratterizzato dai valori mediani nella regione di sfondo ($s_{1,\mathrm{in}}$, $s_{3,\mathrm{in}}$). I parametri vengono normalizzati rispetto all'intensità totale: $s_i = S_i / S_0$; un eventuale offset circolare sistematico viene compensato sottraendo $s_{3,\mathrm{in}}$.
+La ritardanza $\delta$ e l’orientazione dell’asse veloce $\alpha$ vengono estratte combinando tutti e quattro i parametri di Stokes, normalizzati in $s_i = S_i/S_0$ e già sottoposti alle due rotazioni di base introdotte nelle \cref{sec:allineamento,sec:ellitticita}. Per costruzione lo stato di polarizzazione in ingresso, ricavato dalla regione di sfondo, è stato portato sull'equatore canonico della sfera di Poincaré con $s_{1,\mathrm{in}} \to 1$, $s_{2,\mathrm{in}} \to 0$ e $s_{3,\mathrm{in}} \to 0$, a meno di residui di ordine $\mathcal{O}(\beta^2)$ assorbiti nei fit polinomiali. La pipeline conserva in $s_{1,\mathrm{in}}$ la mediana di $s_{1}$ sullo sfondo come fattore di normalizzazione, e adotta lo zero per le due componenti residue. Per aumentare la robustezza al rumore a scapito del dettaglio spaziale, i parametri $s_1$, $s_2$ e $s_3$ vengono convoluti con un filtro gaussiano di deviazione standard $\sigma$ (in pixel dell'immagine ricampionata) prima di qualsiasi ulteriore elaborazione; il valore predefinito è $\sigma = 1$.
 
 \subsection{Modello di estrazione}
 \label{subsec:modello_retardance}
 
-L'angolo dell'asse veloce e la ritardanza si ricavano dalle relazioni:
+Per uno stato di ingresso a polarizzazione lineare prevalentemente orizzontale, la propagazione attraverso un ritardatore con asse veloce a $\alpha$ e ritardanza $\delta$ produce le componenti di Stokes uscenti:
+\begin{align}
+    s_1 &= s_{1,\mathrm{in}}\bigl[1 - \sin^2\!2\alpha\,(1-\cos\delta)\bigr], \label{eq:s1_ritardatore}\\
+    s_2 &= s_{1,\mathrm{in}}\,\sin 2\alpha\cos 2\alpha\,(1-\cos\delta), \label{eq:s2_ritardatore}\\
+    s_3 &= s_{1,\mathrm{in}}\,\sin 2\alpha\,\sin\delta + s_{3,\mathrm{in}}. \label{eq:s3_ritardatore}
+\end{align}
+Invertendo le \cref{eq:s1_ritardatore,eq:s2_ritardatore}, l’angolo dell’asse veloce si ricava tramite:
 \begin{equation}
-    \alpha = \frac{1}{2} \arctan\!\left(\frac{s_{1,\mathrm{in}} - s_1}{s_2}\right),
+    \alpha = \frac{1}{2} \arctan\!\left(\frac{A}{s_2}\right), \qquad A = \max(s_{1,\mathrm{in}} - s_1,\; 0),
     \label{eq:asse_veloce}
 \end{equation}
+dove $A$ è limitato a valori non negativi per imporre il vincolo fisico che un ritardatore passivo non può aumentare la componente $s_1$; l’uso di $\arctan2(A, s_2)$ garantisce la corretta risoluzione della quadrante rispetto all’$\arctan$ ordinario. Noti $\alpha$ e $A$, il coseno e il seno della ritardanza si ricavano separatamente dalle \cref{eq:s1_ritardatore,eq:s3_ritardatore}:
 \begin{equation}
-    \cos\delta = 1 - \frac{s_{1,\mathrm{in}} - s_1}{s_{1,\mathrm{in}} \cdot \sin^2\!2\alpha}.
-    \label{eq:ritardanza_analisi}
+    \cos\delta = 1 - \frac{A}{s_{1,\mathrm{in}} \cdot \sin^2\!2\alpha},
+    \label{eq:cos_delta}
 \end{equation}
-Il segno di $\delta$ viene determinato dal prodotto $s_{3,\mathrm{corr}} \cdot \sin 2\alpha$: se negativo, la ritardanza è assegnata con segno negativo, preservando l'informazione sulla chiralità del campione.
+\begin{equation}
+    \sin\delta = \frac{s_{3}}{s_{1,\mathrm{in}} \cdot \sin 2\alpha},
+    \label{eq:sin_delta}
+\end{equation}
+dove la cancellazione di $s_{3,\mathrm{in}}$ dalla \cref{eq:s3_ritardatore} è garantita dal ribasamento di Poincaré descritto nella \cref{sec:ellitticita}. La ritardanza viene ricostruita tramite $\delta = \arctan_2(\sin\delta,\cos\delta)$ e mappata all’intervallo $[0^\circ, 360^\circ)$ sommando $360^\circ$ ai valori negativi. Questa scelta è preferita alla convenzione con segno $(-180^\circ, 180^\circ]$ perché elimina la discontinuità di avvolgimento a $\pm180^\circ$, la quale, in presenza di rumore, produce salti bruschi e artefatti nelle mappe.
 
 \subsection{Trattamento delle ambiguità numeriche}
 \label{subsec:ambiguita_numeriche}
 
-% TODO: utile dire che "A supporto dell’analisi è stato sviluppato uno strumento interattivo che consente di sovrapporre, per qualsiasi pixel selezionato, i 36 valori misurati alla curva di Malus teorica e di visualizzare l’ellisse di polarizzazione corrispondente." ma questa non mi sembra la sezione giusta, anche perchè non aiuta necessariamente qua
+Quando l’asse veloce è prossimo a $0^\circ$ o $90^\circ$, $\sin^2\!2\alpha$ tende a zero e i denominatori delle \cref{eq:cos_delta,eq:sin_delta} diventano numericamente instabili. Una soglia binaria rigida risolverebbe il problema numerico ma introdurrebbe un anello visibile nelle mappe in corrispondenza della frontiera di esclusione, dove $\delta$ salterebbe bruscamente a zero. Si adotta invece un peso di transizione continua:
+\begin{equation}
+    w = \mathrm{clip}\!\left(\frac{\sin^2\!2\alpha - 0{,}02}{0{,}02},\; 0,\; 1\right),
+    \label{eq:peso_stabilita}
+\end{equation}
+che vale $0$ per $\sin^2\!2\alpha \leq 0{,}02$, $1$ per $\sin^2\!2\alpha \geq 0{,}04$, e varia linearmente tra questi estremi. I valori calcolati vengono quindi pesati verso il caso di assenza di ritardanza ($\cos\delta \to 1$, $\sin\delta \to 0$):
+\begin{equation}
+    \cos\delta \leftarrow w \cdot \cos\delta_{\mathrm{calc}} + (1-w), \qquad \sin\delta \leftarrow w \cdot \sin\delta_{\mathrm{calc}},
+    \label{eq:peso_applicato}
+\end{equation}
+in modo che i pixel a bassa affidabilità convergano gradualmente a $\delta \to 0$ senza discontinuità visibili. I denominatori in \cref{eq:cos_delta,eq:sin_delta} vengono ulteriormente regolarizzati imponendo un valore minimo assoluto prima della divisione per escludere divergenze numeriche.
 
-Il denominatore $\sin^2\!2\alpha$ in \cref{eq:ritardanza_analisi} può diventare molto piccolo quando l'asse veloce è prossimo a $0^\circ$ o $90^\circ$, generando instabilità numeriche. Il calcolo viene pertanto eseguito solo sui pixel in cui $\sin^2\!2\alpha > 0.02$; nei pixel rimanenti si assegna $\delta = 0$. L'argomento della funzione $\arccos$ viene inoltre limitato all'intervallo $[-1, 1]$ prima del calcolo, per prevenire valori NaN dovuti a piccole eccedenze numeriche. A supporto dell'analisi è stato sviluppato uno strumento interattivo che consente di sovrapporre, per qualsiasi pixel selezionato, i 36 valori misurati alla curva di Malus teorica e di visualizzare l'ellisse di polarizzazione corrispondente.
+\subsection{Correzioni di calibrazione specifiche per dataset}
+\label{subsec:waveplate_swap}
+
+Una parte delle acquisizioni del campione a lamina $\lambda/2$, indicata nei riferimenti interni come \texttt{lambdamezzi\_50deg}, è stata eseguita con la lamina ruotata fisicamente di $90^\circ$ rispetto alla convenzione adottata negli altri dataset, ossia con gli assi rapido e lento scambiati. La trasformazione equivalente sui parametri estratti consiste nella mappa $\delta \mapsto 360^\circ - \delta$ e $\alpha \mapsto \alpha - 90^\circ$, applicata in coda alla pipeline di estrazione della ritardanza. La correzione è attivata da un flag di configurazione che riconosce il nome del dataset in elaborazione, ed è inerte su tutti gli altri campioni.
 
 % ---------------------------------------------------------------------------
 \section{Rappresentazione delle mappe}
 \label{sec:visualizzazione}
 
-La pipeline produce una visualizzazione sintetica in formato griglia $3 \times 3$, che presenta simultaneamente tutti i parametri polarimetrici calcolati: $S_0$, $S_1$, $S_2$ nella prima riga; $S_3$, DoLP, AoLP nella seconda; asse veloce $\alpha$, ritardanza $\delta$, e maschera sovrapposta a $S_0$ per verifica visiva nella terza. La scelta delle colormap segue le convenzioni della letteratura polarimetrica: colormap divergenti per grandezze con segno ($S_1$, $S_2$, $S_3$), colormap cicliche per angoli (AoLP, $\alpha$, $\delta$), e colormap sequenziali per grandezze positive ($S_0$, DoLP). La normalizzazione al percentile $99$ anzichè al valore massimo rende la visualizzazione robusta rispetto a pixel anomali isolati.
+La pipeline produce una visualizzazione sintetica in formato griglia $3 \times 3$, che presenta simultaneamente tutti i parametri polarimetrici calcolati: $S_0$, $S_1$, $S_2$ nella prima riga; $S_3$, DoLP, AoLP nella seconda; asse veloce $\alpha$, ritardanza $\delta$ e una mappa diagnostica delle maschere sovrapposta a $S_0$ nella terza. La scelta delle colormap segue le convenzioni della letteratura polarimetrica: colormap divergenti per grandezze con segno ($S_1$, $S_2$, $S_3$), colormap cicliche per angoli (AoLP, $\alpha$, $\delta$) e colormap sequenziali per grandezze positive ($S_0$, DoLP). La normalizzazione al percentile $99$ anziché al valore massimo rende la visualizzazione robusta rispetto a pixel anomali isolati. La mappa diagnostica delle maschere è costruita come composito a due livelli: i pixel coperti da entrambe le maschere (sfondo della \cref{sec:mascheramento} e sfondo ripulito utilizzato per il fit di Poincaré nella \cref{sec:ellitticita}) sono visualizzati in scala di grigi modulata da $S_0$, i pixel coperti solo dalla prima ricevono una tinta rossa attenuata che rivela la posizione del supporto della lamina $\lambda/4$, e i pixel di campione vengono rappresentati in rosso pieno modulato da $S_0$. La sovrapposizione permette di verificare a colpo d'occhio la consistenza fra le due maschere e di intercettare visivamente eventuali fallimenti della segmentazione prima di consegnare la mappa alle figure pubblicabili.
 
 Le grandezze polarimetriche così calcolate --- $S_0$, $S_1$, $S_2$, $S_3$, DoLP, AoLP, ritardanza $\delta$ e asse veloce $\alpha$ --- vengono presentate per ciascun campione nel capitolo seguente sotto forma di mappe bidimensionali, organizzate nella griglia sinottica $3\times 3$ con colormap scelte secondo le convenzioni della letteratura polarimetrica.
