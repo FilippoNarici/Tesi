@@ -61,12 +61,12 @@ Le mappe dell'orientazione dell'asse veloce $\theta$ e della ritardanza $\delta$
 
 \begin{figure}[htbp]
     \centering
-    \subfloat[$\theta$ — canale R]{\includegraphics[height=0.205\textwidth]{Images/generated/lambdaquarti_50deg/R_theta.pdf}}\hfill
-    \subfloat[$\theta$ — canale G]{\includegraphics[height=0.205\textwidth]{Images/generated/lambdaquarti_50deg/G_theta.pdf}}\hfill
-    \subfloat[$\theta$ — canale B]{\includegraphics[height=0.205\textwidth]{Images/generated/lambdaquarti_50deg/B_theta.pdf}}\\
-    \subfloat[$\delta$ — canale R]{\includegraphics[height=0.205\textwidth]{Images/generated/lambdaquarti_50deg/R_delta.pdf}}\hfill
-    \subfloat[$\delta$ — canale G]{\includegraphics[height=0.205\textwidth]{Images/generated/lambdaquarti_50deg/G_delta.pdf}}\hfill
-    \subfloat[$\delta$ — canale B]{\includegraphics[height=0.205\textwidth]{Images/generated/lambdaquarti_50deg/B_delta.pdf}}
+    \subfloat[$\theta$ , canale R]{\includegraphics[height=0.205\textwidth]{Images/generated/lambdaquarti_50deg/R_theta.pdf}}\hfill
+    \subfloat[$\theta$ , canale G]{\includegraphics[height=0.205\textwidth]{Images/generated/lambdaquarti_50deg/G_theta.pdf}}\hfill
+    \subfloat[$\theta$ , canale B]{\includegraphics[height=0.205\textwidth]{Images/generated/lambdaquarti_50deg/B_theta.pdf}}\\
+    \subfloat[$\delta$ , canale R]{\includegraphics[height=0.205\textwidth]{Images/generated/lambdaquarti_50deg/R_delta.pdf}}\hfill
+    \subfloat[$\delta$ , canale G]{\includegraphics[height=0.205\textwidth]{Images/generated/lambdaquarti_50deg/G_delta.pdf}}\hfill
+    \subfloat[$\delta$ , canale B]{\includegraphics[height=0.205\textwidth]{Images/generated/lambdaquarti_50deg/B_delta.pdf}}
     \caption{Mappe dell'orientazione dell'asse veloce $\theta$ (riga superiore) e della ritardanza $\delta$ (riga inferiore) per la lamina $\lambda/4$, sui tre canali del sensore. L'asse veloce è uniforme entro il disco della lamina; la ritardanza cresce dal rosso al blu secondo la dispersione $\delta \propto 1/\lambda$ di una lamina zero-order.}
     \label{fig:qw_theta_delta}
 \end{figure}
@@ -115,12 +115,12 @@ Per validare la ricostruzione si analizzano le mappe dell'orientazione dell'asse
 
 \begin{figure}[htbp]
     \centering
-    \subfloat[$\theta$ — canale R]{\includegraphics[height=0.205\textwidth]{Images/generated/lambdamezzi_50deg/R_theta.pdf}}\hfill
-    \subfloat[$\theta$ — canale G]{\includegraphics[height=0.205\textwidth]{Images/generated/lambdamezzi_50deg/G_theta.pdf}}\hfill
-    \subfloat[$\theta$ — canale B]{\includegraphics[height=0.205\textwidth]{Images/generated/lambdamezzi_50deg/B_theta.pdf}}\\
-    \subfloat[$\delta$ — canale R]{\includegraphics[height=0.205\textwidth]{Images/generated/lambdamezzi_50deg/R_delta.pdf}}\hfill
-    \subfloat[$\delta$ — canale G]{\includegraphics[height=0.205\textwidth]{Images/generated/lambdamezzi_50deg/G_delta.pdf}}\hfill
-    \subfloat[$\delta$ — canale B]{\includegraphics[height=0.205\textwidth]{Images/generated/lambdamezzi_50deg/B_delta.pdf}}
+    \subfloat[$\theta$ , canale R]{\includegraphics[height=0.205\textwidth]{Images/generated/lambdamezzi_50deg/R_theta.pdf}}\hfill
+    \subfloat[$\theta$ , canale G]{\includegraphics[height=0.205\textwidth]{Images/generated/lambdamezzi_50deg/G_theta.pdf}}\hfill
+    \subfloat[$\theta$ , canale B]{\includegraphics[height=0.205\textwidth]{Images/generated/lambdamezzi_50deg/B_theta.pdf}}\\
+    \subfloat[$\delta$ , canale R]{\includegraphics[height=0.205\textwidth]{Images/generated/lambdamezzi_50deg/R_delta.pdf}}\hfill
+    \subfloat[$\delta$ , canale G]{\includegraphics[height=0.205\textwidth]{Images/generated/lambdamezzi_50deg/G_delta.pdf}}\hfill
+    \subfloat[$\delta$ , canale B]{\includegraphics[height=0.205\textwidth]{Images/generated/lambdamezzi_50deg/B_delta.pdf}}
     \caption{Mappe dell'orientazione dell'asse veloce $\theta$ (riga superiore) e della ritardanza $\delta$ (riga inferiore) per la lamina $\lambda/2$, sui tre canali del sensore. L'asse veloce è uniforme entro il disco della lamina, in accordo con l'orientazione fisica di \SI{50}{\degree}; la ritardanza cresce dal rosso al blu coerentemente con la legge di dispersione $\delta \propto 1/\lambda$ di una lamina zero-order. La \emph{colormap} ciclica \texttt{twilight} sull'intero giro $[0^\circ, 360^\circ)$ è impiegata per $\delta$.}
     \label{fig:hw_theta_delta}
 \end{figure}
@@ -155,7 +155,7 @@ Le possibili cause sono state vagliate una per una. Un errore sistematico della 
 
 Questo esponente è la chiave per interpretare il campione. Per un ritardatore attraversato una sola volta la ritardanza è $\delta = 2\pi\,\Delta n(\lambda)\,d/\lambda$: il fattore $1/\lambda$ è di origine geometrica e universale, mentre la birifrangenza $\Delta n(\lambda)$ di un qualsiasi materiale trasparente in regime di dispersione normale cresce verso le lunghezze d'onda corte, il che rende l'esponente effettivo $b \geq 1$ (per il quarzo $b \approx 1{,}14$). Un esponente $b < 1$ richiederebbe una birifrangenza decrescente verso il blu, ossia una dispersione anomala associata a una banda di assorbimento nel visibile, assente in una lamina incolore. L'esponente osservato $b \approx 0{,}7$ è pertanto incompatibile con qualunque ritardatore a singolo passaggio, indipendentemente dal materiale.
 
-La sola interpretazione coerente è che la lamina sia un ritardatore \emph{multi-ordine}: la sua ritardanza totale supera molti multipli di $360^\circ$ e ciò che si misura è il residuo $\delta \bmod 360^\circ$, i cui valori non seguono una semplice legge di potenza. Il canale rosso, prossimo alla lunghezza d'onda di progetto, fissa la lamina a una mezz'onda ($\delta \approx 180^\circ$), coerentemente con un ordine intero. Determinare l'ordine esatto non è però possibile dai soli tre punti spettrali RGB senza conoscere il materiale: ad alto ordine la ritardanza totale è grande e la predizione del valore avvolto è dominata dalla dispersione di birifrangenza $\Delta n(\lambda)$, specifica del materiale, cosicché ordini diversi risultano compatibili a seconda del modello di dispersione assunto. A titolo illustrativo, una lamina di quarzo del quinto ordine riproduce i valori misurati entro pochi gradi, ma il dato non basta a stabilire in modo conclusivo né l'ordine né il materiale. Si conclude pertanto che la lamina $\lambda/2$ è un ritardatore multi-ordine — risultato robusto e indipendente dal materiale — mentre l'ordine specifico resta indeterminato con i dati disponibili.
+La sola interpretazione coerente è che la lamina sia un ritardatore \emph{multi-ordine}: la sua ritardanza totale supera molti multipli di $360^\circ$ e ciò che si misura è il residuo $\delta \bmod 360^\circ$, i cui valori non seguono una semplice legge di potenza. Il canale rosso, prossimo alla lunghezza d'onda di progetto, fissa la lamina a una mezz'onda ($\delta \approx 180^\circ$), coerentemente con un ordine intero. Determinare l'ordine esatto non è però possibile dai soli tre punti spettrali RGB senza conoscere il materiale: ad alto ordine la ritardanza totale è grande e la predizione del valore avvolto è dominata dalla dispersione di birifrangenza $\Delta n(\lambda)$, specifica del materiale, cosicché ordini diversi risultano compatibili a seconda del modello di dispersione assunto. A titolo illustrativo, una lamina di quarzo del quinto ordine riproduce i valori misurati entro pochi gradi, ma il dato non basta a stabilire in modo conclusivo né l'ordine né il materiale. Si conclude pertanto che la lamina $\lambda/2$ è un ritardatore multi-ordine (risultato robusto e indipendente dal materiale), mentre l'ordine specifico resta indeterminato con i dati disponibili.
 
 % ---------------------------------------------------------------------------
 \section{Linearità e risoluzione spaziale: nastro adesivo}
@@ -293,7 +293,7 @@ La soluzione di saccarosio in acqua è otticamente attiva: il saccarosio destrog
     \label{fig:zucchero_s0}
 \end{figure}
 
-La rotazione ottica è piccola, dell'ordine di pochi gradi, e la regione utile della soluzione va distinta dallo sfondo e dai contributi spuri della cannuccia. La stima viene quindi affidata alla procedura di clustering non parziale descritta nella \cref{sec:umap_clustering}, applicata questa volta all'angolo di polarizzazione lineare: l'embedding UMAP dei descrittori di Stokes viene segmentato con HDBSCAN, e il cluster vincente — quello che combina dimensione apprezzabile, bassa dispersione angolare interna e distanza angolare significativa dal cluster dominante dello sfondo — identifica i pixel della soluzione, restituendone la rotazione mediana $\tilde\psi_{\mathrm{win}}$. La procedura è ripetuta sui tre canali (\cref{fig:zucchero_winner_r,fig:zucchero_winner_g,fig:zucchero_winner_b}), fornendo tre stime indipendenti alle rispettive lunghezze d'onda.
+La rotazione ottica è piccola, dell'ordine di pochi gradi, e la regione utile della soluzione va distinta dallo sfondo e dai contributi spuri della cannuccia. La stima viene quindi affidata alla procedura di clustering non parziale descritta nella \cref{sec:umap_clustering}, applicata questa volta all'angolo di polarizzazione lineare: l'embedding UMAP dei descrittori di Stokes viene segmentato con HDBSCAN, e il cluster vincente (quello che combina dimensione apprezzabile, bassa dispersione angolare interna e distanza angolare significativa dal cluster dominante dello sfondo) identifica i pixel della soluzione, restituendone la rotazione mediana $\tilde\psi_{\mathrm{win}}$. La procedura è ripetuta sui tre canali (\cref{fig:zucchero_winner_r,fig:zucchero_winner_g,fig:zucchero_winner_b}), fornendo tre stime indipendenti alle rispettive lunghezze d'onda.
 
 \begin{figure}[htbp]
     \centering
@@ -378,7 +378,7 @@ La mappa differenziale evidenzia, sia pur debolmente, la comparsa di un segnale 
 \section{Discussione}
 \label{sec:discussione}
 
-I risultati presentati nelle sezioni precedenti dimostrano che il sistema è in grado di ricostruire il vettore di Stokes completo con risoluzione spaziale bidimensionale, di misurare ritardanza e asse veloce su campioni macroscopici, e di distinguere fenomeni polarimetrici di natura diversa --- birifrangenza, attività ottica, fotoelasticità --- con un apparato il cui costo complessivo, escluso lo smartphone, è inferiore a 100\,\texteuro.
+I risultati presentati nelle sezioni precedenti dimostrano che il sistema è in grado di ricostruire il vettore di Stokes completo con risoluzione spaziale bidimensionale, di misurare ritardanza e asse veloce su campioni macroscopici, e di distinguere fenomeni polarimetrici di natura diversa (birifrangenza, attività ottica, fotoelasticità) con un apparato il cui costo complessivo, escluso lo smartphone, è inferiore a 100\,\texteuro.
 
 Il principale compromesso è introdotto dal downsampling: con fattori tipici tra 10 e 20, la risoluzione scende da 12 megapixel a $10^4$--$10^5$ pixel, rendendo irrisolvibili strutture più piccole di qualche centinaio di micrometri. Per i campioni macroscopici analizzati questa limitazione non è stata rilevante, ma applicazioni su scala microscopica richiederebbero un'elaborazione a blocchi o su GPU.
 

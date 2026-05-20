@@ -27,7 +27,7 @@ Questo file è la singola fonte di verità sullo stato di avanzamento. Aggiornar
 
 Commenti `% TODO` presenti nei sorgenti LaTeX, da risolvere:
 
-- [~] Em-dash + linguaggio AI-like su TUTTA la tesi (skill `humanizer` installata). cap1/cap2/cap3/cap4 [x] (2026-05-20): em-dash rimossi (virgole/parentesi), cap1 anche false-range. Restano: cap5 (14), cap6 (6). Applico solo rimozione pattern (em-dash, vocab AI, filler, hedging, false range, regola del 3, copula avoidance, signposting), NON la "soul/prima persona" del plugin (conflitta con stile formale tesi).
+- [x] Em-dash su TUTTA la tesi (skill `humanizer` installata in `~/.claude/skills/humanizer`) — fatto 2026-05-20: cap1–cap6, em-dash (`---` e unicode `—`) sostituiti con virgole/parentesi/due punti; cap1 anche false-range "spaziano da…a…"; subcaption "θ — canale R" → "θ, canale R". Restano solo i `% ----` separatori di commento (invisibili). Applicata SOLO la rimozione dei pattern AI del plugin, NON la parte "soul/prima persona" (conflitta con lo stile formale tesi). Pass ulteriore su altri tell AI (vocab, filler, hedging, regola del 3) NON ancora fatto sistematicamente — da valutare.
 - [ ] `chapters/cap1_introduzione.tex:10` — verificare/citare la fonte del costo "decine di migliaia di euro" dei polarimetri da laboratorio (e cifra analoga nel paragrafo seguente): sembra una cifra sparata, serve riferimento.
 - [x] `chapters/cap4_campioni.tex:9` (2026-05-20) — tabella campioni: full `\textwidth`, colonne Fenomeno+Validazione entrambe `X` (spazio condiviso), `\raggedright` + `\small`. Risolto il wrapping brutto della terza colonna.
 - [ ] `chapters/cap5_analisi.tex:77` — voce BibTeX **Ghosh1999** (G. Ghosh, Opt. Commun. 163(1-3):95–102, 1999, DOI:10.1016/S0030-4018(99)00091-7).
