@@ -81,10 +81,10 @@ def plot_cluster_winner_panels(*, mode,
     ax_s = axs[0]
     sc = ax_s.scatter(embedding[:, 0], embedding[:, 1],
                       c=val_at_emb, cmap=cmap, vmin=vmin, vmax=vmax,
-                      s=2.5, alpha=0.85, edgecolors='none')
+                      s=2.5, alpha=0.85, edgecolors='none', rasterized=True)
     ax_s.scatter(embedding[emb_winner_sel, 0], embedding[emb_winner_sel, 1],
                  s=14, facecolors='none', edgecolors='red',
-                 linewidths=0.6, alpha=0.9,
+                 linewidths=0.6, alpha=0.9, rasterized=True,
                  label=f"winner (L{winner_label:+d})")
     ax_s.set_xlabel('UMAP 1'); ax_s.set_ylabel('UMAP 2')
     ax_s.set_title(f"{channel}: UMAP scatter", fontsize=9, pad=4)
@@ -96,7 +96,7 @@ def plot_cluster_winner_panels(*, mode,
     ax_m = axs[1]
     im = ax_m.imshow(value_map, cmap=cmap, vmin=vmin, vmax=vmax, aspect='equal')
     yy, xx = np.nonzero(winner_mask_img)
-    ax_m.scatter(xx, yy, s=2.0, c='red', alpha=0.6, edgecolors='none')
+    ax_m.scatter(xx, yy, s=2.0, c='red', alpha=0.6, edgecolors='none', rasterized=True)
     ax_m.set_title(
         f"{channel}: map (winner n={winner_info['size']}, "
         f"median={median_fmt.format(winner_info['median_deg'])})",

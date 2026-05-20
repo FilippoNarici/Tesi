@@ -62,7 +62,7 @@ def plot_sample_diagnostic(ax, S0, sample_mask, bg_mask=None, title=None):
         overlay[bg_mask] = [0.0, 0.4, 1.0, 0.18]
         ax.imshow(overlay)
     yy, xx = _np.nonzero(sample_mask)
-    ax.scatter(xx, yy, s=0.3, c='red', alpha=0.85, edgecolors='none')
+    ax.scatter(xx, yy, s=0.3, c='red', alpha=0.85, edgecolors='none', rasterized=True)
     ax.set_xticks([]); ax.set_yticks([])
     if title is not None:
         ax.set_title(title, fontsize=9, pad=4)
@@ -564,7 +564,7 @@ def export_umap_panels(spec, embedding, valid_indices, S0_shape,
     fig, ax = plt.subplots(figsize=(3.35 + 0.7, 3.35))
     ax.scatter(embedding[:, 0], embedding[:, 1],
                c=value_valid, cmap=cmap, vmin=vmin, vmax=vmax,
-               s=2.0, alpha=0.85)
+               s=2.0, alpha=0.85, rasterized=True)
     ax.set_xlabel('UMAP 1'); ax.set_ylabel('UMAP 2')
     ax.set_title('UMAP embedding', pad=6)
     cb = fig.colorbar(plt.cm.ScalarMappable(norm=norm, cmap=cmap),
