@@ -28,6 +28,7 @@ Questo file è la singola fonte di verità sullo stato di avanzamento. Aggiornar
 Commenti `% TODO` presenti nei sorgenti LaTeX, da risolvere:
 
 - [ ] `chapters/cap1_introduzione.tex:8` — rimuovere gli em-dash (troppo AI-like).
+- [ ] `chapters/cap1_introduzione.tex:10` — verificare/citare la fonte del costo "decine di migliaia di euro" dei polarimetri da laboratorio (e cifra analoga nel paragrafo seguente): sembra una cifra sparata, serve riferimento.
 - [ ] `chapters/cap4_campioni.tex:9` — tabella campioni troppo stretta, terza colonna wrappata male: sistemare layout.
 - [ ] `chapters/cap5_analisi.tex:77` — voce BibTeX **Ghosh1999** (G. Ghosh, Opt. Commun. 163(1-3):95–102, 1999, DOI:10.1016/S0030-4018(99)00091-7).
 - [ ] `chapters/cap5_analisi.tex:86` — voce BibTeX **Canny1986** (J. Canny, IEEE TPAMI 8(6):679–698, 1986, DOI:10.1109/TPAMI.1986.4767851).
