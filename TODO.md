@@ -45,7 +45,7 @@ Commenti `% TODO` presenti nei sorgenti LaTeX, da risolvere. Scan completo 2026-
 
 **Serve asset / generazione:**
 - [x] `chapters/cap3_apparato.tex:44` (2026-05-21) — figura pattern Bayer RGGB inserita (`fig:bayer`, sez. sensore, `\cref` nel testo). Scaricata da Wikimedia Commons (`Images/bayer_pattern.svg` + `.png` 960px); licenza **CC BY-SA 3.0** di Cburnett verificata via API Commons e attribuita in caption (attribuzione richiesta).
-- [~] `chapters/cap5_analisi.tex:52` — inserire plot G0 (analisi spettrale RGB; `python/outputs/Analisi_Spettrale_S24_RGB.pdf`). Cella G0 del notebook aggiornata 2026-05-21 (TODO interno "ANNOTARE PICCHI" risolto): `find_peaks` annota i picchi dello spettro sorgente — blu 463, verde 535, righe KSF rosse 609/613/631/635/647; PDF rigenerato. RESTA solo l'inserimento della figura in cap5 (decidere path: referenziare `python/outputs/` o copia in `Images/generated/`).
+- [x] `chapters/cap5_analisi.tex:52` (2026-05-21) — figura G0 inserita (`fig:spettro_rgb`, sez. centroide, `\cref` dalla nota KSF). Cella G0 aggiornata: `find_peaks` annota i picchi (blu 463, verde 535, righe KSF rosse 609/631/647...), stile `apply_thesis_style` (serif), ylim +20%. PDF copiato in `Images/generated/spettro_rgb.pdf` (graphicspath è `Images/`). NB: copia da `python/outputs/Analisi_Spettrale_S24_RGB.pdf`; se G0 viene rigenerato, ri-copiare il PDF in `Images/generated/`.
 
 **Utente / confine umano:**
 - [ ] `chapters/cap6_risultati.tex:376` — **lettura qualitativa ΔS3 barra** (dove compare il segnale sotto carico, segno, localizzazione al vincolo): confine di interpretazione umana, spetta all'utente.

@@ -43,7 +43,7 @@ Il sensore CMOS non è un rivelatore monocromatico: ciascun canale colore ha una
 Lo spettro di emissione del display LCD utilizzato come illuminatore è stato misurato indipendentemente con uno spettrometro a reticolo Avantes AvaSpec-2048, calibrato in lunghezza d'onda nell'intervallo visibile, fornendo l'andamento $I(\lambda)$ della radianza emessa al variare di $\lambda$.
 
 % TODO: check (nota spettro KSF inserita da AI 2026-05-21)
-Lo spettro misurato presenta caratteristiche diverse nei tre intervalli colore: le bande verde e blu sono larghe e relativamente omogenee, mentre la regione rossa mostra picchi stretti e ben definiti. Questi ultimi corrispondono alla firma spettrale del fosforo KSF (fluorosilicato di potassio attivato al manganese, $\mathrm{K_2SiF_6{:}Mn^{4+}}$), impiegato come emettitore rosso nei display a retroilluminazione LED~\cite{Wang2015phosphor}, le cui righe di emissione coincidono con i picchi osservati.
+Lo spettro misurato presenta caratteristiche diverse nei tre intervalli colore: le bande verde e blu sono larghe e relativamente omogenee, mentre la regione rossa mostra picchi stretti e ben definiti. Questi ultimi corrispondono alla firma spettrale del fosforo KSF (fluorosilicato di potassio attivato al manganese, $\mathrm{K_2SiF_6{:}Mn^{4+}}$), impiegato come emettitore rosso nei display a retroilluminazione LED~\cite{Wang2015phosphor}, le cui righe di emissione coincidono con i picchi osservati (\cref{fig:spettro_rgb}).
 
 La risposta spettrale del sensore $S_c(\lambda)$ è stata invece estratta dal database pubblico Color Lab Eilat~\cite{Solomatov2023spectral}, adottando come proxy il sensore del Samsung Galaxy S22 Rear Telephoto, per il quale è disponibile una caratterizzazione completa; il sensore montato sul Galaxy S24 utilizzato nelle misure appartiene alla stessa famiglia tecnologica e si assume condivida con il modello di riferimento la forma della risposta spettrale a meno di piccole deviazioni nell'efficienza assoluta che non incidono sul calcolo del baricentro normalizzato. Il segnale effettivo registrato dal canale $c$ è quindi il prodotto $E_c(\lambda) = S_c(\lambda) \cdot I(\lambda)$, e la lunghezza d'onda centroide si calcola come media pesata dopo aver applicato una soglia al $30\%$ del valore di picco, in modo da escludere le code a bassa intensità che pesano in modo sproporzionato sulla media in caso di andamenti asimmetrici:
 \begin{equation}
@@ -55,7 +55,13 @@ I tre centroidi $\lambda_{\mathrm{eff},R}$, $\lambda_{\mathrm{eff},G}$, $\lambda
 % TODO: check (giustificazione centroide vs picco inserita da AI 2026-05-21)
 La scelta del centroide, anziché della lunghezza d'onda di picco, riflette la natura della misura. Su ciascun canale la grandezza polarimetrica ricostruita, ritardanza o angolo di rotazione, è una media della grandezza dipendente dalla lunghezza d'onda pesata sulla risposta spettrale $E_c(\lambda)$. Il centroide è la lunghezza d'onda alla quale una grandezza che varia in modo regolare con $\lambda$ eguaglia, al primo ordine, la propria media pesata, e riproduce quindi il valore effettivamente misurato; la lunghezza d'onda di picco rappresenterebbe invece il solo massimo di emissione, introducendo una distorsione sulle bande asimmetriche o a righe. Il caso più rilevante è il canale rosso, il cui spettro è dominato dalle righe strette del fosforo KSF: il picco coinciderebbe con la singola riga più intensa, mentre il centroide media tutte le righe che contribuiscono al segnale. Poiché la dispersione della ritardanza segue $\delta \propto 1/\lambda$, la lunghezza d'onda rigorosamente equivalente sarebbe la media armonica pesata $1/\langle 1/\lambda\rangle_{E_c}$; sulle bande in esame essa differisce dal centroide di meno di un nanometro, scarto trascurabile rispetto alle altre incertezze della misura.
 
-% TODO: inserire plot g0
+% TODO: check (figura G0 inserita da AI 2026-05-21)
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{Images/generated/spettro_rgb.pdf}
+    \caption{Analisi spettrale dei canali colore. Dall'alto: sensibilità spettrale del sensore (proxy Galaxy S22~\cite{Solomatov2023spectral}); spettro di emissione misurato del display LCD con i picchi annotati, dove le righe strette nel rosso sono la firma del fosforo KSF~\cite{Wang2015phosphor}; segnale effettivo $E_c(\lambda) = S_c(\lambda)\,I(\lambda)$ per i tre canali, con la lunghezza d'onda centroide $\lambda_{\mathrm{eff},c}$ (linea tratteggiata) e la regione sopra la soglia del $30\%$ evidenziata.}
+    \label{fig:spettro_rgb}
+\end{figure}
 
 % ---------------------------------------------------------------------------
 \section{Ricostruzione di \texorpdfstring{$S_0$, $S_1$, $S_2$}{S0, S1, S2}}
