@@ -1,6 +1,6 @@
 # TODO — Stato del progetto
 
-Ultimo aggiornamento: 2026-05-20 (revisione cap6 COMPLETA in bozza per tutti i 7 sample; lambdamezzi chiuso come multi-ordine via b<1; anomalia 3R-B chiusa come inspiegata; superate voci legacy B2/B4/tabelle-cap6 — fit/istogrammi/tabelle ora dal notebook corrente. TUTTE le sezioni cap6 DA RIVEDERE MANUALMENTE. Vedi memory `project_waveplate_multiorder.md`, `project_strati_3R_B_anomaly.md`, `feedback_chapters_manual_review.md`)
+Ultimo aggiornamento: 2026-05-21 (pass humanize em-dash + tell AI su cap1–cap7 con skill `humanizer`; cap3 "polarizzatore lineare di forma circolare"; cap4 tabella campioni sistemata. Prima, 2026-05-20: revisione cap6 7 sample bozza, lambdamezzi chiuso multi-ordine via b<1, anomalia 3R-B chiusa inspiegata, superate voci legacy B2/B4/tabelle-cap6. TUTTE le sezioni cap5/cap6 DA RIVEDERE MANUALMENTE. Vedi memory `project_waveplate_multiorder.md`, `project_strati_3R_B_anomaly.md`, `feedback_chapters_manual_review.md`)
 
 Questo file è la singola fonte di verità sullo stato di avanzamento. Aggiornare ad ogni task completato. Per istruzioni operative vedere `CLAUDE.md`.
 
@@ -8,12 +8,12 @@ Questo file è la singola fonte di verità sullo stato di avanzamento. Aggiornar
 
 | Cap | Titolo | Stato | Note |
 |-----|--------|-------|------|
-| 1 | Introduzione | ~80% | Pulizia stilistica (em-dash, cliché IA) |
+| 1 | Introduzione | ~85% | Em-dash + tell AI rimossi (humanizer) 2026-05-21. Aperto: fonte del costo "decine di migliaia €" (`% TODO` riga 10) |
 | 2 | Fondamenti teorici | ~90% | Denso, ben citato |
 | 3 | Apparato sperimentale | ~95% | Figure setup presenti |
-| 4 | Raccolta dati e campioni | ~85% | Formattazione tabella campioni |
+| 4 | Raccolta dati e campioni | ~90% | Tabella campioni sistemata (colonne X, full textwidth); em-dash + copula avoidance rimossi |
 | 5 | Analisi dati | ~98% | Rewrite end-to-end 2026-05-19 allineato a pipeline `polarimetro` + notebook `analisi.ipynb`: aggiunte sez. organizzazione pipeline 2-pass + cache npz, dispersione quarzo Ghosh, sez. nuove UMAP/HDBSCAN diagnostica, slice + fit dispersione `k/λ^p`, fotoelasticità warp ΔS3, riscrittura sez. visualizzazione (8 PDF per canale, no più 3×3). AvaSpec 2048 descritto. Aperti: voci BibTeX Canny1986, McInnes2018 UMAP, Campello2013 HDBSCAN, Ghosh1999 quartz (placeholder `% TODO` inline). |
-| 6 | Risultati e discussione | ~90% | Tutti i 7 sample revisionati 2026-05-20 (BOZZA, DA RIVEDERE): righello (apertura/panoramica), lamine λ/4+λ/2, nastro strati, zucchero, trave. Figure reali subfloat, dati da pipeline corrente. Rimossa vecchia sec:validazione (misura a vuoto falsa). Ordine: righello → lamine → nastro → versatilità (zucchero, trave). λ/2 ipotesi multi-ordine; anomalia 3R-B aperta; barra solo qualitativa. Resta da rivedere manualmente tutto + chiudere TODO interni (lettura ΔS3 barra). |
+| 6 | Risultati e discussione | ~90% | Tutti i 7 sample revisionati 2026-05-20 (BOZZA, DA RIVEDERE): righello (apertura/panoramica), lamine λ/4+λ/2, nastro strati, zucchero, trave. Figure reali subfloat, dati da pipeline corrente. Rimossa vecchia sec:validazione (misura a vuoto falsa). Ordine: righello → lamine → nastro → versatilità (zucchero, trave). λ/2 = multi-ordine concluso (b<1, ordine indeterminato); anomalia 3R-B CHIUSA (inspiegata, nessun impatto su fit); barra solo qualitativa. Em-dash + tell AI rimossi. Resta: revisione manuale + `% TODO` interno lettura ΔS3 barra. |
 | 7 | Conclusioni | ~70% | Reggere meglio il passaggio agli sviluppi futuri; menzionare UMAP come esplorazione raffinabile (v. sotto) |
 
 ## Consegnabili mancanti (livello tesi)
