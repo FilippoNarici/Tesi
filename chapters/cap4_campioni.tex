@@ -16,7 +16,7 @@ I campioni sono stati scelti per coprire i tre fenomeni polarimetrici di interes
         Nastro adesivo (1--5 strati) & Birifrangenza incrementale & $\delta \propto N$ \\
         Soluzione di saccarosio & Attività ottica & $\alpha_\text{rot} \propto 1/\lambda^2$ \\
         Righello in plastica & Fotoelasticità (stress residuo) & Frange isocromatiche \\
-        Trave a sbalzo & Fotoelasticità (stress applicato) & Frange sotto carico \\
+        Trave a sbalzo & Fotoelasticità (stress applicato) & Birifrangenza indotta dal carico \\
         \hline
     \end{tabularx}
 \end{table}
@@ -27,9 +27,7 @@ I campioni sono stati scelti per coprire i tre fenomeni polarimetrici di interes
 
 Le lamine d'onda commerciali ($\lambda/2$ e $\lambda/4$, entrambe zero-order a $\SI{633}{\nano\meter}$, cfr.\ \cref{sec:fenomeni}) sono il primo test di validazione quantitativa: la ritardanza è nota con precisione e la risposta è spazialmente uniforme, il che consente un confronto diretto tra valore misurato e valore atteso. La lamina $\lambda/4$, orientata a $\SI{45}{\degree}$ rispetto alla polarizzazione incidente, produce luce circolarmente polarizzata con $|S_3/S_0| \approx 1$; la lamina $\lambda/2$ ruota il piano di polarizzazione di un angolo pari al doppio della sua orientazione, con ritardanza nominale $\delta \approx 180^\circ$.
 
-Il vetrino con strati di nastro adesivo trasparente (da 1 a 5 strati, in configurazione simmetrica $1$-$2$-$3$-$4$-$5$-$4$-$3$-$2$-$1$) è un campione a birifrangenza incrementale controllata: il film polimerico orientato del nastro presenta una birifrangenza intrinseca, 
-% TODO: perchè? spieghiamo in brevissimo come mai birifrangenza (polimero stirato)
-e la ritardanza totale cresce approssimativamente come
+Il vetrino con strati di nastro adesivo trasparente (da 1 a 5 strati, in configurazione simmetrica $1$-$2$-$3$-$4$-$5$-$4$-$3$-$2$-$1$) è un campione a birifrangenza incrementale controllata: il film polimerico del nastro, stirato uniassialmente in fase di produzione, ha le catene molecolari allineate lungo una direzione preferenziale, e questa anisotropia strutturale gli conferisce una birifrangenza intrinseca. La ritardanza totale cresce approssimativamente come
 \begin{equation}
 \delta_{\text{tot}} \approx N \cdot \delta_{\text{singolo}},
 \label{eq:ritardo-strati}
@@ -48,5 +46,4 @@ Una soluzione di saccarosio (in una boccetta con cammino ottico $l = \SI{13}{\mi
 
 Un righello in plastica trasparente presenta tensioni residue da stampaggio a iniezione che generano birifrangenza non uniforme nel materiale. Quando posto tra polarizzatore e analizzatore, le regioni a diverso stato di tensione producono le frange isocromatiche e isocline tipiche dei materiali fotoelastici (cfr.\ \cref{sec:fenomeni}). L'analisi con il polarimetro a immagine consente di mappare spazialmente la distribuzione delle tensioni interne.
 
-Una trave in materiale trasparente, vincolata a un'estremità, è stata analizzata in due condizioni: scarica, per verificare l'eventuale presenza di tensioni residue, e sotto carico, con un peso applicato all'estremità libera. Lo sforzo di flessione varia linearmente lungo lo spessore e inversamente con la distanza dal vincolo. Questa distribuzione genera, per effetto fotoelastico, un pattern di frange isocromatiche direttamente confrontabile con le previsioni teoriche, ed è il test più esigente delle capacità quantitative del polarimetro.
-% TODO: le frange non sono visibili, o meglio si osserva variazione s3 ma non molto altro, vedi sotto, io non parlerei di frange piuttosto di una variazione delle proprietà di birifrangenza, inoltre no quantitativo, analisi prettamente qualitiativa, da aggiornare
+Una trave in materiale trasparente, vincolata a un'estremità, è stata analizzata in due condizioni: scarica, per verificare l'eventuale presenza di tensioni residue, e sotto carico, con un peso applicato all'estremità libera. Lo sforzo di flessione varia linearmente lungo lo spessore e inversamente con la distanza dal vincolo, inducendo per effetto fotoelastico una birifrangenza non uniforme lungo la trave. Nelle condizioni di questo esperimento le frange isocromatiche non risultano nettamente risolte: si osserva piuttosto una variazione delle proprietà di birifrangenza, rilevabile soprattutto come modulazione di $S_3$ fra trave carica e scarica. L'analisi su questo campione resta perciò qualitativa.
