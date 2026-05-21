@@ -40,7 +40,7 @@ Commenti `% TODO` presenti nei sorgenti LaTeX, da risolvere. Scan completo 2026-
 - [ ] `chapters/cap5_analisi.tex:8` — `sec:organizzazione_pipeline` chiaro ma disordinato, non segue bene l'ordine logico della catena: riorganizzare.
 - [ ] `chapters/cap5_analisi.tex:33` — downsample: il testo dice "$f = 4$–$20$" ma in realtà è stato usato $f = 4$ (arbitrario) su tutti i dataset. Correggere il testo.
 - [ ] `chapters/cap5_analisi.tex:44` — prima della risposta in assorbimento, nota sullo spettro misurato: G e B omogenei e larghi, R con picchi definiti (uso di KSF, firma spettrale che coincide).
-- [ ] `chapters/cap6_risultati.tex:98` — bug di placement dei float: le figure di lambdaquarti finiscono nella pagina di lambdamezzi; i float non sono vincolati al capitolo e si fanno "scavalcare" dal testo successivo. Problema globale LaTeX (valutare `\FloatBarrier`/placement `[!ht]`/`\clearpage` per capitolo). Collegato all'osservazione "tabella sotto etichetta".
+- [x] `chapters/cap6_risultati.tex:98` (2026-05-21) — float "scavalcati"/spostati di pagina: RISOLTO convertendo TUTTI i float (figure + tabelle, cap3/cap4/cap6) da `[htbp]` a `[H]` del package `float` (già caricato Thesis.tex:47). Ora le figure/tabelle sono ancorate al punto esatto del sorgente, come testo, e il testo non le scavalca. Tradeoff noto di `[H]`: se un float non entra in fondo pagina, viene spinto alla pagina successiva lasciando uno spazio bianco (no text-flow oltre il float). Anche le tabelle convertite per coerenza (utente può chiedere revert se voleva solo figure).
 
 **Serve asset / generazione:**
 - [ ] `chapters/cap3_apparato.tex:44` — inserire foto del pattern Bayer RGGB (immagine Wikipedia Commons `File:Bayer_pattern_on_sensor.svg`, verificare licenza prima dell'uso).
