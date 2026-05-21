@@ -394,20 +394,21 @@ Il confronto con le principali classi di strumentazione polarimetrica commercial
 
 \begin{table}[htbp]
     \centering
-    \small
-    \caption{Confronto fra il polarimetro a immagine proposto e le principali classi di strumentazione polarimetrica commerciale: polarimetro di Stokes puntuale, telecamera a divisione del piano focale (DoFP) e sistemi a immagine full-Stokes o di matrice di Mueller. Le fasce di prezzo sono indicative dei listini commerciali del periodo 2024--2026. L'accuratezza riportata per le classi commerciali è il valore tipico dichiarato od ottenuto dopo calibrazione (per la camera DoFP, deviazione standard sull'angolo di polarizzazione lineare), mentre per il prototipo è l'ordine di grandezza dello scarto rispetto alle previsioni teoriche, in assenza di calibrazione metrologica.}
+    \footnotesize
+    \setlength{\tabcolsep}{4pt}
+    \caption{Confronto fra il polarimetro a immagine proposto e le principali classi di strumentazione polarimetrica commerciale: polarimetro di Stokes puntuale, telecamera a divisione del piano focale (DoFP) e sistemi a immagine full-Stokes o di matrice di Mueller. Le fasce di prezzo sono indicative dei listini commerciali del periodo 2024--2026; il costo del sistema proposto esclude lo smartphone. L'accuratezza riportata per le classi commerciali è il valore tipico dichiarato od ottenuto dopo calibrazione (per la camera DoFP, deviazione standard sull'angolo di polarizzazione lineare), mentre per il prototipo è l'ordine di grandezza dello scarto rispetto alle previsioni teoriche, in assenza di calibrazione metrologica.}
     \label{tab:confronto}
-    \begin{tabularx}{\textwidth}{@{}l *{4}{>{\raggedright\arraybackslash}X}@{}}
+    \begin{tabularx}{\textwidth}{@{}p{2.5cm} *{4}{>{\raggedright\arraybackslash}X}@{}}
         \hline
         \textbf{Caratteristica} & \textbf{Questo lavoro} & \textbf{Polarimetro puntuale} & \textbf{Camera DoFP} & \textbf{Imaging full-Stokes / Mueller} \\
         \hline
-        Grandezza misurata & $S_0$--$S_3$ & $S_0$--$S_3$ & $S_0$--$S_2$ (solo lineare) & $S_0$--$S_3$ o matrice di Mueller \\
-        Risoluzione spaziale & Sì, 2D & No (puntuale) & Sì, singolo scatto & Sì, 2D \\
-        Risoluzione spettrale & Banda larga (Bayer) & Monocromatica o a banda & Banda larga (Bayer) & Monocromatica o iperspettrale \\
-        Misura di $S_3$ & Sì (lamina $\lambda/4$ esterna) & Sì & No & Sì \\
-        Automazione & Manuale & Motorizzata & Singolo scatto & Motorizzata o attiva \\
-        Accuratezza (ordine di grandezza) & $\sim 1$--$5^\circ$ & $\sim 0{,}25^\circ$ & $< 0{,}5^\circ$ & $\lesssim 0{,}1^\circ$ \\
-        Costo indicativo & $<$ 100\,\texteuro\ (escl.\ smartphone) & $\sim$ 3000--6000\,\texteuro & $\sim$ 2000--2500\,\texteuro & da $3\times10^4$ a $>10^5$\,\texteuro \\
+        Grandezza misurata & $S_0$--$S_3$ & $S_0$--$S_3$ & $S_0$--$S_2$ (lineare) & $S_0$--$S_3$ / Mueller \\
+        Risoluzione spaziale & Sì, 2D & No (puntuale) & Sì (snapshot) & Sì, 2D \\
+        Risoluzione spettrale & Banda larga (Bayer) & Mono.\ o a banda & Banda larga (Bayer) & Mono.\ o iperspettr. \\
+        Misura di $S_3$ & Sì (lamina $\lambda/4$) & Sì & No & Sì \\
+        Automazione & Manuale & Motorizzata & Snapshot & Motorizz./attiva \\
+        Accuratezza tipica & $\sim 1$--$5^\circ$ & $\sim 0{,}25^\circ$ & $< 0{,}5^\circ$ & $\lesssim 0{,}1^\circ$ \\
+        Costo indicativo & $<100$\,\texteuro & $3$--$6$\,k\texteuro & $2$--$2{,}5$\,k\texteuro & $10^4$--$10^5$\,\texteuro \\
         \hline
     \end{tabularx}
 \end{table}
