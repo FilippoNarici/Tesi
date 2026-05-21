@@ -52,6 +52,9 @@ La risposta spettrale del sensore $S_c(\lambda)$ è stata invece estratta dal da
 \end{equation}
 I tre centroidi $\lambda_{\mathrm{eff},R}$, $\lambda_{\mathrm{eff},G}$, $\lambda_{\mathrm{eff},B}$ così ottenuti sono salvati in un file di calibrazione e riutilizzati in tutte le correzioni cromatiche della pipeline, in particolare nel fattore $1/\sin\delta(\lambda)$ per la ricostruzione di $S_3$ e nei fit di dispersione descritti nella \cref{sec:slice_dispersione}.
 
+% TODO: check (giustificazione centroide vs picco inserita da AI 2026-05-21)
+La scelta del centroide, anziché della lunghezza d'onda di picco, riflette la natura della misura. Su ciascun canale la grandezza polarimetrica ricostruita, ritardanza o angolo di rotazione, è una media della grandezza dipendente dalla lunghezza d'onda pesata sulla risposta spettrale $E_c(\lambda)$. Il centroide è la lunghezza d'onda alla quale una grandezza che varia in modo regolare con $\lambda$ eguaglia, al primo ordine, la propria media pesata, e riproduce quindi il valore effettivamente misurato; la lunghezza d'onda di picco rappresenterebbe invece il solo massimo di emissione, introducendo una distorsione sulle bande asimmetriche o a righe. Il caso più rilevante è il canale rosso, il cui spettro è dominato dalle righe strette del fosforo KSF: il picco coinciderebbe con la singola riga più intensa, mentre il centroide media tutte le righe che contribuiscono al segnale. Poiché la dispersione della ritardanza segue $\delta \propto 1/\lambda$, la lunghezza d'onda rigorosamente equivalente sarebbe la media armonica pesata $1/\langle 1/\lambda\rangle_{E_c}$; sulle bande in esame essa differisce dal centroide di meno di un nanometro, scarto trascurabile rispetto alle altre incertezze della misura.
+
 % TODO: inserire plot g0
 
 % ---------------------------------------------------------------------------
