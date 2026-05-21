@@ -31,8 +31,24 @@ Commenti `% TODO` presenti nei sorgenti LaTeX, da risolvere. Scan completo 2026-
 - [x] `chapters/cap1_introduzione.tex:8,11` (2026-05-21) — costo riscritto con deep research di mercato (Gemini, verificato contro listini reali: Thorlabs PAX1000 puntuale ~3,7k$ distributore / ~6,1k€ listino UE; FLIR/Lucid DoFP lineare ~2,1–2,4k$ ma SOLO S0/S1/S2, no S3; Bossa Nova SALSA full-Stokes imaging >30k€; J.A. Woollam RC2 Mueller 50–150k$). Riscritto in ordini di grandezza: puntuale ~qualche k€; full-Stokes/Mueller imaging decine–centinaia k€. "Due ordini di grandezza" scoped esplicitamente ai sistemi imaging full-Stokes/Mueller (Classi 3–4). NIENTE \cite ancora (vedi sotto: voci BibTeX smartphone-polarimetry da verificare).
 - [x] `chapters/cap4_campioni.tex:9` (2026-05-20) — tabella campioni: full `\textwidth`, colonne Fenomeno+Validazione entrambe `X` (spazio condiviso), `\raggedright` + `\small`. Risolto il wrapping brutto della terza colonna.
 - [x] `chapters/cap5_analisi.tex` (2026-05-21) — 4 voci method BibTeX scritte, DOI verificati via crossref, `\cite` cablati (commenti `% TODO` rimossi): `Ghosh1999dispersion`, `Canny1986edge` (vol PAMI-8(6)), `McInnes2018umap` (arXiv DOI 10.48550/arXiv.1802.03426), `Campello2013hdbscan` (LNCS 7819, pp 160-172).
-- [ ] `chapters/cap6_risultati.tex:374` — **lettura qualitativa ΔS3 barra** (dove compare il segnale sotto carico, segno, localizzazione al vincolo): confine di interpretazione umana, spetta all'utente.
-- [ ] `Thesis.tex:203` — **verificare la rilevanza delle fonti** una a una fornendo il fulltext a un modello (commento utente). NB: i DOI sono già verificati per esistenza + metadata via crossref (2026-05-21); questo è un check di *pertinenza del contenuto*, non di esistenza. Le 17 voci attuali sono già state scelte per pertinenza, ma rilettura fulltext = controllo extra a discrezione utente.
+> NB 2026-05-21: molti commenti utente erano stati scritti su Overleaf e sincronizzati su GitHub solo durante un rebase successivo; il catalogo sotto è il set completo dopo la sync. 13 commenti totali.
+
+**Azione AI possibile (contenuto / struttura):**
+- [ ] `chapters/cap3_apparato.tex:58` — metodo per ricavare $S_3$ preso dal manuale di laboratorio Polimi: aggiungere `\cite{manuale_polarizzazione}` (voce già in bib).
+- [ ] `chapters/cap4_campioni.tex:31` — spiegare in brevissimo perché birifrangenza (polimero stirato).
+- [ ] `chapters/cap4_campioni.tex:52` — le frange NON sono visibili: si osserva variazione di $S_3$ ma poco altro. Non parlare di "frange" ma di variazione delle proprietà di birifrangenza; analisi prettamente qualitativa, no quantitativo. Da aggiornare.
+- [ ] `chapters/cap5_analisi.tex:8` — `sec:organizzazione_pipeline` chiaro ma disordinato, non segue bene l'ordine logico della catena: riorganizzare.
+- [ ] `chapters/cap5_analisi.tex:33` — downsample: il testo dice "$f = 4$–$20$" ma in realtà è stato usato $f = 4$ (arbitrario) su tutti i dataset. Correggere il testo.
+- [ ] `chapters/cap5_analisi.tex:44` — prima della risposta in assorbimento, nota sullo spettro misurato: G e B omogenei e larghi, R con picchi definiti (uso di KSF, firma spettrale che coincide).
+- [ ] `chapters/cap6_risultati.tex:98` — bug di placement dei float: le figure di lambdaquarti finiscono nella pagina di lambdamezzi; i float non sono vincolati al capitolo e si fanno "scavalcare" dal testo successivo. Problema globale LaTeX (valutare `\FloatBarrier`/placement `[!ht]`/`\clearpage` per capitolo). Collegato all'osservazione "tabella sotto etichetta".
+
+**Serve asset / generazione:**
+- [ ] `chapters/cap3_apparato.tex:44` — inserire foto del pattern Bayer RGGB (immagine Wikipedia Commons `File:Bayer_pattern_on_sensor.svg`, verificare licenza prima dell'uso).
+- [ ] `chapters/cap5_analisi.tex:52` — inserire plot G0 (analisi spettrale RGB; output di `RUN_SPECTRA` in `python/outputs/Analisi_Spettrale_S24_RGB.pdf`).
+
+**Utente / confine umano:**
+- [ ] `chapters/cap6_risultati.tex:376` — **lettura qualitativa ΔS3 barra** (dove compare il segnale sotto carico, segno, localizzazione al vincolo): confine di interpretazione umana, spetta all'utente.
+- [ ] `Thesis.tex:203` — **verificare la rilevanza delle fonti** una a una fornendo il fulltext a un modello (commento utente). NB: i DOI sono già verificati per esistenza + metadata via crossref (2026-05-21); questo è un check di *pertinenza del contenuto*, non di esistenza.
 - [ ] `Thesis.tex:217` — Appendice A "Codice sorgente": inserire listati. ATTENZIONE: il commento cita script legacy (`final_utils.py`, `final_polarimeter.py`) ora archiviati in `python/legacy/`; l'appendice deve listare il package corrente `polarimetro/` + `analisi.ipynb`, non i legacy.
 - [ ] `Thesis.tex:245` — sostituire placeholder con ringraziamenti reali (utente).
 
