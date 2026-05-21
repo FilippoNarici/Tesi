@@ -8,7 +8,7 @@ Questo file è la singola fonte di verità sullo stato di avanzamento. Aggiornar
 
 | Cap | Titolo | Stato | Note |
 |-----|--------|-------|------|
-| 1 | Introduzione | ~90% | Em-dash + tell AI rimossi (humanizer) 2026-05-21. Claim costo riscritto 2026-05-21 (deep research mercato): puntuale ~qualche k€, full-Stokes/Mueller imaging decine–centinaia k€; "2 ordini" scoped a Classi 3–4; DoFP lineare non misura S3. Solo ordini di grandezza, no cifra puntuale. |
+| 1 | Introduzione | DONE (bozza, DA RIVEDERE) | Em-dash + tell AI rimossi (humanizer) 2026-05-21. Claim costo riscritto 2026-05-21 (deep research mercato): puntuale ~qualche k€, full-Stokes/Mueller imaging decine–centinaia k€; "2 ordini" scoped a Classi 3–4; DoFP lineare non misura S3. Solo ordini di grandezza, no cifra puntuale. Paragrafo prior-art (7 \cite verificati). Nessun TODO inline aperto. |
 | 2 | Fondamenti teorici | ~90% | Denso, ben citato |
 | 3 | Apparato sperimentale | ~95% | Figure setup presenti |
 | 4 | Raccolta dati e campioni | ~90% | Tabella campioni sistemata (colonne X, full textwidth); em-dash + copula avoidance rimossi |
@@ -23,17 +23,18 @@ Questo file è la singola fonte di verità sullo stato di avanzamento. Aggiornar
 - [x] Espansione bibliografia (2026-05-21): `.bib` ora a 17 voci (era 6), tutte DOI-verificate crossref e tutte citate. 4 method (Ghosh/Canny/McInnes/Campello → cap5) + 7 stato-dell'arte low-cost/imaging (Burggraaff2020ispex, Gonzalez2020colposcope, Louie2021skin, Gallitto2024malus, Bernard2020polarimeter, Baek2022lensless, Gu2022fullstokes → paragrafo prior-art cap1, no niche-positioning, spiega costo prodotto equivalente). Gemini aveva allucinato 2 DOI su 7 (iSPEX2 talk→paper, Baek rivista/vol/DOI sbagliati) + 1 autore (Bernard primo, non Mendez).
 - [ ] Menzione UMAP in cap7 come esplorazione raffinabile (decisione 2026-04-22: i risultati attuali non giustificano una sottosezione in cap6)
 
-## TODO inline nei file `.tex` (raccolti 2026-05-20)
+## TODO inline nei file `.tex` (ri-scansionati 2026-05-21)
 
-Commenti `% TODO` presenti nei sorgenti LaTeX, da risolvere:
+Commenti `% TODO` presenti nei sorgenti LaTeX, da risolvere. Scan completo 2026-05-21: i capitoli sono puliti (solo titoli + separatori `% ----`); tutti i `% TODO` residui vivono in `cap6_risultati.tex` e `Thesis.tex`.
 
 - [x] Em-dash su TUTTA la tesi (skill `humanizer` installata in `~/.claude/skills/humanizer`) — fatto 2026-05-20: cap1–cap6, em-dash (`---` e unicode `—`) sostituiti con virgole/parentesi/due punti; cap1 anche false-range "spaziano da…a…"; subcaption "θ — canale R" → "θ, canale R". Restano solo i `% ----` separatori di commento (invisibili). Applicata SOLO la rimozione dei pattern AI del plugin, NON la parte "soul/prima persona" (conflitta con lo stile formale tesi). Pass humanize completo cap1–cap7 fatto 2026-05-20: oltre agli em-dash, rimossi copula avoidance (costituisce/funge da → è/fornisce) in cap4/cap5/cap6, parole gonfiate ("fondamentale" cap2, "chiave"→"determinante" e "robusto"→"solido" cap6), cliché "aprirebbe la strada"→"estenderebbe" (cap7), false-range cap1. La tesi è in italiano formale già asciutto: pochi tell trovati, niente riscritture forzate su prosa pulita. NON applicata la parte "soul/prima persona" del plugin (incompatibile con stile tesi). Possibile-refuso segnalato all'utente: cap3 "polarizzatore lineare circolare" (contraddittorio).
 - [x] `chapters/cap1_introduzione.tex:8,11` (2026-05-21) — costo riscritto con deep research di mercato (Gemini, verificato contro listini reali: Thorlabs PAX1000 puntuale ~3,7k$ distributore / ~6,1k€ listino UE; FLIR/Lucid DoFP lineare ~2,1–2,4k$ ma SOLO S0/S1/S2, no S3; Bossa Nova SALSA full-Stokes imaging >30k€; J.A. Woollam RC2 Mueller 50–150k$). Riscritto in ordini di grandezza: puntuale ~qualche k€; full-Stokes/Mueller imaging decine–centinaia k€. "Due ordini di grandezza" scoped esplicitamente ai sistemi imaging full-Stokes/Mueller (Classi 3–4). NIENTE \cite ancora (vedi sotto: voci BibTeX smartphone-polarimetry da verificare).
 - [x] `chapters/cap4_campioni.tex:9` (2026-05-20) — tabella campioni: full `\textwidth`, colonne Fenomeno+Validazione entrambe `X` (spazio condiviso), `\raggedright` + `\small`. Risolto il wrapping brutto della terza colonna.
 - [x] `chapters/cap5_analisi.tex` (2026-05-21) — 4 voci method BibTeX scritte, DOI verificati via crossref, `\cite` cablati (commenti `% TODO` rimossi): `Ghosh1999dispersion`, `Canny1986edge` (vol PAMI-8(6)), `McInnes2018umap` (arXiv DOI 10.48550/arXiv.1802.03426), `Campello2013hdbscan` (LNCS 7819, pp 160-172).
 - [ ] `chapters/cap6_risultati.tex:374` — **lettura qualitativa ΔS3 barra** (dove compare il segnale sotto carico, segno, localizzazione al vincolo): confine di interpretazione umana, spetta all'utente.
-- [ ] `Thesis.tex:216` — Appendice A: inserire listati dei principali script Python.
-- [ ] `Thesis.tex:244` — sostituire con ringraziamenti reali (utente).
+- [ ] `Thesis.tex:203` — **verificare la rilevanza delle fonti** una a una fornendo il fulltext a un modello (commento utente). NB: i DOI sono già verificati per esistenza + metadata via crossref (2026-05-21); questo è un check di *pertinenza del contenuto*, non di esistenza. Le 17 voci attuali sono già state scelte per pertinenza, ma rilettura fulltext = controllo extra a discrezione utente.
+- [ ] `Thesis.tex:217` — Appendice A "Codice sorgente": inserire listati. ATTENZIONE: il commento cita script legacy (`final_utils.py`, `final_polarimeter.py`) ora archiviati in `python/legacy/`; l'appendice deve listare il package corrente `polarimetro/` + `analisi.ipynb`, non i legacy.
+- [ ] `Thesis.tex:245` — sostituire placeholder con ringraziamenti reali (utente).
 
 ## Revisione cap6 per-sample (in corso)
 
