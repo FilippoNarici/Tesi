@@ -113,3 +113,12 @@ dist/
 # nuovi dataset, committare un dataset alla volta. Le HTML plotly heatmap
 # a DOWNSAMPLE_FACTOR=1 sono gia' ignorate piu' sopra (50-160 MB ciascuna,
 # impossibili da pushare).
+
+# =========================
+# BIBLIOGRAFIA (fulltext PDF di riferimento)
+# =========================
+# La cartella biblio/ contiene i fulltext PDF delle fonti citate: servono solo
+# come riferimento locale per verificare la pertinenza delle citazioni
+# (cfr. Thesis.tex:203). Sono coperti da copyright e pesanti, non vanno
+# committati nel repo ne' sincronizzati su Overleaf.
+biblio/
