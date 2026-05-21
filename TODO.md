@@ -8,11 +8,11 @@ Questo file è la singola fonte di verità sullo stato di avanzamento. Aggiornar
 
 | Cap | Titolo | Stato | Note |
 |-----|--------|-------|------|
-| 1 | Introduzione | ~85% | Em-dash + tell AI rimossi (humanizer) 2026-05-21. Aperto: fonte del costo "decine di migliaia €" (`% TODO` riga 10) |
+| 1 | Introduzione | ~90% | Em-dash + tell AI rimossi (humanizer) 2026-05-21. Claim costo riscritto 2026-05-21 (deep research mercato): puntuale ~qualche k€, full-Stokes/Mueller imaging decine–centinaia k€; "2 ordini" scoped a Classi 3–4; DoFP lineare non misura S3. Solo ordini di grandezza, no cifra puntuale. |
 | 2 | Fondamenti teorici | ~90% | Denso, ben citato |
 | 3 | Apparato sperimentale | ~95% | Figure setup presenti |
 | 4 | Raccolta dati e campioni | ~90% | Tabella campioni sistemata (colonne X, full textwidth); em-dash + copula avoidance rimossi |
-| 5 | Analisi dati | ~98% | Rewrite end-to-end 2026-05-19 allineato a pipeline `polarimetro` + notebook `analisi.ipynb`: aggiunte sez. organizzazione pipeline 2-pass + cache npz, dispersione quarzo Ghosh, sez. nuove UMAP/HDBSCAN diagnostica, slice + fit dispersione `k/λ^p`, fotoelasticità warp ΔS3, riscrittura sez. visualizzazione (8 PDF per canale, no più 3×3). AvaSpec 2048 descritto. Aperti: voci BibTeX Canny1986, McInnes2018 UMAP, Campello2013 HDBSCAN, Ghosh1999 quartz (placeholder `% TODO` inline). |
+| 5 | Analisi dati | ~99% | Rewrite end-to-end 2026-05-19 allineato a pipeline `polarimetro` + notebook `analisi.ipynb`: aggiunte sez. organizzazione pipeline 2-pass + cache npz, dispersione quarzo Ghosh, sez. nuove UMAP/HDBSCAN diagnostica, slice + fit dispersione `k/λ^p`, fotoelasticità warp ΔS3, riscrittura sez. visualizzazione (8 PDF per canale, no più 3×3). AvaSpec 2048 descritto. BibTeX Ghosh1999/Canny1986/McInnes2018/Campello2013 verificati crossref + cablati `\cite` (2026-05-21). |
 | 6 | Risultati e discussione | ~90% | Tutti i 7 sample revisionati 2026-05-20 (BOZZA, DA RIVEDERE): righello (apertura/panoramica), lamine λ/4+λ/2, nastro strati, zucchero, trave. Figure reali subfloat, dati da pipeline corrente. Rimossa vecchia sec:validazione (misura a vuoto falsa). Ordine: righello → lamine → nastro → versatilità (zucchero, trave). λ/2 = multi-ordine concluso (b<1, ordine indeterminato); anomalia 3R-B CHIUSA (inspiegata, nessun impatto su fit); barra solo qualitativa. Em-dash + tell AI rimossi. Resta: revisione manuale + `% TODO` interno lettura ΔS3 barra. |
 | 7 | Conclusioni | ~70% | Reggere meglio il passaggio agli sviluppi futuri; menzionare UMAP come esplorazione raffinabile (v. sotto) |
 
@@ -20,7 +20,7 @@ Questo file è la singola fonte di verità sullo stato di avanzamento. Aggiornar
 
 - [ ] Appendice A: listati dei principali script Python (attualmente placeholder)
 - [ ] Ringraziamenti (placeholder — li scrive l'utente)
-- [ ] Espansione bibliografia: target 10–15 voci nuove (attualmente 6, quasi tutti libri di testo)
+- [x] Espansione bibliografia (2026-05-21): `.bib` ora a 17 voci (era 6), tutte DOI-verificate crossref e tutte citate. 4 method (Ghosh/Canny/McInnes/Campello → cap5) + 7 stato-dell'arte low-cost/imaging (Burggraaff2020ispex, Gonzalez2020colposcope, Louie2021skin, Gallitto2024malus, Bernard2020polarimeter, Baek2022lensless, Gu2022fullstokes → paragrafo prior-art cap1, no niche-positioning, spiega costo prodotto equivalente). Gemini aveva allucinato 2 DOI su 7 (iSPEX2 talk→paper, Baek rivista/vol/DOI sbagliati) + 1 autore (Bernard primo, non Mendez).
 - [ ] Menzione UMAP in cap7 come esplorazione raffinabile (decisione 2026-04-22: i risultati attuali non giustificano una sottosezione in cap6)
 
 ## TODO inline nei file `.tex` (raccolti 2026-05-20)
@@ -28,12 +28,9 @@ Questo file è la singola fonte di verità sullo stato di avanzamento. Aggiornar
 Commenti `% TODO` presenti nei sorgenti LaTeX, da risolvere:
 
 - [x] Em-dash su TUTTA la tesi (skill `humanizer` installata in `~/.claude/skills/humanizer`) — fatto 2026-05-20: cap1–cap6, em-dash (`---` e unicode `—`) sostituiti con virgole/parentesi/due punti; cap1 anche false-range "spaziano da…a…"; subcaption "θ — canale R" → "θ, canale R". Restano solo i `% ----` separatori di commento (invisibili). Applicata SOLO la rimozione dei pattern AI del plugin, NON la parte "soul/prima persona" (conflitta con lo stile formale tesi). Pass humanize completo cap1–cap7 fatto 2026-05-20: oltre agli em-dash, rimossi copula avoidance (costituisce/funge da → è/fornisce) in cap4/cap5/cap6, parole gonfiate ("fondamentale" cap2, "chiave"→"determinante" e "robusto"→"solido" cap6), cliché "aprirebbe la strada"→"estenderebbe" (cap7), false-range cap1. La tesi è in italiano formale già asciutto: pochi tell trovati, niente riscritture forzate su prosa pulita. NON applicata la parte "soul/prima persona" del plugin (incompatibile con stile tesi). Possibile-refuso segnalato all'utente: cap3 "polarizzatore lineare circolare" (contraddittorio).
-- [ ] `chapters/cap1_introduzione.tex:10` — verificare/citare la fonte del costo "decine di migliaia di euro" dei polarimetri da laboratorio (e cifra analoga nel paragrafo seguente): sembra una cifra sparata, serve riferimento.
+- [x] `chapters/cap1_introduzione.tex:8,11` (2026-05-21) — costo riscritto con deep research di mercato (Gemini, verificato contro listini reali: Thorlabs PAX1000 puntuale ~3,7k$ distributore / ~6,1k€ listino UE; FLIR/Lucid DoFP lineare ~2,1–2,4k$ ma SOLO S0/S1/S2, no S3; Bossa Nova SALSA full-Stokes imaging >30k€; J.A. Woollam RC2 Mueller 50–150k$). Riscritto in ordini di grandezza: puntuale ~qualche k€; full-Stokes/Mueller imaging decine–centinaia k€. "Due ordini di grandezza" scoped esplicitamente ai sistemi imaging full-Stokes/Mueller (Classi 3–4). NIENTE \cite ancora (vedi sotto: voci BibTeX smartphone-polarimetry da verificare).
 - [x] `chapters/cap4_campioni.tex:9` (2026-05-20) — tabella campioni: full `\textwidth`, colonne Fenomeno+Validazione entrambe `X` (spazio condiviso), `\raggedright` + `\small`. Risolto il wrapping brutto della terza colonna.
-- [ ] `chapters/cap5_analisi.tex:77` — voce BibTeX **Ghosh1999** (G. Ghosh, Opt. Commun. 163(1-3):95–102, 1999, DOI:10.1016/S0030-4018(99)00091-7).
-- [ ] `chapters/cap5_analisi.tex:86` — voce BibTeX **Canny1986** (J. Canny, IEEE TPAMI 8(6):679–698, 1986, DOI:10.1109/TPAMI.1986.4767851).
-- [ ] `chapters/cap5_analisi.tex:203` — voce BibTeX **McInnes2018** (UMAP, arXiv:1802.03426).
-- [ ] `chapters/cap5_analisi.tex:206` — voce BibTeX **Campello2013** (HDBSCAN, PAKDD 2013, DOI:10.1007/978-3-642-37456-2_14).
+- [x] `chapters/cap5_analisi.tex` (2026-05-21) — 4 voci method BibTeX scritte, DOI verificati via crossref, `\cite` cablati (commenti `% TODO` rimossi): `Ghosh1999dispersion`, `Canny1986edge` (vol PAMI-8(6)), `McInnes2018umap` (arXiv DOI 10.48550/arXiv.1802.03426), `Campello2013hdbscan` (LNCS 7819, pp 160-172).
 - [ ] `chapters/cap6_risultati.tex:374` — **lettura qualitativa ΔS3 barra** (dove compare il segnale sotto carico, segno, localizzazione al vincolo): confine di interpretazione umana, spetta all'utente.
 - [ ] `Thesis.tex:216` — Appendice A: inserire listati dei principali script Python.
 - [ ] `Thesis.tex:244` — sostituire con ringraziamenti reali (utente).
