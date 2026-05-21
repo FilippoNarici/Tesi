@@ -12,7 +12,7 @@ I campioni sono stati scelti per coprire i tre fenomeni polarimetrici di interes
         \textbf{Campione} & \textbf{Fenomeno} & \textbf{Validazione attesa} \\
         \hline
         Lamina $\lambda/2$ zero-order & Birifrangenza & $\delta \approx 180^\circ$, AoLP ruotato \\
-        Lamina $\lambda/4$ zero-order & Birifrangenza & $|S_3/S_0| \approx 1$ a $45^\circ$ \\
+        Lamina $\lambda/4$ zero-order & Birifrangenza & $|S_3/S_0| \approx 1$ a $45^\circ$ \\ %     TODO: questa cosa e quella sopra non le abbiamo inserite nel capitolo 6, magari le verificherei come verifica aggiuntiva
         Nastro adesivo (1--5 strati) & Birifrangenza incrementale & $\delta \propto N$ \\
         Soluzione di saccarosio & Attività ottica & $\alpha_\text{rot} \propto 1/\lambda^2$ \\
         Righello in plastica & Fotoelasticità (stress residuo) & Frange isocromatiche \\
@@ -25,9 +25,11 @@ I campioni sono stati scelti per coprire i tre fenomeni polarimetrici di interes
 \section{Campioni birifrangenti}
 \label{sec:campioni-birifrangenti}
 
-Le lamine d'onda commerciali ($\lambda/2$ e $\lambda/4$, entrambe zero-order a $\SI{633}{\nano\meter}$, cfr.\ \cref{sec:fenomeni}) sono il primo test di validazione: la ritardanza è nota con precisione e la risposta è spazialmente uniforme, il che consente un confronto diretto tra valore misurato e valore atteso. La lamina $\lambda/4$, orientata a $\SI{45}{\degree}$ rispetto alla polarizzazione incidente, produce luce circolarmente polarizzata con $|S_3/S_0| \approx 1$; la lamina $\lambda/2$ ruota il piano di polarizzazione di un angolo pari al doppio della sua orientazione, con ritardanza nominale $\delta \approx 180^\circ$.
+Le lamine d'onda commerciali ($\lambda/2$ e $\lambda/4$, entrambe zero-order a $\SI{633}{\nano\meter}$, cfr.\ \cref{sec:fenomeni}) sono il primo test di validazione quantitativa: la ritardanza è nota con precisione e la risposta è spazialmente uniforme, il che consente un confronto diretto tra valore misurato e valore atteso. La lamina $\lambda/4$, orientata a $\SI{45}{\degree}$ rispetto alla polarizzazione incidente, produce luce circolarmente polarizzata con $|S_3/S_0| \approx 1$; la lamina $\lambda/2$ ruota il piano di polarizzazione di un angolo pari al doppio della sua orientazione, con ritardanza nominale $\delta \approx 180^\circ$.
 
-Il vetrino con strati di nastro adesivo trasparente (da 1 a 5 strati, in configurazione simmetrica $1$-$2$-$3$-$4$-$5$-$4$-$3$-$2$-$1$) è un campione a birifrangenza incrementale controllata: il film polimerico orientato del nastro presenta una birifrangenza intrinseca, e la ritardanza totale cresce approssimativamente come
+Il vetrino con strati di nastro adesivo trasparente (da 1 a 5 strati, in configurazione simmetrica $1$-$2$-$3$-$4$-$5$-$4$-$3$-$2$-$1$) è un campione a birifrangenza incrementale controllata: il film polimerico orientato del nastro presenta una birifrangenza intrinseca, 
+% TODO: perchè? spieghiamo in brevissimo come mai birifrangenza (polimero stirato)
+e la ritardanza totale cresce approssimativamente come
 \begin{equation}
 \delta_{\text{tot}} \approx N \cdot \delta_{\text{singolo}},
 \label{eq:ritardo-strati}
@@ -46,4 +48,5 @@ Una soluzione di saccarosio (in una boccetta con cammino ottico $l = \SI{13}{\mi
 
 Un righello in plastica trasparente presenta tensioni residue da stampaggio a iniezione che generano birifrangenza non uniforme nel materiale. Quando posto tra polarizzatore e analizzatore, le regioni a diverso stato di tensione producono le frange isocromatiche e isocline tipiche dei materiali fotoelastici (cfr.\ \cref{sec:fenomeni}). L'analisi con il polarimetro a immagine consente di mappare spazialmente la distribuzione delle tensioni interne.
 
-Una trave in materiale trasparente, vincolata a un'estremità, è stata analizzata in due condizioni: scarica, per verificare l'eventuale presenza di tensioni residue, e sotto carico, con un peso applicato all'estremità libera. Il campo di sforzi in una trave a sbalzo è noto dalla teoria di Eulero-Bernoulli: lo sforzo di flessione varia linearmente lungo lo spessore e inversamente con la distanza dal vincolo. Questa distribuzione genera, per effetto fotoelastico, un pattern di frange isocromatiche direttamente confrontabile con le previsioni teoriche, ed è il test più esigente delle capacità quantitative del polarimetro.
+Una trave in materiale trasparente, vincolata a un'estremità, è stata analizzata in due condizioni: scarica, per verificare l'eventuale presenza di tensioni residue, e sotto carico, con un peso applicato all'estremità libera. Lo sforzo di flessione varia linearmente lungo lo spessore e inversamente con la distanza dal vincolo. Questa distribuzione genera, per effetto fotoelastico, un pattern di frange isocromatiche direttamente confrontabile con le previsioni teoriche, ed è il test più esigente delle capacità quantitative del polarimetro.
+% TODO: le frange non sono visibili, o meglio si osserva variazione s3 ma non molto altro, vedi sotto, io non parlerei di frange piuttosto di una variazione delle proprietà di birifrangenza, inoltre no quantitativo, analisi prettamente qualitiativa, da aggiornare
