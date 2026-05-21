@@ -44,7 +44,7 @@ Commenti `% TODO` presenti nei sorgenti LaTeX, da risolvere. Scan completo 2026-
 - [x] `chapters/cap6_risultati.tex:98` (2026-05-21) — float "scavalcati"/spostati di pagina: RISOLTO convertendo TUTTI i float (figure + tabelle, cap3/cap4/cap6) da `[htbp]` a `[H]` del package `float` (già caricato Thesis.tex:47). Ora le figure/tabelle sono ancorate al punto esatto del sorgente, come testo, e il testo non le scavalca. Tradeoff noto di `[H]`: se un float non entra in fondo pagina, viene spinto alla pagina successiva lasciando uno spazio bianco (no text-flow oltre il float). Anche le tabelle convertite per coerenza (utente può chiedere revert se voleva solo figure).
 
 **Serve asset / generazione:**
-- [ ] `chapters/cap3_apparato.tex:44` — inserire foto del pattern Bayer RGGB (immagine Wikipedia Commons `File:Bayer_pattern_on_sensor.svg`, verificare licenza prima dell'uso).
+- [x] `chapters/cap3_apparato.tex:44` (2026-05-21) — figura pattern Bayer RGGB inserita (`fig:bayer`, sez. sensore, `\cref` nel testo). Scaricata da Wikimedia Commons (`Images/bayer_pattern.svg` + `.png` 960px); licenza **CC BY-SA 3.0** di Cburnett verificata via API Commons e attribuita in caption (attribuzione richiesta).
 - [~] `chapters/cap5_analisi.tex:52` — inserire plot G0 (analisi spettrale RGB; `python/outputs/Analisi_Spettrale_S24_RGB.pdf`). Cella G0 del notebook aggiornata 2026-05-21 (TODO interno "ANNOTARE PICCHI" risolto): `find_peaks` annota i picchi dello spettro sorgente — blu 463, verde 535, righe KSF rosse 609/613/631/635/647; PDF rigenerato. RESTA solo l'inserimento della figura in cap5 (decidere path: referenziare `python/outputs/` o copia in `Images/generated/`).
 
 **Utente / confine umano:**
