@@ -380,28 +380,34 @@ La mappa differenziale evidenzia, sia pur debolmente, la comparsa di un segnale 
 
 I risultati presentati nelle sezioni precedenti dimostrano che il sistema è in grado di ricostruire il vettore di Stokes completo con risoluzione spaziale bidimensionale, di misurare ritardanza e asse veloce su campioni macroscopici, e di distinguere fenomeni polarimetrici di natura diversa (birifrangenza, attività ottica, fotoelasticità) con un apparato il cui costo complessivo, escluso lo smartphone, è inferiore a 100\,\texteuro.
 
+Una stima rigorosa dell'incertezza di misura esula dalle possibilità di questo lavoro: quantificarla richiederebbe una calibrazione dello strumento contro campioni a ritardanza nota e con incertezza certificata, riferimenti non disponibili per un prototipo che non ha ancora ricevuto una caratterizzazione metrologica. In assenza di tali standard, l'accuratezza può essere valutata soltanto per confronto con le previsioni teoriche sui campioni di validazione, e gli scarti osservati si collocano nell'ordine di pochi gradi. La lamina quarto d'onda zero-order, il cui ritardo misurato è stato confrontato con il modello di dispersione del quarzo (\cref{subsec:risultati_qw}), ne è l'esempio più diretto, con uno scarto contenuto entro circa quattro gradi su tutti e tre i canali. Tale valore va inteso come ordine di grandezza dell'accordo con la teoria, non come una barra d'errore calibrata.
+
+Lo scarto non si distribuisce in modo uniforme fra le grandezze ricostruite, e la gerarchia osservata riflette la lunghezza della catena di misura che ciascuna richiede. L'angolo di polarizzazione lineare e il grado di polarizzazione discendono direttamente dai parametri di Stokes lineari $S_0$, $S_1$ e $S_2$, estratti dal sistema sovradeterminato delle trentasei acquisizioni angolari, e risultano perciò le grandezze più stabili. La ritardanza richiede invece la determinazione di $S_3$, e con essa le due acquisizioni aggiuntive con lamina $\lambda/4$, la correzione cromatica del ritardo della lamina e l'azzeramento dell'ellitticità residua sulla sfera di Poincaré; la catena più lunga, sommata all'ambiguità di avvolgimento modulo $360^\circ$ per i campioni ad alta ritardanza, rende $\delta$ la quantità intrinsecamente meno precisa, in accordo con la maggiore sensibilità del suo calcolo alle approssimazioni discusse di seguito.
+
 Il principale compromesso è introdotto dal downsampling: con fattori tipici tra 10 e 20, la risoluzione scende da 12 megapixel a $10^4$--$10^5$ pixel, rendendo irrisolvibili strutture più piccole di qualche centinaio di micrometri. Per i campioni macroscopici analizzati questa limitazione non è stata rilevante, ma applicazioni su scala microscopica richiederebbero un'elaborazione a blocchi o su GPU.
 
 Un secondo limite è l'approssimazione monocromatica: l'assegnazione di una singola lunghezza d'onda effettiva a ciascun canale colore ignora la larghezza di banda dei filtri Bayer, che si estende su diverse decine di nanometri. Per campioni con forte dispersione, la misura rappresenta una media pesata sulla banda; una caratterizzazione più fine richiederebbe filtri passa-banda stretti o una sorgente monocromatica.
 
 La sensibilità alla calibrazione della lamina $\lambda/4$ è un terzo fattore: la correzione cromatica $1/\sin\delta(\lambda)$ assume un modello di dispersione lineare che diventa meno accurato allontanandosi da $\lambda_0 = \SI{633}{\nano\meter}$. Questo spiega la scelta del canale rosso come canale predefinito per l'analisi.
 
-Rispetto ai polarimetri di laboratorio convenzionali, il sistema scambia accuratezza assoluta e risoluzione spettrale con costo, portabilità e accessibilità (\cref{tab:confronto}). È particolarmente adatto a contesti didattici e a misure esplorative, dove la rapidità di setup e il basso costo compensano le limitazioni in precisione.
+Il confronto con le principali classi di strumentazione polarimetrica commerciale (\cref{tab:confronto}) colloca il sistema in una posizione intermedia. Le telecamere a divisione del piano focale offrono imaging di polarizzazione a costo contenuto, ma rinunciano alla componente circolare $S_3$; i sistemi a immagine full-Stokes o di matrice di Mueller, capaci della stessa misura completa ottenuta in questo lavoro, hanno invece costi di due o tre ordini di grandezza superiori. Il prototipo scambia accuratezza assoluta e risoluzione spettrale con costo, portabilità e accessibilità, e risulta particolarmente adatto a contesti didattici e a misure esplorative, dove la rapidità di setup e il basso costo compensano le limitazioni in precisione.
 
 \begin{table}[htbp]
     \centering
-    \caption{Confronto qualitativo tra il polarimetro a immagine proposto e un polarimetro da laboratorio convenzionale.}
+    \small
+    \caption{Confronto fra il polarimetro a immagine proposto e le principali classi di strumentazione polarimetrica commerciale: polarimetro di Stokes puntuale, telecamera a divisione del piano focale (DoFP) e sistemi a immagine full-Stokes o di matrice di Mueller. Le fasce di prezzo sono indicative dei listini commerciali del periodo 2024--2026. L'accuratezza riportata per le classi commerciali è il valore tipico dichiarato od ottenuto dopo calibrazione (per la camera DoFP, deviazione standard sull'angolo di polarizzazione lineare), mentre per il prototipo è l'ordine di grandezza dello scarto rispetto alle previsioni teoriche, in assenza di calibrazione metrologica.}
     \label{tab:confronto}
-    \begin{tabularx}{0.9\textwidth}{lXX}
+    \begin{tabularx}{\textwidth}{@{}l *{4}{>{\raggedright\arraybackslash}X}@{}}
         \hline
-        \textbf{Caratteristica} & \textbf{Sistema proposto} & \textbf{Laboratorio} \\
+        \textbf{Caratteristica} & \textbf{Questo lavoro} & \textbf{Polarimetro puntuale} & \textbf{Camera DoFP} & \textbf{Imaging full-Stokes / Mueller} \\
         \hline
-        Costo & $<$ 100\,\texteuro\ (escluso smartphone) & $>$ 10\,000\,\texteuro \\
-        Portabilità & Elevata (tascabile) & Limitata (banco ottico) \\
-        Risoluzione spaziale & $\sim 10^4$--$10^5$~px (post-binning) & Variabile (CCD/CMOS dedicato) \\
-        Risoluzione spettrale & Banda larga (filtro Bayer) & Monocromatica o iperspettrale \\
-        Misura di $S_3$ & Sì (con lamina $\lambda/4$ esterna) & Sì \\
-        Automazione & Manuale (rotazione analizzatore) & Motorizzata \\
+        Grandezza misurata & $S_0$--$S_3$ & $S_0$--$S_3$ & $S_0$--$S_2$ (solo lineare) & $S_0$--$S_3$ o matrice di Mueller \\
+        Risoluzione spaziale & Sì, 2D & No (puntuale) & Sì, singolo scatto & Sì, 2D \\
+        Risoluzione spettrale & Banda larga (Bayer) & Monocromatica o a banda & Banda larga (Bayer) & Monocromatica o iperspettrale \\
+        Misura di $S_3$ & Sì (lamina $\lambda/4$ esterna) & Sì & No & Sì \\
+        Automazione & Manuale & Motorizzata & Singolo scatto & Motorizzata o attiva \\
+        Accuratezza (ordine di grandezza) & $\sim 1$--$5^\circ$ & $\sim 0{,}25^\circ$ & $< 0{,}5^\circ$ & $\lesssim 0{,}1^\circ$ \\
+        Costo indicativo & $<$ 100\,\texteuro\ (escl.\ smartphone) & $\sim$ 3000--6000\,\texteuro & $\sim$ 2000--2500\,\texteuro & da $3\times10^4$ a $>10^5$\,\texteuro \\
         \hline
     \end{tabularx}
 \end{table}
