@@ -116,7 +116,14 @@ def plot_dispersion_fit(fit, *,
         all_vals = list(values)
         if design_point is not None:
             all_vals.append(design_point['value'])
-        ax.set_ylim(0, max(all_vals) * y_pad_frac)
+        vmin, vmax = min(all_vals), max(all_vals)
+        if vmin >= 0:
+            ax.set_ylim(0, vmax * y_pad_frac)
+        elif vmax <= 0:
+            ax.set_ylim(vmin * y_pad_frac, 0)
+        else:
+            pad = max(abs(vmin), abs(vmax)) * (y_pad_frac - 1.0)
+            ax.set_ylim(vmin - pad, vmax + pad)
     ax.grid(True, linestyle=':', alpha=0.6)
     ax.axhline(0.0, color='gray', linewidth=0.6, alpha=0.5)
     ax.legend(loc=legend_loc, fontsize=7, framealpha=0.85)

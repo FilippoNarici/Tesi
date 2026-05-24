@@ -36,7 +36,7 @@ STOKES_PARAM_CONFIG = {
               'vmin': 0, 'vmax': 360},
     'theta': {'titolo': r'Asse veloce $\theta$',
               'unita': '°', 'cmap': 'twilight',
-              'vmin': -90, 'vmax': 90},
+              'vmin': 0, 'vmax': 90},
 }
 
 STOKES_PARAM_ORDER = ('S0', 'S1', 'S2', 'S3', 'DoLP', 'AoLP', 'delta', 'theta')

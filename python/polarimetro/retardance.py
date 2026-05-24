@@ -2,8 +2,6 @@
 import numpy as np
 import scipy.ndimage as ndimage
 
-from . import config
-
 
 def calculate_dolp_aolp(S0, S1, S2):
     print("Calculating DoLP and AoLP...")
@@ -24,9 +22,10 @@ def calculate_retardance_and_fast_axis(S0, S1, S2, S3, bg_mask,
     align_poincare_ellipticity. La rotazione Poincare assume input puramente
     lineare; le formule sotto richiedono s3_bg ~ 0 sul background.
 
-    Se target_folder corrisponde a un dataset con waveplate fast/slow scambiate
-    (vedi config.WAVEPLATE_SWAPPED_DATASETS) applica la correzione equivalente
-    sulla sfera di Poincare (delta -> 360 - delta, theta -> theta - 90 deg).
+    target_folder: riservato (la correzione swap fast/slow per-dataset e' stata
+    rimossa il 2026-05-24; il segno globale di S3 e' fissato in stokes.py e
+    validato dalla lamina lambda/4 zero-order). Parametro mantenuto per
+    compatibilita' di firma con pipeline.process_channel; attualmente inutilizzato.
     """
     print("Calculating Retardance and Fast Axis...")
     if S3 is None:
@@ -103,11 +102,5 @@ def calculate_retardance_and_fast_axis(S0, S1, S2, S3, bg_mask,
 
     delta_deg = np.degrees(delta)
     theta_deg = np.degrees(theta)
-
-    if config.is_waveplate_swapped(target_folder):
-        print("  -> WAVEPLATE_AXES_SWAPPED active: applying fast/slow axis "
-              "correction (delta -> 360 - delta, theta -> theta - 90 deg).")
-        delta_deg = (360.0 - delta_deg) % 360.0
-        theta_deg = (theta_deg - 90.0 + 90.0) % 180.0 - 90.0
 
     return delta_deg, theta_deg

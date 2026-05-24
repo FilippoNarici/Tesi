@@ -93,7 +93,12 @@ def calculate_s3(wav_dir, channel_index, downsample_factor=1,
         print("Error: Could not find or load both wav45.dng and wav-45.dng.")
         return None
 
-    # Angle inversion: original -45 -> I(+45), original +45 -> I(-45)
+    # Swap S3 globale (2026-05-23): segno assoluto di S3 = I(+45)-I(-45) dipende
+    # dall'orientamento fronte/retro della w/4-di-riferimento, grado di liberta'
+    # NON fissato da zucchero (S3~0) ne' da A2 (verso angoli). Lo inchioda la
+    # lambdaquarti zero-order: delta deve SALIRE verso il blu (delta~1/lambda);
+    # senza swap dava 273/251/230 (discendente, ramo 360-delta). Con swap ->
+    # 87/109/130 (ascendente, ~90@633nm). Convenzione manuale: S3<0 destrogiro.
     I_45 = img_minus_45_orig
     I_minus_45 = img_45_orig
 
@@ -225,7 +230,8 @@ def calculate_s3_rgb(wav_dir, channel_indices=(0, 1, 2),
 
     out = {}
     for ch in channel_indices:
-        # Angle inversion: original -45 -> I(+45), original +45 -> I(-45)
+        # Swap S3 globale (2026-05-23): vedi nota in calculate_s3. Segno assoluto
+        # S3 fissato dalla lambdaquarti zero-order (delta deve salire verso blu).
         img_45 = rgb_m45[int(ch)]
         img_m45 = rgb_45[int(ch)]
         if dark_per_ch[int(ch)] is not None:

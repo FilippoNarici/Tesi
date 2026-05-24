@@ -63,12 +63,12 @@ Strumenti opzionali (gated da flag, in fondo notebook):
 | Modulo | Contenuto |
 |--------|-----------|
 | `__init__.py` | Re-export public API e namespace di tutti i sotto-moduli (`config`, `pipeline`, `plotting`, `slice_fit`, `umap_runner`, `clustering_plot`, `dispersion`, `photoelasticity`) |
-| `config.py` | Costanti immutabili (`SENSOR_WHITE_LEVEL=4095`, `SATURATION_FRACTION=0.98`, `WAV_HOLDER_THRESHOLD=0.50`, soglie Canny, dilation), `WAVEPLATE_SWAPPED_DATASETS`, `WAVEPLATE_DESIGN_ANCHOR` (punti design 633 nm per λ/2 e λ/4), `is_waveplate_swapped(target_folder)`, `get_channel_wavelength(csv_path, channel_index)` |
+| `config.py` | Costanti immutabili (`SENSOR_WHITE_LEVEL=4095`, `SATURATION_FRACTION=0.98`, `WAV_HOLDER_THRESHOLD=0.50`, soglie Canny, dilation), `WAVEPLATE_DESIGN_ANCHOR` (punti design 633 nm per λ/2 e λ/4), `get_channel_wavelength(csv_path, channel_index)`. (swap per-dataset `WAVEPLATE_SWAPPED_DATASETS`/`is_waveplate_swapped` rimosso 2026-05-24) |
 | `io_raw.py` | `load_raw_image`, `load_rotation_sequence`, `load_dark_frame`, `downsample_image`, `reset_saturation_accumulator`, `get_saturation_mask`. Globals modulo: `_SATURATION_ACCUMULATOR`, `_DARK_FRAME_CACHE` |
 | `stokes.py` | `calculate_linear_stokes`, `calculate_s3` (con correzione λ via Ghosh), `calculate_linear_stokes_rgb_streaming` (38 file letti 1 volta), `calculate_s3_rgb`, `quartz_birefringence`, `waveplate_retardance`, `get_wav_intensity_cache()`. Global `_WAV_INTENSITY_CACHE` (esposto via getter per evitare import circolari con `align`) |
 | `mask.py` | `generate_background_mask` (Canny + dark prior + flood-fill multi-component + compactness + erosione scalata DS) |
 | `align.py` | `align_reference_frame` (asse S3), `align_poincare_ellipticity` (asse S2, usa `stokes.get_wav_intensity_cache()`), `get_poincare_bg_mask()`. Global `_POINCARE_BG_MASK_CACHE` |
-| `retardance.py` | `calculate_dolp_aolp`, `calculate_retardance_and_fast_axis` (arctan2 [0°, 360°), valuta `WAVEPLATE_SWAPPED` a runtime via arg `target_folder`) |
+| `retardance.py` | `calculate_dolp_aolp`, `calculate_retardance_and_fast_axis` (δ via arctan2 [0°, 360°), θ ripiegato [0°,90°]). Arg `target_folder` riservato/inutilizzato (swap per-dataset rimosso). Il segno di S3 è fissato a monte in `stokes.py`, non qui |
 | `umap_runner.py` | Helper UMAP: `build_validity_mask`, `random_sample_mask`, `plot_sample_diagnostic`, `build_feature_matrix`, `color_spec`, `aolp_clip_range`, `normalize_stokes`, `fit_umap`, `cluster_umap_hdbscan_by_aolp` / `_by_delta` (HDBSCAN sull'embedding UMAP + statistica circolare + score `size_frac × R × ang_dist²`), `compute_or_load_umap_cache` (one-channel runner: build_validity_mask + random_sample_mask + fit_umap + cache npz schema v3), `export_umap_panels` (3 PDF pubblicabili: mappa, scatter UMAP, hist filtrato sample) |
 | `clustering_plot.py` | `plot_cluster_winner_panels(mode='aolp'\|'delta', ...)` — figura 3-pannelli (UMAP scatter, mappa spaziale, istogramma) con cluster vincente rosso. Dedup celle D-aolp + D-delta del notebook |
 | `dispersion.py` | Fit spettrale `f(λ) = k/λ^p` parametrico. `fit_inverse_lambda(lambdas, values, power=1\|2)` ritorna dict `{k, k_err, r2, ...}`; `plot_dispersion_fit(fit, ..., design_point=None)` genera figura 1-pannello stile tesi. Usato da D-aolp-fit (`p=2`, Drude), D-delta-fit (`p=1` + design anchor), H (`p=1` su slope) |
@@ -132,7 +132,7 @@ Le cache npz sono rigenerabili eseguendo la cella Load+Stokes o `RUN_SPECTRA`/UM
 Vedi `CLAUDE.md` (radice), sezione "Insidie tecniche note". Le più critiche per chi tocca il notebook o il package:
 
 * `align_poincare_ellipticity` ritorna nuovi array (riassegnare `S1, S3` nei chiamanti). La cella Load+Stokes lo fa correttamente.
-* `WAVEPLATE_AXES_SWAPPED` per `lambdamezzi_50deg` ora gestito a runtime via `config.is_waveplate_swapped(target_folder)` chiamato dentro `calculate_retardance_and_fast_axis`. Cambiare DATASET nel notebook è sicuro.
+* **Segno di S3**: fissato globalmente in `stokes.py` (`calculate_s3`/`calculate_s3_rgb` fanno `I_−45−I_+45`), validato dalla λ/4 zero-order. Convenzione `S3<0`=destrogiro (manuale). Lo swap per-dataset (`WAVEPLATE_SWAPPED_DATASETS`/`is_waveplate_swapped`) è stato **rimosso** 2026-05-24; cambiare DATASET resta sicuro.
 * Retardance arctan2 [0°, 360°); le tabelle storiche basate su `arccos` vanno rimisurate (TODO B2).
 * Saturation accumulator va resettato all'inizio di ogni run; la cella Load+Stokes lo fa.
 * La cache npz `stokes_*` invalida automaticamente se cambia `DOWNSAMPLE_FACTOR` o `DATASET` salvato.

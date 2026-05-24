@@ -85,15 +85,15 @@ Poiché la matrice $\mathbf{A}$ non dipende dal pixel, la pseudo-inversa viene c
 
 Il parametro $S_3$, che quantifica la componente di polarizzazione circolare, non è accessibile tramite il solo analizzatore lineare. La sua misura richiede l'inserimento della lamina $\lambda/4$ nel cammino ottico, che converte la polarizzazione circolare in polarizzazione lineare analizzabile. Le due immagini acquisite con la lamina a $+45^\circ$ e $-45^\circ$ forniscono le intensità $I_{+45}$ e $I_{-45}$, legate a $S_3$ dalla relazione~\cite{manuale_polarizzazione}:
 \begin{equation}
-    S_3 = \frac{I_{+45} - I_{-45}}{\sin\delta(\lambda)},
+    S_3 = \frac{I_{-45} - I_{+45}}{\sin\delta(\lambda)},
     \label{eq:s3_formula}
 \end{equation}
-dove $\delta(\lambda)$ è il ritardo di fase effettivo della lamina alla lunghezza d'onda di lavoro. Il fattore correttivo $1/\sin\delta(\lambda)$ compensa la dipendenza cromatica della lamina zero-order, calibrata per produrre un ritardo nominale di $90^\circ$ alla lunghezza d'onda di design $\lambda_0 = \SI{633}{\nano\meter}$. Per una lamina di ordine zero in $\alpha$-quarzo lo spessore è fissato e il ritardo a una generica lunghezza d'onda dipende dalla birifrangenza $\Delta n(\lambda) = n_e(\lambda) - n_o(\lambda)$ del materiale:
+dove $\delta(\lambda)$ è il ritardo di fase effettivo della lamina alla lunghezza d'onda di lavoro. L'ordine delle due immagini nella differenza fissa il segno di $S_3$ in accordo con la convenzione adottata ($S_3 < 0$ per la polarizzazione destrogira, \cref{subsec:stokes_def}). Tale segno dipende dall'orientazione fisica della lamina $\lambda/4$ di riferimento e non dal modello: è stato determinato imponendo che la lamina $\lambda/4$ zero-order analizzata come campione riproduca la dispersione $\delta \propto 1/\lambda$ attesa, criterio che funge al contempo da auto-validazione della ricostruzione di $S_3$ (\cref{subsec:risultati_qw}). Il fattore correttivo $1/\sin\delta(\lambda)$ compensa la dipendenza cromatica della lamina zero-order, calibrata per produrre un ritardo nominale di $90^\circ$ alla lunghezza d'onda di design $\lambda_0 = \SI{633}{\nano\meter}$. Per una lamina di ordine zero in $\alpha$-quarzo lo spessore è fissato e il ritardo a una generica lunghezza d'onda dipende dalla birifrangenza $\Delta n(\lambda) = n_e(\lambda) - n_o(\lambda)$ del materiale:
 \begin{equation}
     \delta(\lambda) = \frac{\pi}{2} \cdot \frac{\Delta n(\lambda)}{\Delta n(\lambda_0)} \cdot \frac{\lambda_0}{\lambda}.
     \label{eq:dispersione-qwp}
 \end{equation}
-La birifrangenza è valutata tramite il modello di Sellmeier proposto da Ghosh per l'$\alpha$-quarzo, valido nell'intervallo $200$--$2000$~nm, che fornisce indici di rifrazione ordinario e straordinario separati a partire dai rispettivi coefficienti tabulati~\cite{Ghosh1999dispersion}. Per il canale rosso ($\lambda_{\mathrm{eff}} \approx \SI{600}{\nano\meter}$) il fattore $1/\sin\delta(\lambda)$ risulta dell'ordine di $1{,}05$, modesto ma non trascurabile per misure quantitative; sui canali blu e verde la deviazione cresce in modulo, e la correzione spettrale risulta indispensabile per evitare distorsioni sistematiche di $S_3$. Anche per le immagini con lamina l'orientazione nominale viene invertita per coerenza con la convenzione destrorsa adottata negli angoli dell'analizzatore.
+La birifrangenza è valutata tramite il modello di Sellmeier proposto da Ghosh per l'$\alpha$-quarzo, valido nell'intervallo $200$--$2000$~nm, che fornisce indici di rifrazione ordinario e straordinario separati a partire dai rispettivi coefficienti tabulati~\cite{Ghosh1999dispersion}. Per il canale rosso ($\lambda_{\mathrm{eff}} \approx \SI{600}{\nano\meter}$) il fattore $1/\sin\delta(\lambda)$ risulta dell'ordine di $1{,}05$, modesto ma non trascurabile per misure quantitative; sui canali blu e verde la deviazione cresce in modulo, e la correzione spettrale risulta indispensabile per evitare distorsioni sistematiche di $S_3$.
 
 % ---------------------------------------------------------------------------
 \section{Segmentazione della regione di sfondo}
@@ -158,7 +158,7 @@ Dai parametri di Stokes allineati si calcolano il grado di polarizzazione linear
     \mathrm{DoLP} = \frac{\sqrt{S_1'^2 + S_2'^2}}{S_0}, \qquad \mathrm{AoLP} = \frac{1}{2}\arctan_2\!\left(S_2',\; S_1'\right).
     \label{eq:dolp_aolp}
 \end{equation}
-Il DoLP è limitato all'intervallo $[0, 1]$: valori prossimi a $1$ indicano luce completamente polarizzata linearmente, valori prossimi a $0$ indicano luce non polarizzata o polarizzata circolarmente. L'AoLP è calcolato in gradi nell'intervallo $[-90^\circ, +90^\circ]$ e rappresenta la direzione dell'asse di polarizzazione lineare predominante in ciascun pixel.
+Il DoLP è limitato all'intervallo $[0, 1]$: valori prossimi a $1$ indicano luce completamente polarizzata linearmente, valori prossimi a $0$ indicano luce non polarizzata o polarizzata circolarmente. L'AoLP è calcolato in gradi nell'intervallo $[-90^\circ, +90^\circ]$ e rappresenta la direzione dell'asse di polarizzazione lineare predominante in ciascun pixel. Il segno segue la convenzione di rotazione introdotta nella \cref{subsec:stokes_def}: un AoLP positivo corrisponde a una rotazione antioraria dell'asse di polarizzazione per un osservatore rivolto verso la sorgente, sicché una rotazione ottica destrogira (oraria per tale osservatore) produce uno spostamento dell'AoLP verso valori negativi. Questa assegnazione del segno è verificata in modo indipendente sul campione di soluzione zuccherina, otticamente attivo e destrogiro, che fornisce un riferimento sperimentale del verso di rotazione.
 
 % ---------------------------------------------------------------------------
 \section{Estrazione della ritardanza e dell'asse veloce}
@@ -191,6 +191,8 @@ dove $A$ è limitato a valori non negativi per imporre il vincolo fisico che un 
 \end{equation}
 dove la cancellazione di $s_{3,\mathrm{in}}$ dalla \cref{eq:s3_ritardatore} è garantita dal ribasamento di Poincaré descritto nella \cref{sec:ellitticita}. La ritardanza viene ricostruita tramite $\delta = \arctan_2(\sin\delta,\cos\delta)$ e mappata all'intervallo $[0^\circ, 360^\circ)$ sommando $360^\circ$ ai valori negativi. Questa scelta è preferita alla convenzione con segno $(-180^\circ, 180^\circ]$ perché elimina la discontinuità di avvolgimento a $\pm180^\circ$, la quale, in presenza di rumore, produce salti bruschi e artefatti nelle mappe. L'orientazione dell'asse veloce risulta confinata all'intervallo $[0^\circ, 90^\circ]$ per costruzione della \cref{eq:asse_veloce}, in accordo con l'ambiguità intrinseca di $\pi/2$ del riferimento del ritardatore.
 
+Questo ripiegamento comporta la perdita del segno dell'orientazione: la procedura non distingue l'asse veloce dall'asse lento, né un'orientazione $+\alpha$ dalla sua riflessa. Ne discende una proprietà rilevante per l'interpretazione delle lamine d'onda nel \cref{ch:risultati}: uno scambio fisico fra asse veloce e asse lento, equivalente a una lamina inserita capovolta, non altera né $\alpha$ né l'AoLP, poiché entrambi dipendono unicamente da $S_1$ e $S_2$ (\cref{eq:asse_veloce,eq:dolp_aolp}). Un tale scambio si manifesta esclusivamente nel segno di $S_3$, ossia nel discriminare $\delta$ da $360^\circ - \delta$. L'informazione sull'elicità introdotta dal campione risiede pertanto interamente in $S_3$, mentre l'orientazione lineare con segno è fornita dall'AoLP.
+
 \subsection{Trattamento delle ambiguità numeriche}
 \label{subsec:ambiguita_numeriche}
 
@@ -206,10 +208,11 @@ che vale $0$ per $\sin^2\!2\alpha \leq 0{,}02$, $1$ per $\sin^2\!2\alpha \geq 0{
 \end{equation}
 in modo che i pixel a bassa affidabilità convergano gradualmente a $\delta \to 0$ senza discontinuità visibili. I denominatori in \cref{eq:cos_delta,eq:sin_delta} vengono ulteriormente regolarizzati imponendo un valore minimo assoluto prima della divisione per escludere divergenze numeriche.
 
-\subsection{Correzioni di calibrazione specifiche per dataset}
-\label{subsec:waveplate_swap}
-
-Una parte delle acquisizioni del campione a lamina $\lambda/2$, indicata nei riferimenti interni come \texttt{lambdamezzi\_50deg}, è stata eseguita con la lamina ruotata fisicamente di $90^\circ$ rispetto alla convenzione adottata negli altri dataset, ossia con gli assi rapido e lento scambiati. La trasformazione equivalente sui parametri estratti consiste nella mappa $\delta \mapsto 360^\circ - \delta$ e $\alpha \mapsto \alpha - 90^\circ$, applicata in coda alla pipeline di estrazione della ritardanza. La correzione è attivata da un flag di configurazione che riconosce il nome del dataset in elaborazione, ed è inerte su tutti gli altri campioni.
+% Sottosezione "Correzioni di calibrazione specifiche per dataset" rimossa
+% (2026-05-24): lo swap fast/slow per-dataset su lambdamezzi è stato eliminato.
+% Il segno globale di S3 è ora fissato in modo unico (cfr. cap6, lamina lambda/4
+% zero-order come riferimento di auto-validazione); nessun dataset richiede più
+% una correzione di swap dedicata.
 
 % ---------------------------------------------------------------------------
 \section{Riduzione della dimensionalità e identificazione del cluster polarimetricamente dominante}

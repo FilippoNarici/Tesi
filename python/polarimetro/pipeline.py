@@ -23,7 +23,7 @@ from . import (
 
 def run_pass_a_unified(channels, channels_rgb, pol_subfolder, wav_subfolder,
                         downsample_factor, wavelengths_per_ch, dark_frame_path,
-                        invert_angles=True):
+                        invert_angles=False):
     """Pass A streaming RGB: legge 38 file (36 pol + 2 wav) una sola volta.
 
     channels: lista label canali (es. ['R','G','B']).
@@ -61,7 +61,7 @@ def run_pass_a_unified(channels, channels_rgb, pol_subfolder, wav_subfolder,
 
 def run_pass_a_per_channel(channels, channels_rgb, pol_subfolder, wav_subfolder,
                             downsample_factor, wavelengths_per_ch,
-                            dark_frame_path, invert_angles=True):
+                            dark_frame_path, invert_angles=False):
     """Pass A sequenziale per-canale.
 
     Stessa struttura di run_pass_a_unified ma legge i file una volta per canale
@@ -112,8 +112,9 @@ def process_channel(ch, raw_per_ch, bg_shared, downsample_factor,
     """Pass B per un canale: align (S3 + Poincaré) + DoLP/AoLP + retardance.
 
     raw_per_ch: dict prodotto da run_pass_a_*. bg_shared: bg_mask unificata o
-    None (in tal caso ricalcolata localmente da S0). target_folder: usato da
-    `calculate_retardance_and_fast_axis` per valutare `WAVEPLATE_SWAPPED`.
+    None (in tal caso ricalcolata localmente da S0). target_folder: passato a
+    `calculate_retardance_and_fast_axis` (parametro riservato, inutilizzato dal
+    2026-05-24: la correzione swap per-dataset e' stata rimossa).
 
     Restituisce (ch, processed_dict) per facile collect da ThreadPoolExecutor.
     """
