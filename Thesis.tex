@@ -46,6 +46,18 @@
 \usepackage{amsthm,thmtools,xcolor} % Coloured "Theorem"
 \usepackage{float}
 
+% === Marcatori di revisione (TEMPORANEI, rimuovibili per colore) ===
+% Ogni capitolo/blocco da revisionare e' colorato. Rivisto un colore -> rimuovere
+% le righe \REVstart{<col>}/\REVend{<col>} corrispondenti in questo file.
+\definecolor{revIntro}{rgb}{0.55,0.10,0.75}     % viola  - cap1 Introduzione
+\definecolor{revTeoria}{rgb}{0.10,0.25,0.85}    % blu    - cap2 Teoria
+\definecolor{revSetup}{rgb}{0.00,0.55,0.20}     % verde  - cap3 Apparato + cap4 Campioni
+\definecolor{revAnalisi}{rgb}{0.90,0.45,0.00}   % arancio- cap5 Analisi
+\definecolor{revRisultati}{rgb}{0.80,0.05,0.05} % rosso  - cap6 Risultati
+\definecolor{revConcl}{rgb}{0.00,0.50,0.50}     % teal   - cap7 Conclusioni
+\newcommand{\REVstart}[1]{\color{#1}}
+\newcommand{\REVend}[1]{\color{black}}
+
 % STANDARD MATH PACKAGES
 \usepackage{amsmath}
 \usepackage{amsthm}
@@ -170,31 +182,45 @@ L'apparato è stato validato su campioni rappresentativi di birifrangenza (lamin
 
 \chapter{Introduzione}
 \label{ch:introduzione}
+\REVstart{revIntro}
 \input{chapters/cap1_introduzione.tex}
+\REVend{revIntro}
 
 \chapter{Fondamenti teorici della polarimetria}
 \label{ch:teoria}
+\REVstart{revTeoria}
 \input{chapters/cap2_teoria.tex}
+\REVend{revTeoria}
 
 \chapter{Apparato sperimentale}
 \label{ch:apparato}
+\REVstart{revSetup}
 \input{chapters/cap3_apparato.tex}
+\REVend{revSetup}
 
 \chapter{Campioni}
 \label{ch:campioni}
+\REVstart{revSetup}
 \input{chapters/cap4_campioni.tex}
+\REVend{revSetup}
 
 \chapter{Analisi dei dati}
 \label{ch:analisi}
+\REVstart{revAnalisi}
 \input{chapters/cap5_analisi.tex}
+\REVend{revAnalisi}
 
 \chapter{Risultati e discussione}
 \label{ch:risultati}
+\REVstart{revRisultati}
 \input{chapters/cap6_risultati.tex}
+\REVend{revRisultati}
 
 \chapter{Conclusioni e sviluppi futuri}
 \label{ch:conclusioni}
+\REVstart{revConcl}
 \input{chapters/cap7_conclusioni.tex}
+\REVend{revConcl}
 
 %------------------------------------------------------------------------------
 %	BIBLIOGRAPHY
