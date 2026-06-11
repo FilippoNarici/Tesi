@@ -128,17 +128,33 @@ identificabile. **Irrilevante per la correzione S3** (rosso 1/sin≈1.000).
    monocromatica SOLO per il rosso (modello a più righe pesate). Tenuto come ultima
    risorsa per la complessità.
 
-### Prossimi passi
-- [ ] **(principale)** cercare il bias moltiplicativo ~1.75% nell'estrazione δ:
-  confronto self-ref vs direzione vs cos su un caso pulito; il self-ref dovrebbe
-  essere imparziale → se mostra ~0.982 c'è un residuo sistematico da isolare.
-- [ ] (ultima risorsa) modello a righe multiple per il rosso (KSF) → δ efficace.
-- [x] Tilt escluso come causa principale (∝ ordine, darebbe λ/2 ≫ λ/4; osservato 2×).
-- [x] Centroide rosso scartato (semplice/affidabile; picco 631 ≪ 644).
+### STATO: APERTO (issue minore, irrilevante per S3)
 
-**Nota:** qualunque sia il culprit, NON inficia la correzione di S3: al rosso
-δ_a≈90° → 1/sin≈1.000, insensibile a un errore di ~2% sulla λ o sulla δ. Tocca
-solo i valori assoluti di δ e i fit di dispersione, non il fattore di correzione.
+Sintesi finale del deficit del rosso, dopo aver escluso tutto il resto:
+
+- **Tutti i sistematici ∝ordine esclusi** (tilt, errore-λ del canale, overlap
+  multi-riga KSF): scalano col ritardo totale (ordine·360°) → darebbero λ/2 ≈ 22× λ/4,
+  ma si osserva 2×.
+- **NON è un bias moltiplicativo della pipeline.** Il rapporto misurato/modello
+  NON è costante sui canali (λ/4: R 0.97 / G 1.03 / B 1.04): il rosso legge basso,
+  G/B leggono ALTI. Nessun fattore unico ~0.982. Quindi non è una "δ sotto-letta":
+  è solo la **dispersione reale** di una lamina con design un po' sotto i 633 nm
+  d'etichetta (il rosso ≈ al design → ~nominale; G/B salgono più ripide).
+- **Depol risolta a parte** (vedi esperimento 5-righe sotto): la DoP è
+  **indipendente dall'ordine** (λ/4 ≈ λ/2 a ogni canale) → haze/scattering del
+  materiale, NON effetto di banda/multi-ordine. Coerente con foglio di polimero.
+
+**Cosa resta aperto:** il deficit è piccolo (1.6°/3.1°, dentro lo scatter di pochi
+gradi). Con **N=2 lamine** non si distingue una **tolleranza/etichettatura
+sistematica del costruttore** (design reale del lotto ~615–633, "633" nominale) da
+una **coincidenza** di due piccole deviazioni dello stesso segno (~25% di probabilità
+a 2 campioni). Non risolvibile coi dati attuali: 2 lamine × 3 canali larghi è
+degenere. **Servirebbe**: più lamine (statistica di lotto) o una misura di ritardanza
+diretta e indipendente, per separare sistematico-vs-coincidenza.
+
+**Irrilevante per la correzione S3** (al rosso δ_a≈90° → 1/sin≈1.000). Tocca solo i
+valori assoluti di δ e i fit di dispersione, mai il fattore di correzione né i
+risultati della tesi.
 
 ---
 
@@ -198,3 +214,14 @@ osservato solo 2× (∝ valore nominale 90/180). Tutti i sistematici ∝ordine E
 algoritmo semplice, picco 631 ≪ 644). Residuo piccolo (1.6°/3.1°), compatibile con
 sensibilità di ricostruzione ai punti degeneri δ=90°/180° o scatter + ambiguità di
 design-λ. Culprit ~chiuso: non un sistematico singolo; irrilevante per S3.
+
+**2026-06-11 (chiusura indagine).** Due verifiche finali: (1) il rapporto
+misurato/modello NON è costante sui canali (λ/4 R/G/B = 0.97/1.03/1.04) → NON c'è
+bias moltiplicativo; il "deficit del rosso" è la dispersione reale di una lamina con
+design un po' sotto 633. (2) la DoP è indipendente dall'ordine (λ/4≈λ/2 a ogni
+canale) → la depol è haze/scattering del materiale, non effetto banda/multi-ordine.
+**Issue lasciato APERTO** (deciso utente): se il piccolo below-design sia tolleranza
+sistematica di lotto o coincidenza a N=2 non è separabile coi dati attuali (2 lamine
+× 3 canali larghi). Ipotesi fisica leading = fogli di polimero tagliati (spiega
+spessore, multi-ordine λ/2, depol-haze, design off-label condiviso). Tesi invariata,
+correzione S3 robusta. Indagine sospesa qui.
