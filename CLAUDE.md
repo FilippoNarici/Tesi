@@ -86,7 +86,7 @@ Espandere l'approccio puntuale 1D della polarimetria classica a un'analisi matri
 Elementi tecnici stabili:
 * 36 immagini RAW a passi di 10° per S0/S1/S2 (pseudo-inversa).
 * 2 immagini con lamina λ/4 a ±45° per S3.
-* Convenzione angoli invertita per coerenza destrorsa.
+* Angoli nominali usati direttamente (`invert_angles=False`, l'inversione è stata RIMOSSA 2026-05-24: era un errore concettuale). Riferimento fissato a valle (allineamento LCD) + elicità nel segno di S3.
 * Downsampling a blocchi `DOWNSAMPLE_FACTOR × DOWNSAMPLE_FACTOR` (default 4) per stabilità computazionale.
 
 Insidie che cambiano il risultato se ignorate:
