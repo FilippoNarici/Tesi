@@ -163,6 +163,22 @@ Variazione frazionaria δ ≈ ±0.16%/(5°)², ∝ θ². Spostamento δ avvolta 
 
 ---
 
+### Esperimento "per gioco": rosso = 5 righe KSF (609/613/631/635/647)
+
+Pesi d'intensita' da `r.csv`: 631→0.37, 635→0.29, 613→0.18, 609→0.08, 647→0.08
+(centroide 5 righe = 628 nm, coerente col 626). δ ricostruita = media circolare
+pesata di δ_s sulle righe; |risultante| = ritenzione DoP.
+- **Zero-order**: shift ~0.3°, DoP 1.00 → le 5 righe ≡ 1 centroide. Niente cambia.
+- **Multi-ordine (5–6)**: modello prevede shift ~−9° + DoP ~0.80.
+- **MA i dati NON mostrano la depol prevista**: DoP rossa misurata λ/4=0.906,
+  λ/2=0.923 (entrambe ~0.92, λ/2 multi-ordine perfino PIÙ ALTA della λ/4). Se la
+  depol fosse l'effetto banda multi-ordine, la λ/2 dovrebbe avere la DoP più bassa.
+  → la depol rossa (~0.9) è **indipendente dall'ordine** (illuminazione/misura),
+  NON effetto multi-riga. Le due righe dominanti 631/635 distano solo 4 nm → spread
+  in δ minimo anche a ordine 5–6; il modello a 5-δ sovrastima usando le code deboli.
+- **Esito: nessun risultato interessante** (come previsto). Effetto multi-riga
+  trascurabile; un altro vicolo cieco chiuso pulito. Non per la tesi.
+
 ### Voci datate
 
 **2026-06-11** — Aperto il journal. Indagine materiale/ordine/tilt chiusa come sopra.
