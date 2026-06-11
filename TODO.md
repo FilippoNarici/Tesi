@@ -60,7 +60,7 @@ Commenti `% TODO` presenti nei sorgenti LaTeX, da risolvere. Scan completo 2026-
 **Utente / confine umano:**
 - [ ] `chapters/cap6_risultati.tex:376` — **lettura qualitativa ΔS3 barra** (dove compare il segnale sotto carico, segno, localizzazione al vincolo): confine di interpretazione umana, spetta all'utente.
 - [ ] `Thesis.tex:203` — **verificare la rilevanza delle fonti** una a una fornendo il fulltext a un modello (commento utente). NB: i DOI sono già verificati per esistenza + metadata via crossref (2026-05-21); questo è un check di *pertinenza del contenuto*, non di esistenza.
-- [ ] `Thesis.tex:217` — Appendice A "Codice sorgente": inserire listati. ATTENZIONE: il commento cita script legacy (`final_utils.py`, `final_polarimeter.py`) ora archiviati in `python/legacy/`; l'appendice deve listare il package corrente `polarimetro/` + `analisi.ipynb`, non i legacy.
+- [ ] `Thesis.tex:217` — Appendice A "Codice sorgente": inserire listati. ATTENZIONE: il commento cita script legacy (`final_utils.py`, `final_polarimeter.py`) ora rimossi dal working tree (solo cronologia git); l'appendice deve listare il package corrente `polarimetro/` + `analisi.ipynb`.
 - [ ] `Thesis.tex:245` — sostituire placeholder con ringraziamenti reali (utente).
 
 ## Revisione cap6 per-sample (in corso)

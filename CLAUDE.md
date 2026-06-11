@@ -42,8 +42,9 @@ Espandere l'approccio puntuale 1D della polarimetria classica a un'analisi matri
 │   │   ├── slice\_fit.py               # Slice diagonale δ + plateau + fit through-origin (F)
 │   │   ├── photoelasticity.py          # Phase correlation + centerline + warp (cella I)
 │   │   └── plotting.py                 # Stile tesi, mask overlay, mappe Stokes, hist strati
-│   ├── legacy/                         # Archivio script .py originali (riferimento storico)
-│   │   └── final\_*.py                 # 11 script (incluso final\_utils.py)
+│   ├── calibrate\_s3\_retardance.py    # Ricalibrazione δ_a analizzatore λ/4 (provenienza MEASURED\_S3\_RETARDANCE\_DEG)
+│   ├── run\_all\_datasets.py           # Re-run headless dei 7 dataset (svuota cache prima)
+│   ├── S3\_CALIBRATION.md              # Processo correzione S3 data-driven
 │   ├── requirements.txt                # Dipendenze Python
 │   ├── spettri/                        # CSV di risposta sensore e sorgente
 │   ├── outputs/                        # CSV, PDF spettrale, cache npz UMAP/Stokes (gitignored)
@@ -144,7 +145,7 @@ Strumenti opzionali nel notebook (gated da flag in testa):
 
 Compilazione tesi: `pdflatex Thesis.tex && bibtex Thesis && pdflatex Thesis.tex && pdflatex Thesis.tex`.
 
-Riferimento storico: gli script `final_*.py` originali sono archiviati in `python/legacy/`. Non più mantenuti; usare il notebook + il package `polarimetro/`.
+Riferimento storico: gli script `final_*.py` originali (pre-refactor) sono stati rimossi dal working tree (2026-06-11); restano recuperabili dalla cronologia git. Usare il notebook + il package `polarimetro/`.
 
 ## Confine di interpretazione umana (regola cardine)
 

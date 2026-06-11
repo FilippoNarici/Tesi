@@ -1,8 +1,8 @@
 """UMAP helpers: validity mask, normalize, feature builder, color spec.
 
-I run_interactive_dataset / run_dataset_rgb completi vivono ancora nel legacy
-final_umap.py (utility esterna, non orchestrata dal notebook). Qui solo i
-mattoni atomici riusabili dalle celle analysis_cells.
+I run_interactive_dataset / run_dataset_rgb completi (selettore poligono
+interattivo) non sono nel package: vivevano nel pre-refactor `final_umap.py`,
+ora solo nella cronologia git. Qui i mattoni atomici riusabili dalle celle.
 """
 import numpy as np
 
@@ -17,7 +17,7 @@ DELTA_VMIN = 0.0
 DELTA_VMAX = 360.0
 DELTA_EDGE_EXCLUDE_DEG = 20.0
 
-UMAP_SPARSE_STRIDE = 20  # legacy: stride su pixel NATIVI (final_umap.py)
+UMAP_SPARSE_STRIDE = 20  # stride su pixel NATIVI (campionamento sparso)
 UMAP_RANDOM_SAMPLE_N = 30000  # numero target di pixel campionati a caso fra i validi
 UMAP_FIT_SAMPLE = 20000
 UMAP_N_NEIGHBORS = 80

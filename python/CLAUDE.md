@@ -7,10 +7,11 @@ Questo file è letto da Claude quando lavora nella directory `python/`. Per rego
 Tre artefatti:
 
 1. **`analisi.ipynb`** — singolo notebook con dispatcher per dataset. Punto di ingresso unico per l'analisi quotidiana.
-2. **`polarimetro/`** — package Python che contiene tutta la logica numerica (split di `final_utils.py`). Tutte le funzioni public API esposte tramite `__init__.py`.
-3. **`legacy/`** — archivio dei 11 script `final_*.py` originali (compreso `final_utils.py`). Riferimento storico, non più mantenuto.
+2. **`polarimetro/`** — package Python che contiene tutta la logica numerica (estratto dall'originale `final_utils.py`). Tutte le funzioni public API esposte tramite `__init__.py`.
 
-Convenzione: edit del notebook + edit del package. Non riprendere mai logica nei `final_*.py` in `legacy/`.
+Gli 11 script `final_*.py` pre-refactor sono stati rimossi dal working tree (2026-06-11); recuperabili dalla cronologia git se serve un riferimento storico.
+
+Convenzione: edit del notebook + edit del package.
 
 Utility mantenute (radice `python/`):
 * `calibrate_s3_retardance.py` — ricalcola `delta_a` dell'analizzatore λ/4 (provenienza di `config.MEASURED_S3_RETARDANCE_DEG`). Eseguire solo se cambia l'hardware/λ.
@@ -108,7 +109,7 @@ DoLP, AoLP = calculate_dolp_aolp(S0, S1, S2)
 delta_deg, theta_deg = calculate_retardance_and_fast_axis(S0, S1, S2, S3, bg_mask, target_folder)
 ```
 
-Tutto invariato rispetto al pre-refactor; questa è la stessa pipeline di `legacy/final_polarimeter.py` ma riorganizzata in moduli.
+Tutto invariato rispetto al pre-refactor; questa è la stessa pipeline dell'originale `final_polarimeter.py` ma riorganizzata in moduli.
 
 ## Dipendenze (`requirements.txt`)
 
