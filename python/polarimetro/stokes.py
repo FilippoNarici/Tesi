@@ -68,6 +68,24 @@ def waveplate_retardance(wavelength_nm,
     return delta_design * dn_ratio * lam_ratio
 
 
+def analyzer_retardance(channel_index, wavelength_nm):
+    """Ritardanza δ_a (rad) dell'analizzatore λ/4 per la correzione di S3.
+
+    Usa il valore MISURATO direttamente da `lambdaquarti` per canale
+    (`config.MEASURED_S3_RETARDANCE_DEG`: non circolare, depol-unbiased,
+    material-free) se `config.USE_MEASURED_S3_RETARDANCE` è attivo e il canale è
+    calibrato; altrimenti ricade sul modello quarzo zero-order di Ghosh.
+
+    Calibrazione per indice di canale (0=R, 1=G, 2=B): δ_a è una proprietà fisica
+    dell'analizzatore al centroide spettrale del canale, non una funzione di λ
+    continua. Il fallback quarzo resta per λ non calibrate (es. punto di design).
+    """
+    if (config.USE_MEASURED_S3_RETARDANCE
+            and channel_index in config.MEASURED_S3_RETARDANCE_DEG):
+        return np.radians(config.MEASURED_S3_RETARDANCE_DEG[channel_index])
+    return waveplate_retardance(wavelength_nm)
+
+
 def calculate_s3(wav_dir, channel_index, downsample_factor=1,
                  wavelength=config.DEFAULT_DESIGN_WAVELENGTH_NM,
                  dark_frame_path=config.DEFAULT_DARK_FRAME_PATH,
@@ -104,15 +122,15 @@ def calculate_s3(wav_dir, channel_index, downsample_factor=1,
 
     _WAV_INTENSITY_CACHE = I_45 + I_minus_45
 
-    delta = waveplate_retardance(wavelength)
+    delta = analyzer_retardance(channel_index, wavelength)
     correction_factor = np.sin(delta)
-    dn_ratio = (quartz_birefringence(wavelength)
-                / quartz_birefringence(config.DEFAULT_DESIGN_WAVELENGTH_NM))
+    src = ("measured" if (config.USE_MEASURED_S3_RETARDANCE
+                          and channel_index in config.MEASURED_S3_RETARDANCE_DEG)
+           else "quartz-Ghosh")
 
-    print(f"Calculating S3... (lambda = {wavelength:.1f} nm, "
-          f"Delta_n ratio = {dn_ratio:.4f}, "
-          f"delta = {np.degrees(delta):.2f} deg, "
-          f"1/sin(delta) = {1/correction_factor:.3f})")
+    print(f"Calculating S3... (ch={channel_index}, lambda = {wavelength:.1f} nm, "
+          f"delta_a = {np.degrees(delta):.2f} deg [{src}], "
+          f"1/sin(delta_a) = {1/correction_factor:.3f})")
 
     S3 = (I_45 - I_minus_45) / correction_factor
     return S3
@@ -243,12 +261,14 @@ def calculate_s3_rgb(wav_dir, channel_indices=(0, 1, 2),
         wav_intensity = img_45_ds + img_m45_ds
 
         lam = wavelengths_per_ch[int(ch)]
-        delta = waveplate_retardance(lam)
+        delta = analyzer_retardance(int(ch), lam)
         correction = np.sin(delta)
-        dn_ratio = (quartz_birefringence(lam)
-                    / quartz_birefringence(config.DEFAULT_DESIGN_WAVELENGTH_NM))
-        print(f"  ch={int(ch)}: lambda={lam:.1f} nm, dn_ratio={dn_ratio:.4f}, "
-              f"delta={np.degrees(delta):.2f} deg, 1/sin(delta)={1/correction:.3f}")
+        src = ("measured" if (config.USE_MEASURED_S3_RETARDANCE
+                              and int(ch) in config.MEASURED_S3_RETARDANCE_DEG)
+               else "quartz-Ghosh")
+        print(f"  ch={int(ch)}: lambda={lam:.1f} nm, "
+              f"delta_a={np.degrees(delta):.2f} deg [{src}], "
+              f"1/sin(delta_a)={1/correction:.3f}")
 
         S3 = (img_45_ds - img_m45_ds) / correction
         out[int(ch)] = (S3, wav_intensity)

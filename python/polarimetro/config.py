@@ -40,6 +40,21 @@ WAVEPLATE_DESIGN_ANCHOR = {
     'lambdaquarti_50deg': {'wavelength_nm': 633.0, 'delta_deg':  90.0},
 }
 
+# Ritardanza δ_a(λ) dell'analizzatore λ/4 MISURATA direttamente, per canale.
+# Usata nella correzione cromatica di S3: S3 = (I_−45 − I_+45)/sin(δ_a).
+#
+# Stima ottenuta dal dataset `lambdaquarti_50deg` (DS=4) sfruttando l'identità
+# lamina-campione == lamina-analizzatore (quindi δ_campione = δ_a). È:
+#   - NON circolare: usa I_−45−I_+45 grezzo; δ_a si auto-riferisce (∝ sin²δ_a);
+#   - depol-unbiased: il fattore di depolarizzazione scalare si cancella nei
+#     rapporti / nella direzione del vettore di Stokes (DoP locale, non sfondo);
+#   - material-free: nessun modello di Sellmeier (quarzo) assunto.
+# Punto fisso pipeline-consistente (rotazione di Poincaré reale), 2026-06-11.
+# Confronto material-free: quarzo Ghosh dà 91,1/107,9/126,2° → accordo entro
+# pochi gradi senza assumere il materiale. Indici: 0=R, 1=G, 2=B.
+MEASURED_S3_RETARDANCE_DEG = {0: 88.4, 1: 111.0, 2: 130.8}
+USE_MEASURED_S3_RETARDANCE = True
+
 
 def get_channel_wavelength(csv_path, channel_index):
     """Reads centroid wavelength (nm) for the given channel index (0:R, 1:G, 2:B)."""

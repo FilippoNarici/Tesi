@@ -12,6 +12,11 @@ Tre artefatti:
 
 Convenzione: edit del notebook + edit del package. Non riprendere mai logica nei `final_*.py` in `legacy/`.
 
+Utility mantenute (radice `python/`):
+* `calibrate_s3_retardance.py` — ricalcola `delta_a` dell'analizzatore λ/4 (provenienza di `config.MEASURED_S3_RETARDANCE_DEG`). Eseguire solo se cambia l'hardware/λ.
+* `run_all_datasets.py` — re-run headless di tutti i 7 dataset (svuota le cache stokes_*/umap_* prima; ~1 h). Usare dopo un cambio che altera i risultati ma non la chiave di cache (es. correzione S3).
+* **`S3_CALIBRATION.md`** — processo completo della correzione S₃ data-driven (problema, metodo non circolare + depol-unbiased, risultato, come riprodurre). Leggere prima di toccare `stokes.py`/correzione S₃.
+
 ## Notebook `analisi.ipynb`
 
 Cella **config** (in testa):
@@ -27,7 +32,7 @@ Cella **dispatcher**: `ANALYSES_PER_DATASET` mappa ogni dataset alle analisi att
 
 | Dataset | Analisi |
 |---------|---------|
-| `lambdaquarti_50deg` | A, B, C-delta, D-delta, D-delta-fit |
+| `lambdaquarti_50deg` | A, B, C-delta, D-delta, D-delta-fit, S3CAL |
 | `lambdamezzi_50deg` | A, B, C-delta, D-delta, D-delta-fit |
 | `strati_v2` | A, B, C-delta, F, E, H |
 | `zucchero` | A, B, C-aolp, D-aolp, D-aolp-fit |
@@ -46,6 +51,7 @@ Celle analisi (gated dal dispatcher):
 | D-aolp-fit | Fit `ψ(λ) = k/λ²` (Drude per attività ottica naturale) via `poldisp.fit_inverse_lambda(..., power=2)` + `poldisp.plot_dispersion_fit`. Legge `D_AOLP_RESULTS` + `outputs/rgb_wavelengths.csv`. | PDF in `Images/generated/<DATASET>/aolp_lambda_fit.pdf` |
 | D-delta | Mirror di D-aolp ma su δ ∈ [0°, 360°) ciclica. `polumap.cluster_umap_hdbscan_by_delta` + `polcluster.plot_cluster_winner_panels(mode='delta', ...)`. Popola `D_DELTA_RESULTS[ch]`. Escluso `strati_v2`. | PDF in `Images/generated/<DATASET>/<CH>_delta_winner.pdf` |
 | D-delta-fit | Fit `δ(λ) = k/λ` (quarzo zero-order) via `poldisp.fit_inverse_lambda(..., power=1)`. Se `DATASET` in `polcfg.WAVEPLATE_DESIGN_ANCHOR` aggiunge punto di design (180°@633nm per λ/2, 90° per λ/4) come diamond nero. | PDF in `Images/generated/<DATASET>/delta_lambda_fit.pdf` |
+| S3CAL | Figura di calibrazione della correzione S3 (solo `lambdaquarti`): δ_a misurato (`polcfg.MEASURED_S3_RETARDANCE_DEG`) vs modello quarzo (`pol.waveplate_retardance`, riscontro) + punto design, via `poldisp.plot_s3_calibration`. Pura visualizzazione delle costanti di calibrazione (no re-run pipeline). Cap6 `fig:s3_calibration`. | PDF in `Images/generated/lambdaquarti_50deg/s3_calibration.pdf` |
 | E | Istogramma δ pubblicato (`polplot.plot_delta_strati_histogram`) con plateau strati come vline + etichette 1L→5→1R (frazioni y da `polplot.STRATI_LABEL_Y_FRAC`). HTML interattivo via `save_delta_strati_histogram_html`. Hard-require `STRATI_SLICE_RESULTS` da F. | PDF + HTML in `Images/generated/<DATASET>/` |
 | F | Slice δ multistrato (3 pannelli pub) tramite `polslice.build_slice_grid` + `sample_thick_delta` + `detect_plateaus` + `fit_layers`. Popola `STRATI_SLICE_RESULTS[ch]` per E + H. | PDF + HTML in `Images/generated/<DATASET>/` |
 | H | Fit lineare `δ = m·n` through-origin per canale + fit dispersione `δ(λ) = k/λ` su slope via `poldisp.fit_inverse_lambda`. Hard-require `STRATI_SLICE_RESULTS` da F. | PDF + HTML in `Images/generated/strati_fit/` |
@@ -63,15 +69,15 @@ Strumenti opzionali (gated da flag, in fondo notebook):
 | Modulo | Contenuto |
 |--------|-----------|
 | `__init__.py` | Re-export public API e namespace di tutti i sotto-moduli (`config`, `pipeline`, `plotting`, `slice_fit`, `umap_runner`, `clustering_plot`, `dispersion`, `photoelasticity`) |
-| `config.py` | Costanti immutabili (`SENSOR_WHITE_LEVEL=4095`, `SATURATION_FRACTION=0.98`, `WAV_HOLDER_THRESHOLD=0.50`, soglie Canny, dilation), `WAVEPLATE_DESIGN_ANCHOR` (punti design 633 nm per λ/2 e λ/4), `get_channel_wavelength(csv_path, channel_index)`. (swap per-dataset `WAVEPLATE_SWAPPED_DATASETS`/`is_waveplate_swapped` rimosso 2026-05-24) |
+| `config.py` | Costanti immutabili (`SENSOR_WHITE_LEVEL=4095`, `SATURATION_FRACTION=0.98`, `WAV_HOLDER_THRESHOLD=0.50`, soglie Canny, dilation), `WAVEPLATE_DESIGN_ANCHOR` (punti design 633 nm per λ/2 e λ/4), `MEASURED_S3_RETARDANCE_DEG` (δ_a analizzatore MISURATO per canale {0:88.4,1:111.0,2:130.8}) + `USE_MEASURED_S3_RETARDANCE` (default True, 2026-06-11), `get_channel_wavelength(csv_path, channel_index)`. (swap per-dataset `WAVEPLATE_SWAPPED_DATASETS`/`is_waveplate_swapped` rimosso 2026-05-24) |
 | `io_raw.py` | `load_raw_image`, `load_rotation_sequence`, `load_dark_frame`, `downsample_image`, `reset_saturation_accumulator`, `get_saturation_mask`. Globals modulo: `_SATURATION_ACCUMULATOR`, `_DARK_FRAME_CACHE` |
-| `stokes.py` | `calculate_linear_stokes`, `calculate_s3` (con correzione λ via Ghosh), `calculate_linear_stokes_rgb_streaming` (38 file letti 1 volta), `calculate_s3_rgb`, `quartz_birefringence`, `waveplate_retardance`, `get_wav_intensity_cache()`. Global `_WAV_INTENSITY_CACHE` (esposto via getter per evitare import circolari con `align`) |
+| `stokes.py` | `calculate_linear_stokes`, `analyzer_retardance(ch_idx, λ)` (δ_a per la correzione S3: misurato da `config.MEASURED_S3_RETARDANCE_DEG` se canale calibrato, else fallback quarzo `waveplate_retardance`), `calculate_s3` / `calculate_s3_rgb` (correzione λ via δ_a misurato, fallback Ghosh), `calculate_linear_stokes_rgb_streaming` (38 file letti 1 volta), `quartz_birefringence`, `waveplate_retardance`, `get_wav_intensity_cache()`. Global `_WAV_INTENSITY_CACHE` (esposto via getter per evitare import circolari con `align`) |
 | `mask.py` | `generate_background_mask` (Canny + dark prior + flood-fill multi-component + compactness + erosione scalata DS) |
 | `align.py` | `align_reference_frame` (asse S3), `align_poincare_ellipticity` (asse S2, usa `stokes.get_wav_intensity_cache()`), `get_poincare_bg_mask()`. Global `_POINCARE_BG_MASK_CACHE` |
 | `retardance.py` | `calculate_dolp_aolp`, `calculate_retardance_and_fast_axis` (δ via arctan2 [0°, 360°), θ ripiegato [0°,90°]). Arg `target_folder` riservato/inutilizzato (swap per-dataset rimosso). Il segno di S3 è fissato a monte in `stokes.py`, non qui |
 | `umap_runner.py` | Helper UMAP: `build_validity_mask`, `random_sample_mask`, `plot_sample_diagnostic`, `build_feature_matrix`, `color_spec`, `aolp_clip_range`, `normalize_stokes`, `fit_umap`, `cluster_umap_hdbscan_by_aolp` / `_by_delta` (HDBSCAN sull'embedding UMAP + statistica circolare + score `size_frac × R × ang_dist²`), `compute_or_load_umap_cache` (one-channel runner: build_validity_mask + random_sample_mask + fit_umap + cache npz schema v3), `export_umap_panels` (3 PDF pubblicabili: mappa, scatter UMAP, hist filtrato sample) |
 | `clustering_plot.py` | `plot_cluster_winner_panels(mode='aolp'\|'delta', ...)` — figura 3-pannelli (UMAP scatter, mappa spaziale, istogramma) con cluster vincente rosso. Dedup celle D-aolp + D-delta del notebook |
-| `dispersion.py` | Fit spettrale `f(λ) = k/λ^p` parametrico. `fit_inverse_lambda(lambdas, values, power=1\|2)` ritorna dict `{k, k_err, r2, ...}`; `plot_dispersion_fit(fit, ..., design_point=None)` genera figura 1-pannello stile tesi. Usato da D-aolp-fit (`p=2`, Drude), D-delta-fit (`p=1` + design anchor), H (`p=1` su slope) |
+| `dispersion.py` | Fit spettrale `f(λ) = k/λ^p` parametrico. `fit_inverse_lambda(lambdas, values, power=1\|2)` ritorna dict `{k, k_err, r2, ...}`; `plot_dispersion_fit(fit, ..., design_point=None)` genera figura 1-pannello stile tesi. Usato da D-aolp-fit (`p=2`, Drude), D-delta-fit (`p=1` + design anchor), H (`p=1` su slope). `plot_s3_calibration(ch_lambdas, delta_measured, quartz_func, design_point=None)`: figura calibrazione δ_a misurato vs curva quarzo (riscontro, non fit) — cella S3CAL |
 | `plotting.py` | `apply_thesis_style` (rcParams serif dpi 300), `save_and_show`, `mask_overlay_rgb`, `plot_mask_overlay_figure`, `make_param_figure`, `save_param_html`, `resolve_sym_limits`, `mpl_cmap_to_plotly_scale`, `fmt_sci`. **Costanti**: `STOKES_PARAM_CONFIG` + `STOKES_PARAM_ORDER` (8 mappe pubblicate per cella B), `STRATI_LABEL_Y_FRAC` (frazioni y per etichette plateau 1L→1R). **Cella E**: `plot_delta_strati_histogram`, `save_delta_strati_histogram_html` (istogramma δ + vline plateau). **S0 cmap**: `make_s0_cmap(channel_idx)` (nero→R/G/B) |
 | `slice_fit.py` | Algoritmo F (strati_v2): `build_slice_grid` (slice spessa diagonale), `sample_thick_delta` (media circolare lungo larghezza), `find_auto_crop` (esclude bordi + δ vicini 0/360), `detect_plateaus` (gradient threshold + min_run filter), `fit_layers` (fit δ = m·n through origin con unwrap L/R separato) |
 | `pipeline.py` | Orchestratore Pass A + Pass B per cella Load+Stokes. API: `run_pass_a_unified` (streaming RGB 1×38 file), `run_pass_a_per_channel` (sequenziale single-channel), `compute_unified_bg_mask` (mean S0_RGB → Canny mask), `process_channel` (Pass B puro: align + retardance per canale, thread-safe), `apply_saturation_global` (NaN OR fra canali), `load_cache_npz` + `save_cache_npz` (schema: downsample_factor, dataset, unified_mask, per-ch keys) |

@@ -1,6 +1,16 @@
 # TODO — Stato del progetto
 
-Ultimo aggiornamento: 2026-05-21 (pass humanize em-dash + tell AI su cap1–cap7 con skill `humanizer`; cap3 "polarizzatore lineare di forma circolare"; cap4 tabella campioni sistemata. Prima, 2026-05-20: revisione cap6 7 sample bozza, lambdamezzi chiuso multi-ordine via b<1, anomalia 3R-B chiusa inspiegata, superate voci legacy B2/B4/tabelle-cap6. TUTTE le sezioni cap5/cap6 DA RIVEDERE MANUALMENTE. Vedi memory `project_waveplate_multiorder.md`, `project_strati_3R_B_anomaly.md`, `feedback_chapters_manual_review.md`)
+Ultimo aggiornamento: 2026-06-11 (correzione S3 ora DATA-DRIVEN: δ_a analizzatore MISURATO non quarzo. Vedi sotto + memory `project_s3_datadriven_calibration.md`). Prima, 2026-05-21: pass humanize em-dash + tell AI su cap1–cap7. TUTTE le sezioni cap5/cap6 DA RIVEDERE MANUALMENTE. Vedi memory `project_waveplate_multiorder.md`, `project_strati_3R_B_anomaly.md`, `feedback_chapters_manual_review.md`.
+
+## Correzione S3 data-driven (2026-06-11)
+
+Risolto il punto debole "perché quarzo?" della correzione S3. δ_a(λ) dell'analizzatore λ/4 **misurato** dal dataset lambdaquarti (non circolare, depol-unbiased, material-free; sfrutta λ/4 sample==analizzatore). Dettaglio in memory `project_s3_datadriven_calibration.md`.
+
+- [x] CODICE: `config.MEASURED_S3_RETARDANCE_DEG = {0:88.4,1:111.0,2:130.8}` + `USE_MEASURED_S3_RETARDANCE=True`; `stokes.analyzer_retardance()` (misurato o fallback quarzo) cablato in `calculate_s3`/`calculate_s3_rgb`. Correzione 1/sinδ_a = 1.000/1.071/1.321.
+- [x] TESI: nuova `\section{Calibrazione della correzione cromatica di S3}` (`sec:calibrazione_s3`) apre i risultati quantitativi cap6; cap5 §determinazione-s3 editato (δ_a misurato, quarzo=riscontro); λ/4 lamine de-circolarizzata; `tab:qw_ritardanza` aggiornata (87.1/108.6/128.4); fix bug duplicato `eq:dispersione-qwp`. Compila pulito (80 pp, 0 undefined). **BOZZA, DA RIVEDERE.**
+- [x] **Full re-run TUTTI i dataset FATTO (2026-06-11)**: tutti i 7 dataset rieseguiti headless via `python/_run_all.py` (nbclient, cache stokes_*/umap_* svuotate prima → ricalcolo S3 nuovo), 57.5 min, 7/7 OK. Rigenerati cache + UMAP embedding + tutti i PDF con la correzione nuova. Numeri cap6 riallineati alle figure: lambdaquarti δ 87.1/108.6/**128.5**; lambdamezzi δ 176.9/**156.8/134.5** (era 157.2/135.9; tab + sequenza prosa + scarti; n=−0.91/+0.71 e −20°/banda INVARIATI); strati slope 240.2/280.8/316.8 INVARIATE (tab plateau G/B aggiornata ≤2°; anomalia 3R-B 46.7→46.4); zucchero |AoLP| 3.95/4.92/6.12 (tab+caption R/B; Drude k=1.39e6 e c≈0.47 INVARIATI). Compila pulito (86 pp, 0 undefined).
+- [x] Figura di calibrazione dedicata (2026-06-11): `poldisp.plot_s3_calibration` (δ_a misurato vs curva quarzo + design), cella notebook **S3CAL** (gated lambdaquarti), PDF `Images/generated/lambdaquarti_50deg/s3_calibration.pdf`, inserita in cap6 `fig:s3_calibration`. Compila pulito. Sanity p≈DoP/θ uniforme lasciata in prosa (non in figura, per consistenza numerica).
+- [x] Cleanup (2026-06-11): rimossi i 6 script diagnostici `verify_*.py`; promossi `verify_s3_fixedpoint.py` → `python/calibrate_s3_retardance.py` (ricalibrazione) e `_run_all.py` → `python/run_all_datasets.py` (re-run headless). Processo documentato in **`python/S3_CALIBRATION.md`** (referenziato da `python/CLAUDE.md` + `CLAUDE.md` radice). Coerente con [[feedback_diagnostic_cleanup]].
 
 Questo file è la singola fonte di verità sullo stato di avanzamento. Aggiornare ad ogni task completato. Per istruzioni operative vedere `CLAUDE.md`.
 

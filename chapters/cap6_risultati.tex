@@ -38,13 +38,56 @@ Le frange sono più leggibili nella mappa del DoLP: le bande scure, dove $\mathr
 L'esito è qualitativo ma significativo: senza alcuna calibrazione quantitativa il polarimetro restituisce mappe coerenti che rivelano la birifrangenza residua del materiale e la sua dipendenza spettrale, confermando il corretto funzionamento dell'intera catena di misura prima dei test di accuratezza presentati nelle sezioni successive.
 
 % ---------------------------------------------------------------------------
+\section{Calibrazione della correzione cromatica di \texorpdfstring{$S_3$}{S3}}
+\label{sec:calibrazione_s3}
+
+La ricostruzione di $S_3$ (\cref{eq:s3_formula}) contiene un unico parametro libero, il ritardo $\delta_a(\lambda)$ della lamina $\lambda/4$ impiegata come analizzatore, attraverso il fattore di correzione cromatica $1/\sin\delta_a(\lambda)$. Poiché ogni mappa di ritardanza e ogni mappa dell'asse veloce dei campioni birifrangenti dipendono da $S_3$, la scelta di $\delta_a(\lambda)$ condiziona l'intero capitolo. Adottarne un valore da un modello di materiale, come la dispersione del quarzo cristallino, lascerebbe i risultati appesi a un'assunzione non verificata, sia sul materiale della lamina sia sul suo ordine. Si è perciò preferito \emph{misurare} $\delta_a(\lambda)$ direttamente dai dati, prima di applicare la pipeline ai campioni, e relegare il modello di quarzo al ruolo di riscontro indipendente.
+
+La misura sfrutta un'identità dell'apparato. La lamina $\lambda/4$ analizzata come campione nel dataset \texttt{lambdaquarti} è dello stesso tipo della lamina $\lambda/4$ inserita come analizzatore di $S_3$ in tutte le acquisizioni: le due condividono per costruzione lo stesso ritardo $\delta_a(\lambda)$. Misurare la ritardanza del campione equivale dunque a misurare la quantità che entra nella correzione. Il punto determinante è che questa misura può essere condotta senza ricorrere a $S_3$ e senza alcun modello di dispersione. I parametri lineari $S_0$, $S_1$, $S_2$ provengono dalle trentasei acquisizioni con il solo analizzatore lineare rotante, in cui la lamina $\lambda/4$ analizzatore non è presente nel cammino ottico; la ritardanza del campione vi è impressa attraverso la conversione dello stato di polarizzazione incidente, e il suo modulo è fissato dal canale coseno, costruito sui soli $S_0$, $S_1$, $S_2$. Il segno di $\delta_a$, e con esso il completamento a $[0^\circ, 360^\circ)$, non serve alla correzione, che dipende dal solo $\sin\delta_a$.
+
+Resta da rendere la stima immune da due effetti che, se trascurati, la distorcerebbero. Il primo è la depolarizzazione introdotta dalla lamina, che riduce il grado di polarizzazione totale dal valore prossimo all'unità dello sfondo a circa $0{,}9$ nel rosso e $0{,}7$ nel blu: normalizzare sul livello dello sfondo, come fa il canale coseno, spinge artificiosamente la ritardanza verso $90^\circ$. Il secondo è l'ellitticità residua del fascio incidente, già rimossa nella pipeline dalla rotazione di Poincaré attorno all'asse $S_2$ (\cref{sec:ellitticita}). Entrambi si neutralizzano lavorando con i \emph{rapporti} fra le componenti del vettore di Stokes, ovvero con la sua direzione: sotto depolarizzazione scalare il fattore di depolarizzazione $p$ moltiplica tutte le componenti e si elide nei rapporti, lasciando inalterata la direzione dell'ellisse e quindi la ritardanza. La direzione del vettore, ricostruita sui pixel della lamina dopo gli allineamenti, fornisce così una stima di $\delta_a$ indipendente dalla normalizzazione di sfondo.
+
+L'ultimo ingrediente chiude il problema senza introdurre circolarità. La differenza grezza $I_{-45} - I_{+45}$, non ancora divisa per $\sin\delta_a$, raccoglie due fattori $\sin\delta_a$: uno introdotto dalla lamina-campione nel convertire la polarizzazione, l'altro dall'analizzatore identico nel rivelarla. Vale pertanto, per uno stato incidente lineare di riferimento,
+\begin{equation}
+    I_{-45} - I_{+45} \;\propto\; p \, \sin 2\theta \, \sin^2\!\delta_a,
+    \label{eq:s3_selfref}
+\end{equation}
+dove $\theta$ è l'orientazione dell'asse della lamina. Il ritardo $\delta_a$ vi compare al quadrato e si auto-riferisce: rapportando la \cref{eq:s3_selfref} alle componenti lineari $S_1$, $S_2$, nelle quali $p$ si elide, si ottiene un sistema di due equazioni nelle due incognite $\delta_a$ e $\theta$, risolto in modo auto-consistente con la rotazione di Poincaré effettivamente usata nella pipeline. La soluzione non assume alcun materiale, alcun ordine, né la correzione che si intende calibrare.
+
+I valori così ottenuti sono riportati nella \cref{tab:s3_calibrazione}. La bontà interna della procedura è confermata da due verifiche che non sono state imposte ma emergono dalla soluzione: il fattore di depolarizzazione $p$ ricostruito dall'inversione riproduce il grado di polarizzazione totale misurato indipendentemente sui tre canali, decrescente verso il blu, e l'orientazione $\theta$ risulta uniforme fra i canali, come deve essere per una lamina spazialmente omogenea osservata a un'unica orientazione meccanica. Il modello di quarzo cristallino, valutato con la dispersione di Ghosh (\cref{eq:dispersione-qwp}) e mai usato nell'inversione, fornisce $90{,}9^\circ$, $107{,}5^\circ$ e $126{,}9^\circ$ sui tre canali: concorda con la ritardanza misurata entro pochi gradi senza esserne il presupposto, come mostra la \cref{fig:s3_calibration}. La compatibilità della lamina con un singolo ordine ne risulta confermata a posteriori, e il modello di quarzo legittimato come parametrizzazione di comodo di una curva che i dati determinano da soli.
+
+\begin{table}[H]
+    \centering
+    \caption{Ritardanza $\delta_a$ della lamina $\lambda/4$ analizzatore, misurata direttamente dal dataset \texttt{lambdaquarti} in modo non circolare, depol-unbiased e indipendente dal materiale (vedi testo), e fattore di correzione cromatica $1/\sin\delta_a$ adottato nella ricostruzione di $S_3$. L'ultima colonna riporta, come riscontro indipendente, il ritardo previsto dal modello di quarzo cristallino (Sellmeier di Ghosh), che non interviene nella misura. L'accordo entro pochi gradi su tutti i canali rende la correzione data-driven e non vincolata all'ipotesi sul materiale. Al canale rosso $\delta_a \approx 90^\circ$ rende la correzione prossima all'unità e quindi insensibile a ogni scelta di modello.}
+    \label{tab:s3_calibrazione}
+    \begin{tabular}{lcccc}
+        \hline
+        \textbf{Canale} & $\lambda_\mathrm{eff}$ [\si{\nano\meter}] & $\delta_a$ misurato [\si{\degree}] & $1/\sin\delta_a$ & $\delta_a$ quarzo [\si{\degree}] \\
+        \hline
+        Rosso & 626 & $88{,}4$  & $1{,}000$ & $90{,}9$  \\
+        Verde & 536 & $111{,}0$ & $1{,}071$ & $107{,}5$ \\
+        Blu   & 466 & $130{,}8$ & $1{,}321$ & $126{,}9$ \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.62\textwidth]{Images/generated/lambdaquarti_50deg/s3_calibration.pdf}
+    \caption{Calibrazione della ritardanza $\delta_a$ dell'analizzatore $\lambda/4$. I tre punti colorati sono i valori misurati direttamente dal dataset \texttt{lambdaquarti} in modo non circolare e indipendente dal materiale; la curva tratteggiata è il modello di quarzo cristallino (Sellmeier di Ghosh), \emph{non} un fit ai punti ma un riscontro indipendente che non interviene nella misura; il diamante nero è il punto di design $(\lambda_0 = \SI{633}{\nano\meter},\,\delta_0 = 90^\circ)$. La misura traccia la curva di quarzo entro pochi gradi su tutti i canali, e la correzione $1/\sin\delta_a$ riportata in legenda cresce dal rosso, dove è prossima all'unità, al blu.}
+    \label{fig:s3_calibration}
+\end{figure}
+
+L'adozione di questa correzione misurata, in luogo del modello di quarzo, sposta la ritardanza ricostruita dei campioni di non più di circa un grado, blu compreso, e lascia invariate le pendenze del nastro stratificato analizzato nella \cref{sec:risultati_nastro}. Questa insensibilità è essa stessa un risultato: la ricostruzione della ritardanza non dipende in modo critico dal modello di dispersione adottato per $S_3$, e l'obiezione di principio sulla scelta del materiale della lamina perde mordente sul piano quantitativo. Le sezioni seguenti applicano la correzione calibrata a campioni di ritardanza nota e crescente.
+
+% ---------------------------------------------------------------------------
 \section{Accuratezza della ricostruzione: lamine d'onda}
 \label{sec:risultati_lamine}
 
 \subsection{Lamina \texorpdfstring{$\lambda/4$}{lambda/4} zero-order}
 \label{subsec:risultati_qw}
 
-La lamina quarto d'onda zero-order in $\alpha$-quarzo ($\lambda_0 = \SI{633}{\nano\meter}$), orientata a circa \SI{50}{\degree}, è stata analizzata sui tre canali colore con la stessa procedura impiegata per la lamina $\lambda/2$. Questo campione ha un ruolo privilegiato nella validazione: la lamina utilizzata come sample è dello stesso tipo della lamina $\lambda/4$ impiegata come analizzatore di $S_3$ in tutte le misure del lavoro (\cref{sec:determinazione-s3}). Il valore di ritardanza atteso per il sample coincide pertanto con il ritardo $\delta(\lambda)$ che la pipeline assume nel fattore di correzione cromatica $1/\sin\delta(\lambda)$ applicato a $S_3$. La misura diretta del sample fornisce dunque un controllo di auto-consistenza della correzione di $S_3$ stessa, con l'avvertenza che la misura del sample fa a sua volta uso di $S_3$ corretto con la medesima lamina: una coincidenza fra ritardanza misurata e ritardanza assunta indica coerenza interna del modello dispersivo, mentre una divergenza segnala un'inconsistenza da imputare al modello o alla stima della lunghezza d'onda effettiva.
+La lamina quarto d'onda zero-order ($\lambda_0 = \SI{633}{\nano\meter}$), orientata a circa \SI{50}{\degree}, è stata analizzata sui tre canali colore con la stessa procedura impiegata per la lamina $\lambda/2$. Questo campione ha un ruolo speciale: è dello stesso tipo della lamina $\lambda/4$ impiegata come analizzatore di $S_3$, ed è dal suo dataset che si ricava la calibrazione non circolare della correzione cromatica di $S_3$ (\cref{sec:calibrazione_s3}). Analizzata qui come campione attraverso la pipeline completa, con la correzione già calibrata, ne riproduce per costruzione la ritardanza e ne documenta l'uniformità spaziale; il controllo di accuratezza genuino e indipendente dal materiale, ovvero il confronto fra ritardanza misurata e modello di quarzo senza assumerlo, è quello discusso nella sezione di calibrazione.
 
 La struttura del campione è visibile nelle mappe di intensità $S_0$ in \cref{fig:qw_s0}: il disco centrale corrisponde alla lamina a ritardanza uniforme, l'anello scuro alla montatura circolare che la sostiene, e lo sfondo libero alla luce diretta del display LCD, dove la ritardanza è prossima a zero.
 
@@ -71,19 +114,19 @@ Le mappe dell'orientazione dell'asse veloce $\theta$ e della ritardanza $\delta$
     \label{fig:qw_theta_delta}
 \end{figure}
 
-La stima quantitativa della ritardanza segue la stessa pipeline di clustering della \cref{sec:umap_clustering}: il cluster vincente HDBSCAN sull'embedding UMAP individua i pixel del disco della lamina e ne fornisce la mediana $\tilde\delta_{\mathrm{win}}$. Le tre stime per-canale sono raccolte nella \cref{tab:qw_ritardanza} e fittate con la legge di dispersione $\delta(\lambda) = k/\lambda$ di una lamina zero-order. Il punto di design $(\lambda_0 = \SI{633}{\nano\meter},\,\delta_0 = 90^\circ)$ è riportato come riferimento ma non incluso nel fit, che è condotto sui soli tre punti misurati. Il risultato è in \cref{fig:qw_delta_fit}.
+La stima quantitativa della ritardanza segue la stessa pipeline di clustering della \cref{sec:umap_clustering}: il cluster vincente HDBSCAN sull'embedding UMAP individua i pixel del disco della lamina e ne fornisce la mediana $\tilde\delta_{\mathrm{win}}$. Le tre stime per-canale, ottenute processando la lamina come campione con la correzione di $S_3$ calibrata, sono raccolte nella \cref{tab:qw_ritardanza} e confrontate con il modello di quarzo. Esse coincidono per costruzione con la calibrazione (\cref{tab:s3_calibrazione}) a meno di una lieve differenza, più marcata al blu, dovuta al bias di depolarizzazione della lettura combinata coseno-seno della ritardanza, che tende a riavvicinare il valore a $90^\circ$. Le stime sono fittate con la legge di dispersione $\delta(\lambda) = k/\lambda$ di una lamina zero-order; il punto di design $(\lambda_0 = \SI{633}{\nano\meter},\,\delta_0 = 90^\circ)$ è riportato come riferimento ma non incluso nel fit, condotto sui soli tre punti misurati. Il risultato è in \cref{fig:qw_delta_fit}.
 
 \begin{table}[H]
     \centering
-    \caption{Ritardanza della lamina $\lambda/4$ (zero-order, $\lambda_0 = \SI{633}{\nano\meter}$) estratta dalla mediana del cluster vincente HDBSCAN sull'embedding UMAP, confrontata con il valore teorico $\delta_\mathrm{teorico} = 90^\circ \cdot \Delta n(\lambda)/\Delta n(\lambda_0) \cdot \lambda_0/\lambda$ secondo il modello di Sellmeier di Ghosh per l'$\alpha$-quarzo. Questi stessi valori teorici sono il ritardo $\delta(\lambda)$ assunto nella correzione $1/\sin\delta$ di $S_3$.}
+    \caption{Ritardanza della lamina $\lambda/4$ analizzata \emph{come campione} (zero-order, $\lambda_0 = \SI{633}{\nano\meter}$), estratta dalla mediana del cluster vincente HDBSCAN sull'embedding UMAP e processata con la correzione di $S_3$ calibrata (\cref{sec:calibrazione_s3}), confrontata con il modello di quarzo cristallino $\delta(\lambda) = 90^\circ \cdot \Delta n(\lambda)/\Delta n(\lambda_0) \cdot \lambda_0/\lambda$ (Sellmeier di Ghosh), riportato come riscontro indipendente. L'accordo è entro pochi gradi su tutti i canali. La lieve differenza rispetto ai valori di calibrazione (\cref{tab:s3_calibrazione}), più marcata al blu, riflette il bias di depolarizzazione della lettura combinata coseno-seno della ritardanza.}
     \label{tab:qw_ritardanza}
     \begin{tabular}{lcccc}
         \hline
-        \textbf{Canale} & $\lambda_\mathrm{eff}$ [\si{\nano\meter}] & $\tilde\delta_\mathrm{win}$ [\si{\degree}] & $\delta_\mathrm{teorico}$ [\si{\degree}] & Scarto [\si{\degree}] \\
+        \textbf{Canale} & $\lambda_\mathrm{eff}$ [\si{\nano\meter}] & $\tilde\delta_\mathrm{win}$ [\si{\degree}] & $\delta_\mathrm{quarzo}$ [\si{\degree}] & Scarto [\si{\degree}] \\
         \hline
         Rosso & 626 & $87{,}1$  & $90{,}9$  & $-3{,}8$ \\
-        Verde & 536 & $108{,}9$ & $107{,}5$ & $+1{,}4$ \\
-        Blu   & 466 & $129{,}8$ & $126{,}9$ & $+2{,}9$ \\
+        Verde & 536 & $108{,}6$ & $107{,}5$ & $+1{,}1$ \\
+        Blu   & 466 & $128{,}5$ & $126{,}9$ & $+1{,}6$ \\
         \hline
     \end{tabular}
 \end{table}
@@ -100,7 +143,7 @@ La stima quantitativa della ritardanza segue la stessa pipeline di clustering de
 \subsection{Lamina \texorpdfstring{$\lambda/2$}{lambda/2} zero-order}
 \label{subsec:risultati_hw}
 
-La lamina mezz'onda zero-order in $\alpha$-quarzo ($\lambda_0 = \SI{633}{\nano\meter}$), orientata a circa \SI{50}{\degree}, è stata analizzata sui tre canali colore con l'obiettivo di validare la ricostruzione della ritardanza in un regime di forte dispersione cromatica, oltre la lunghezza d'onda di progetto. La struttura macroscopica del campione è visibile nelle mappe di intensità $S_0$ in \cref{fig:hw_s0}: si distingue il disco centrale della lamina, la montatura metallica circolare che la sostiene e lo sfondo libero illuminato dal display LCD. Il contrasto fra le tre acquisizioni RGB riflette unicamente la trasmissività spettrale del sistema sorgente-lamina-sensore e non dipende dallo stato di polarizzazione locale.
+La lamina mezz'onda zero-order ($\lambda_0 = \SI{633}{\nano\meter}$), orientata a circa \SI{50}{\degree}, è stata analizzata sui tre canali colore con l'obiettivo di validare la ricostruzione della ritardanza in un regime di forte dispersione cromatica, oltre la lunghezza d'onda di progetto. La struttura macroscopica del campione è visibile nelle mappe di intensità $S_0$ in \cref{fig:hw_s0}: si distingue il disco centrale della lamina, la montatura metallica circolare che la sostiene e lo sfondo libero illuminato dal display LCD. Il contrasto fra le tre acquisizioni RGB riflette unicamente la trasmissività spettrale del sistema sorgente-lamina-sensore e non dipende dallo stato di polarizzazione locale.
 
 \begin{figure}[H]
     \centering
@@ -129,28 +172,28 @@ Per ottenere una stima quantitativa della ritardanza non condizionata da scelte 
 
 \begin{table}[H]
     \centering
-    \caption{Ritardanza della lamina $\lambda/2$ estratta dalla mediana del cluster vincente HDBSCAN sull'embedding UMAP, confrontata con la previsione zero-order $\delta_\mathrm{teorico} = 180^\circ \cdot \Delta n(\lambda)/\Delta n(\lambda_0) \cdot \lambda_0/\lambda$ (modello di Sellmeier di Ghosh per l'$\alpha$-quarzo). La ritardanza misurata \emph{decresce} verso il blu, in direzione opposta alla previsione zero-order, che \emph{cresce}: la lamina non è riconducibile a un ritardatore a singolo ordine (vedi testo).}
+    \caption{Ritardanza della lamina $\lambda/2$ estratta dalla mediana del cluster vincente HDBSCAN sull'embedding UMAP, confrontata con la previsione a singolo ordine $\delta_\mathrm{teorico} = \delta_0 \cdot \lambda_0/\lambda$ ($\delta_0 = 180^\circ$ alla lunghezza d'onda di design $\lambda_0 = \SI{633}{\nano\meter}$). Questa è la dipendenza minima attesa per un qualunque ritardatore a singolo passaggio, fissata dal solo fattore geometrico $1/\lambda$ e indipendente dal materiale; la dispersione di birifrangenza, se presente, non farebbe che accentuarne la crescita verso il blu. La ritardanza misurata \emph{decresce} invece verso il blu, in direzione opposta alla previsione, che \emph{cresce}: la lamina non è riconducibile a un ritardatore a singolo ordine (vedi testo).}
     \label{tab:hw_ritardanza}
     \begin{tabular}{lcccc}
         \hline
         \textbf{Canale} & $\lambda_\mathrm{eff}$ [\si{\nano\meter}] & $\tilde\delta_\mathrm{win}$ [\si{\degree}] & $\delta_\mathrm{teorico}$ [\si{\degree}] & Scarto [\si{\degree}] \\
         \hline
-        Rosso & 626 & $176{,}9$ & $181{,}8$ & $-4{,}9$ \\
-        Verde & 536 & $157{,}2$ & $214{,}9$ & $-57{,}7$ \\
-        Blu   & 466 & $135{,}9$ & $253{,}7$ & $-117{,}8$ \\
+        Rosso & 626 & $176{,}9$ & $182{,}0$ & $-5{,}1$ \\
+        Verde & 536 & $156{,}8$ & $212{,}6$ & $-55{,}8$ \\
+        Blu   & 466 & $134{,}5$ & $244{,}5$ & $-110{,}0$ \\
         \hline
     \end{tabular}
 \end{table}
 
-I tre valori misurati decrescono in modo monotono dal rosso al blu ($176{,}9 \to 157{,}2 \to 135{,}9^\circ$), in direzione opposta alla previsione zero-order, che cresce ($181{,}8 \to 214{,}9 \to 253{,}7^\circ$). Per un ritardatore attraversato una sola volta la ritardanza $\delta = 2\pi\,\Delta n(\lambda)\,d/\lambda$ cresce \emph{sempre} verso le lunghezze d'onda corte, poiché vi concorrono sia il fattore geometrico $1/\lambda$ sia l'aumento della birifrangenza $\Delta n(\lambda)$ in regime di dispersione normale. Una ritardanza misurata \emph{decrescente} è perciò incompatibile con qualunque ritardatore a singolo passaggio, indipendentemente dal materiale. Un fit empirico della forma $\delta = k/\lambda^{\,n}$ sui tre punti restituisce un esponente $n \approx -0{,}9$; la branch complementare $360^\circ - \delta$, ascendente, darebbe $n \approx +0{,}7$. In entrambi i casi $|n| < 1$, mentre il singolo passaggio impone $n \geq 1$ (per il quarzo $n \approx 1{,}14$): l'esponente non rappresenta una legge di dispersione fisica, e il suo stesso cambiare di segno al variare della convenzione di elicità conferma che si tratta di un artefatto.
+I tre valori misurati decrescono in modo monotono dal rosso al blu ($176{,}9 \to 156{,}8 \to 134{,}5^\circ$), in direzione opposta alla previsione a singolo ordine, che cresce ($182{,}0 \to 212{,}6 \to 244{,}5^\circ$). Per un ritardatore attraversato una sola volta la ritardanza $\delta = 2\pi\,\Delta n(\lambda)\,d/\lambda$ cresce \emph{sempre} verso le lunghezze d'onda corte, poiché vi concorre il fattore geometrico $1/\lambda$, a cui un'eventuale birifrangenza $\Delta n(\lambda)$ in regime di dispersione normale non fa che sommarsi. Una ritardanza misurata \emph{decrescente} è perciò incompatibile con qualunque ritardatore a singolo passaggio, indipendentemente dal materiale. Un fit empirico della forma $\delta = k/\lambda^{\,n}$ sui tre punti restituisce un esponente $n \approx -0{,}9$; la branch complementare $360^\circ - \delta$, ascendente, darebbe $n \approx +0{,}7$. In entrambi i casi $|n| < 1$, mentre il singolo passaggio impone $n \geq 1$ (il solo fattore geometrico fissa $n = 1$, la dispersione normale lo porta oltre): l'esponente non rappresenta una legge di dispersione fisica, e il suo stesso cambiare di segno al variare della convenzione di elicità conferma che si tratta di un artefatto.
 
-Le possibili cause sono state vagliate una per una. Un errore sistematico della catena di analisi è escluso dalla validazione offerta dalla lamina $\lambda/4$ (\cref{subsec:risultati_qw}), che condivide con questa misura il modello di Stokes, la correzione cromatica di $S_3$ e le lunghezze d'onda effettive, e riproduce il proprio riferimento entro $\SI{4}{\degree}$ su tutti i canali, blu compreso. Una depolarizzazione differenziale del campione è esclusa dal grado di polarizzazione totale misurato all'interno dei due dischi, che risulta identico fra le due lamine a ciascun canale (circa $0{,}77$ al blu per entrambe) e dunque attribuibile al sistema di illuminazione e non allo spessore di materiale attraversato. La natura cristallina delle lamine, parte di un kit didattico, esclude infine i ritardatori polimerici a dispersione anomala.
+Le possibili cause sono state vagliate una per una. Un errore sistematico della catena di analisi è escluso dalla validazione offerta dalla lamina $\lambda/4$ (\cref{subsec:risultati_qw}), che condivide con questa misura il modello di Stokes, la correzione cromatica di $S_3$ e le lunghezze d'onda effettive, e riproduce il proprio riferimento entro $\SI{4}{\degree}$ su tutti i canali, blu compreso. Una depolarizzazione differenziale del campione è esclusa dal grado di polarizzazione totale misurato all'interno dei due dischi, che risulta identico fra le due lamine a ciascun canale (circa $0{,}77$ al blu per entrambe) e dunque attribuibile al sistema di illuminazione e non allo spessore di materiale attraversato. Resta da considerare una dispersione del materiale così anomala da invertire l'andamento geometrico: per produrre una decrescita reale di $\delta$ verso il blu la birifrangenza dovrebbe diminuire più rapidamente di quanto il fattore $1/\lambda$ cresca, un comportamento estraneo a un ritardatore trasparente nel visibile e perciò scartato senza bisogno di ipotesi sul materiale specifico.
 
 Resta da escludere che la decrescita sia un'inversione di segno, prodotta da una lamina inserita con assi rapido e lento scambiati: una tale configurazione manda $\delta$ in $360^\circ - \delta$ e riporterebbe i valori al ramo ascendente. L'ipotesi è smentita dal segno della componente circolare. Uno scambio fra asse veloce e asse lento non altera né l'asse veloce ricostruito né l'AoLP, che dipendono unicamente da $S_1$ e $S_2$ (\cref{sec:retardance}), e si manifesta esclusivamente nel segno di $S_3$. Il parametro $S_3$ misurato all'interno del disco è positivo su tutti i canali in cui è apprezzabilmente diverso da zero, con lo stesso segno della lamina $\lambda/4$ (\cref{subsec:risultati_qw}): le due lamine condividono dunque la medesima elicità, e il segno di $S_3$, fissato globalmente e validato dalla $\lambda/4$ zero-order, è quello corretto anche in questa misura. La decrescita è perciò genuina e non un'inversione.
 
 L'unica interpretazione compatibile è che la lamina sia un ritardatore \emph{multi-ordine}, la cui ritardanza vera supera molti multipli di $360^\circ$. Poiché $\delta_\mathrm{vero}(\lambda)$ cresce sempre verso il blu, una decrescita del valore misurato implica necessariamente l'attraversamento di uno o più multipli di $360^\circ$ fra un canale e il successivo: il passo apparente di circa $-20^\circ$ per banda corrisponde a un incremento reale di circa $+340^\circ$, ossia quasi un giro intero di ritardanza fra canali RGB adiacenti. Con soli tre campioni spettrali, una fase che avanza di tanto fra un punto e il successivo viene sotto-campionata e appare procedere lentamente all'indietro, in stretta analogia con l'effetto stroboscopico per cui una ruota in rapida rotazione sembra girare al contrario in una ripresa a basso numero di fotogrammi. La decrescita osservata è la manifestazione di questo avvolgimento (aliasing spettrale), non di una dispersione anomala del materiale.
 
-Il canale rosso, prossimo alla lunghezza d'onda di progetto, conferma una mezz'onda ($\delta \approx 177^\circ \approx 180^\circ$), coerente con un ordine intero; proprio in prossimità di $180^\circ$ la componente $S_3 \propto \sin\delta$ si annulla e la ritardanza è massimamente sensibile al rumore, cosicché lo scarto di pochi gradi da $180^\circ$ non è significativo. Determinare l'ordine esatto non è invece possibile dai soli tre punti spettrali RGB. La ritardanza vera, pari a molti multipli di $360^\circ$, dipende dallo spessore e dalla dispersione di birifrangenza del materiale, ignoto; al crescere dell'ordine il valore avvolto diventa estremamente sensibile a $\Delta n(\lambda)$, e una scansione sistematica degli ordini su un modello di quarzo non individua alcuna soluzione di spessore fisicamente plausibile, con gli unici accostamenti accettabili confinati a ordini elevatissimi (spessori dell'ordine del millimetro) tipici della degenerazione introdotta dal sotto-campionamento. Si conclude pertanto che la lamina $\lambda/2$ è un ritardatore multi-ordine — risultato solido e indipendente dal materiale, fondato sull'impossibilità della decrescita per un ritardatore a singolo passaggio — mentre l'ordine specifico resta indeterminato con i dati disponibili.
+Il canale rosso, prossimo alla lunghezza d'onda di progetto, conferma una mezz'onda ($\delta \approx 177^\circ \approx 180^\circ$), coerente con un ordine intero; proprio in prossimità di $180^\circ$ la componente $S_3 \propto \sin\delta$ si annulla e la ritardanza è massimamente sensibile al rumore, cosicché lo scarto di pochi gradi da $180^\circ$ non è significativo. Determinare l'ordine esatto non è invece possibile dai soli tre punti spettrali RGB. La ritardanza vera, pari a molti multipli di $360^\circ$, dipende dallo spessore e dalla dispersione di birifrangenza $\Delta n(\lambda)$ del materiale, entrambi ignoti; al crescere dell'ordine il valore avvolto diventa estremamente sensibile a $\Delta n(\lambda)$, cosicché con un materiale non caratterizzato e soli tre campioni spettrali il problema è degenere e ammette un'intera famiglia di ordini compatibili. Si conclude pertanto che la lamina $\lambda/2$ è un ritardatore multi-ordine — risultato solido e indipendente dal materiale, fondato sull'impossibilità della decrescita per un ritardatore a singolo passaggio — mentre l'ordine specifico resta indeterminato con i dati disponibili.
 
 % ---------------------------------------------------------------------------
 \section{Linearità e risoluzione spaziale: nastro adesivo}
@@ -233,8 +276,8 @@ La \cref{tab:nastro_plateau} raccoglie le mediane di ritardanza dei nove plateau
         \textbf{Canale} & 1L & 2L & 3L & 4L & 5 & 4R & 3R & 2R & 1R \\
         \hline
         Rosso & $247{,}6$ & $130{,}7$ & $15{,}1$  & $242{,}1$ & $117{,}1$ & $235{,}7$ & $354{,}9$ & $111{,}5$ & $237{,}6$ \\
-        Verde & $290{,}9$ & $196{,}3$ & $120{,}2$ & $52{,}9$  & $338{,}8$ & $42{,}4$  & $105{,}6$ & $174{,}0$ & $282{,}9$ \\
-        Blu   & $322{,}8$ & $296{,}0$ & $256{,}9$ & $182{,}2$ & $148{,}5$ & $170{,}5$ & $210{,}2$ & $270{,}8$ & $316{,}5$ \\
+        Verde & $290{,}6$ & $196{,}6$ & $119{,}8$ & $53{,}5$  & $338{,}5$ & $42{,}9$  & $105{,}4$ & $173{,}9$ & $282{,}7$ \\
+        Blu   & $321{,}2$ & $295{,}3$ & $258{,}5$ & $182{,}3$ & $147{,}2$ & $169{,}9$ & $212{,}1$ & $271{,}9$ & $315{,}2$ \\
         \hline
     \end{tabular}
 \end{table}
@@ -256,7 +299,7 @@ La \cref{tab:nastro_plateau} raccoglie le mediane di ritardanza dei nove plateau
 
 La linearità della risposta è eccellente su tutti e tre i canali, con $R^2 > 0{,}998$: il sistema ricostruisce una ritardanza accumulata fino a oltre $\SI{1500}{\degree}$ mantenendo la proporzionalità diretta con il numero di strati, una volta risolto l'avvolgimento tramite l'unwrap geometrico della slice. La simmetria della pila è rispettata entro pochi gradi sulla maggior parte dei plateau, confermando la coerenza spaziale della ricostruzione.
 
-Il confronto delle regioni omologhe a tre strati evidenzia un'asimmetria residua fra lato sinistro e destro: contenuta sul rosso ($\SI{735.1}{\degree}$ contro $\SI{714.9}{\degree}$, $\SI{20.2}{\degree}$) e sul verde ($\SI{840.2}{\degree}$ contro $\SI{825.6}{\degree}$, $\SI{14.6}{\degree}$), essa sale a $\SI{46.7}{\degree}$ sul blu ($\SI{976.9}{\degree}$ contro $\SI{930.2}{\degree}$). L'effetto è confinato al terzo strato e al solo canale blu, non comparendo negli altri strati né sugli altri canali, ed è quindi incompatibile con un'asimmetria fisica generica del campione. Le verifiche condotte hanno escluso difetti di allineamento dei frame, depolarizzazione locale e asimmetrie nella distribuzione dei vettori di Stokes; la causa, plausibilmente una registrazione cromatica imperfetta del canale blu o un'interferenza sottile selettiva negli strati di adesivo, resta non identificata. Trattandosi di un'anomalia localizzata a un singolo punto, essa non influisce né sulla pendenza media né sulla linearità della risposta ($R^2 > 0{,}998$), entrambe ricavate dal fit complessivo sui nove plateau.
+Il confronto delle regioni omologhe a tre strati evidenzia un'asimmetria residua fra lato sinistro e destro: contenuta sul rosso ($\SI{735.1}{\degree}$ contro $\SI{714.9}{\degree}$, $\SI{20.2}{\degree}$) e sul verde ($\SI{839.8}{\degree}$ contro $\SI{825.4}{\degree}$, $\SI{14.3}{\degree}$), essa sale a $\SI{46.4}{\degree}$ sul blu ($\SI{978.5}{\degree}$ contro $\SI{932.1}{\degree}$). L'effetto è confinato al terzo strato e al solo canale blu, non comparendo negli altri strati né sugli altri canali, ed è quindi incompatibile con un'asimmetria fisica generica del campione. Le verifiche condotte hanno escluso difetti di allineamento dei frame, depolarizzazione locale e asimmetrie nella distribuzione dei vettori di Stokes; la causa, plausibilmente una registrazione cromatica imperfetta del canale blu o un'interferenza sottile selettiva negli strati di adesivo, resta non identificata. Trattandosi di un'anomalia localizzata a un singolo punto, essa non influisce né sulla pendenza media né sulla linearità della risposta ($R^2 > 0{,}998$), entrambe ricavate dal fit complessivo sui nove plateau.
 
 La dipendenza della ritardanza per strato dalla lunghezza d'onda è riassunta dai due grafici di \cref{fig:nastro_fit}. Il primo riporta i valori srotolati di $\delta$ in funzione del numero di strati per i tre canali, con le rispettive rette di fit attraverso l'origine; il secondo riporta le tre pendenze $m_c$ in funzione della lunghezza d'onda, con il fit di dispersione $m(\lambda) = k/\lambda$. Il fit restituisce $k = 1{,}49\cdot10^{5}~\si{\degree\nano\meter}$/strato con $R^2 = 0{,}993$. Il rapporto fra le pendenze agli estremi spettrali, $m_B/m_R = 316{,}8/240{,}2 = 1{,}319$, è leggermente inferiore al rapporto puramente geometrico $\lambda_R/\lambda_B = 626/466 = 1{,}343$: lo scarto quantifica la riduzione della birifrangenza $\Delta n$ del polimero verso il rosso rispetto al puro scaling $1/\lambda$, coerente con la dispersione normale del materiale.
 
@@ -293,7 +336,7 @@ La rotazione ottica è piccola, dell'ordine di pochi gradi, e la regione utile d
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{Images/generated/zucchero/R_aolp_winner.pdf}
-    \caption{Identificazione del cluster vincente sul canale rosso: embedding UMAP colorato per AoLP (sinistra), mappa spaziale con il cluster della soluzione evidenziato (centro) e istogramma dell'AoLP (destra). La mediana del cluster vincente è $\mathrm{AoLP} = -3{,}88^\circ$ (rotazione destrogira), corrispondente a una rotazione ottica di modulo $\tilde\psi_{\mathrm{win}} = \SI{3.88}{\degree}$.}
+    \caption{Identificazione del cluster vincente sul canale rosso: embedding UMAP colorato per AoLP (sinistra), mappa spaziale con il cluster della soluzione evidenziato (centro) e istogramma dell'AoLP (destra). La mediana del cluster vincente è $\mathrm{AoLP} = -3{,}95^\circ$ (rotazione destrogira), corrispondente a una rotazione ottica di modulo $\tilde\psi_{\mathrm{win}} = \SI{3.95}{\degree}$.}
     \label{fig:zucchero_winner_r}
 \end{figure}
 
@@ -307,7 +350,7 @@ La rotazione ottica è piccola, dell'ordine di pochi gradi, e la regione utile d
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{Images/generated/zucchero/B_aolp_winner.pdf}
-    \caption{Cluster vincente sul canale blu, con la stessa struttura a tre pannelli della \cref{fig:zucchero_winner_r}. L'AoLP mediano è $-6{,}15^\circ$, ossia una rotazione di modulo $\tilde\psi_{\mathrm{win}} = \SI{6.15}{\degree}$, la più ampia dei tre canali.}
+    \caption{Cluster vincente sul canale blu, con la stessa struttura a tre pannelli della \cref{fig:zucchero_winner_r}. L'AoLP mediano è $-6{,}12^\circ$, ossia una rotazione di modulo $\tilde\psi_{\mathrm{win}} = \SI{6.12}{\degree}$, la più ampia dei tre canali.}
     \label{fig:zucchero_winner_b}
 \end{figure}
 
@@ -330,9 +373,9 @@ La rotazione misurata permette una stima della concentrazione tramite la legge d
         \hline
         \textbf{Canale} & $\lambda_\mathrm{eff}$ [\si{\nano\meter}] & $\tilde\psi_{\mathrm{win}}$ [\si{\degree}] & $[\alpha]_\lambda$ [\si{\degree}\,\si{\milli\liter}\,\si{\gram}$^{-1}$\,\si{\deci\meter}$^{-1}$] & $c$ [\si{\gram\per\milli\liter}] \\
         \hline
-        Rosso & 626 & $3{,}88$ & $58{,}9$  & $0{,}51$ \\
+        Rosso & 626 & $3{,}95$ & $58{,}9$  & $0{,}52$ \\
         Verde & 536 & $4{,}92$ & $80{,}3$  & $0{,}47$ \\
-        Blu   & 466 & $6{,}15$ & $106{,}2$ & $0{,}45$ \\
+        Blu   & 466 & $6{,}12$ & $106{,}2$ & $0{,}44$ \\
         \hline
     \end{tabular}
 \end{table}
