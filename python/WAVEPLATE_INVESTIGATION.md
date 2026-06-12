@@ -1,5 +1,22 @@
 # Journal — indagine parametri lamine d'onda
 
+## REGISTRO IPOTESI (tenere TUTTE, anche le morte: servono se si apre un dead end)
+
+| # | ipotesi | stato | causa di morte / evidenza |
+|---|---|---|---|
+| 1 | lamine in quarzo (modello rif.) | MORTA | mai materiale accertato; a 3 bande quarzo≈PMMA≈PC (riscontro arbitrario); rimosso da tesi 2026-06-12 |
+| 2 | λ/2 multi-ordine ~5-6 + aliasing | MORTA | ritenzione di banda: ordine≥2 ⇒ DoP_G ≤0.78 (≤0.5 a ord.5), misurato 0.845; robusto al modello di banda |
+| 3 | fogli polimerici SPESSI tagliati (~1mm, ord. 5-6) | MORTA | con la #2; lo spessore visibile è il vetro del sandwich |
+| 4 | tilt / λ_R errata / multi-riga KSF (below-design rosso) | MORTE | scalano con l'ordine (22×), osservato 2×; e il below-design ~si dissolve con la reinterpretazione zero-order |
+| 5 | λ/4 multi-ordine (ipotesi utente 2026-06-12) | MORTA | stessa ritenzione di banda; zero-order normale fitta RMS 1.7-4° |
+| 6 | λ/2 = stack di Pancharatnam | MORTA | asse veloce per canale fermo entro ±0.3° (stack ⇒ rotazione di gradi) |
+| 7 | λ/2 = reverse film ingegnerizzato (OLED/copolimero/bilayer) | POSSIBILE ma non necessaria | indistinguibile dalla #8 nei dati; #8 più parsimoniosa (timing, costo) |
+| 8 | λ/2 = film CELLULOSICO wide-spectrum (cellophane/diacetato, ~35-65 µm) in vetro; λ/4 = film stirato normale (~20-30 µm) in vetro | **VIVA (attuale)** | reverse naturale della cellulosa (letteratura+brevetti); cellophane λ/2 wide-spectrum documentato; Re-ratio misurato 0.746/0.965 (rami) vs 0.869 flat di letteratura; haze uguale fra lamine |
+
+Spessori: Re(633)=316 nm (λ/2) e 158 nm (λ/4); con Δn cellophane 0.005-0.009 ⇒
+d ≈ 35-65 µm (un singolo foglio da imballaggio ≈ mezz'onda da solo, oss. di Feynman).
+I mm visibili = dischi di vetro. Sanity: nastro adesivo misurato ~417 nm/strato, stessa scala.
+
 ## ⚠️ SVOLTA 2026-06-12 (sera): il multi-ordine è FALSIFICATO. Ipotesi finale congiunta.
 
 Indagine congiunta richiesta dall'utente ("difficile credere λ/4 zero-order se il
