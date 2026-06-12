@@ -1,5 +1,65 @@
 # Journal — indagine parametri lamine d'onda
 
+## ⚠️ SVOLTA 2026-06-12 (sera): il multi-ordine è FALSIFICATO. Ipotesi finale congiunta.
+
+Indagine congiunta richiesta dall'utente ("difficile credere λ/4 zero-order se il
+costruttore non la etichetta come tale; strano una zero e una multi"). Strumento
+nuovo: **modello a banda integrata** (`verify_joint_order.py`) con gli spettri reali
+per canale (G0: camera S22-proxy × bianco sorgente; sensibilità: primarie pure):
+per ogni ipotesi (ordine, dispersione Cauchy b anche NEGATIVA) predice sia la δ
+avvolta (arg V) sia la **ritenzione di polarizzazione |V|** intra-banda, confrontata
+con la DoP misurata nel disco (estratta dalle cache: q 0.910/0.826/0.794,
+h 0.924/0.845/0.802; selezione disco via δ lontana >45° dallo sfondo).
+
+**Risultato 1 — multi-ordine ESCLUSO per entrambe, robusto alla banda.** A ordine 5
+il verde (FWHM ~40 nm, vero sia per banda G0 sia per primaria pura) ritiene
+|V_G|=0.32-0.39 → DoP prevista ≤0.5; a ordine 2 ≤0.78. Misurato 0.845. Nessun haze
+può ALZARE la DoP → ogni soluzione multi-ordine richiede haze 1.5-3 (impossibile).
+Vale anche per il rosso (righe KSF sparse su 609-647 nm). Il vecchio esperimento
+"5 righe" aveva già visto questa tensione (DoP prevista 0.80 vs 0.92 misurata) ma
+era stata archiviata come sovrastima; era invece il segnale giusto.
+
+**Risultato 2 — la discesa della λ/2 è dispersione INVERSA reale, non aliasing.**
+L'esclusione in tesi della "dispersione anomala" ("estranea a un ritardatore
+trasparente") è FALSA per i film ingegnerizzati: i **reverse-dispersion retarder
+film** sono prodotti di massa (polarizzatori circolari OLED, brevetti quotano
+Re450/Re550 preferibile 0.50-0.93, ideale achromat 0.818). Il nostro implicito:
+**Re466/Re536 = 0.746** → in piena fascia commerciale. Fit zero-order reverse
+(b=−150k..−135k Cauchy): RMS 1.8-5.8°, D633=173-182° ≈ design, haze 0.96/0.89/0.85.
+
+**Risultato 3 — soluzione congiunta vincente (score netto):**
+| lamina | ordine | dispersione (Re-ratio) | δ(633) | RMS | haze RGB |
+|---|---|---|---|---|---|
+| λ/4 | **0** | normale, Re536/Re626≈1.075 (film PC/PET-like) | 84-88° | 1.7-4° | 0.94/0.85/0.81 |
+| λ/2 | **0** | INVERSA, Re466/Re536≈0.746 (reverse film) | 173-182° | 1.8-5.8° | 0.95/0.87/0.83 |
+
+Haze identico fra le lamine (mismatch 0.015-0.04) → stessa famiglia costruttiva +
+depol di misura comune. Il puzzle del rosso sotto-design ~SI DISSOLVE (entrambe
+leggono ≈nominale al design come zero-order).
+
+**Ipotesi costruttiva finale (tra noi):** entrambe = **film polimerico sottile
+laminato fra dischi di vetro** (costruzione standard dei retarder zero-order
+low-cost; i mm visibili = substrato di vetro, non il ritardatore). λ/4 da film a
+dispersione normale; λ/2 da film a dispersione inversa (prodotto wideband/OLED).
+Sostituisce l'ipotesi precedente "foglio spesso tagliato multi-ordine 5-6" (morta
+con il multi-ordine).
+
+**Caveat:** (1) il ramo δ della λ/2 dipende dal segno globale di S3: ramo
+complementare 183/203/225 → comunque reverse film ma blando (Re-ratio ~0.95);
+in entrambi i casi zero-order, MAI multi-ordine. (2) Cauchy 1-param è rozza;
+numeri indicativi. (3) R450 Cauchy-equivalente 0.51-0.60 sembra estremo, ma la
+metrica industriale è il Re-ratio = 0.746, in fascia.
+
+**CONSEGUENZE TESI (da decidere con l'utente, NON ancora applicate):** la sezione
+λ/2 di cap6 (multi-ordine + aliasing + tabella scarti vs k/λ), il paragrafo ipotesi
+fogli tagliati (appena aggiunto), i cenni cap4/cap7 "multi-ordine" e l'argomento
+"n≥1 impossibile" (vale solo per dispersione normale) andrebbero riscritti attorno
+a: λ/2 = ritardatore zero-order a dispersione inversa, identificato dalla
+ritenzione di polarizzazione. La calibrazione S3 NON cambia (δ_a misurata
+direttamente, indipendente da tutto questo).
+
+---
+
 ## IPOTESI PRINCIPALE (utente, 2026-06-11): lamine = fogli di polimero TAGLIATI
 
 Entrambe le lamine sarebbero dischi ritagliati da un foglio di polimero stirato.
