@@ -31,6 +31,15 @@ NON cambiano** (δ_a misurato direttamente, indipendente dall'ordine).
 Stato: ipotesi fisica leading, coerente coi dati e con le osservazioni dirette delle
 lamine. Ordine non univoco (degenere a 3 punti) ma il quadro è unitario.
 
+**AGGIORNAMENTO 2026-06-12: ipotesi PROMOSSA IN TESI** (decisione utente, supera il
+precedente "keep in notes only"). Paragrafo in cap6, fine `subsec:risultati_hw`
+(dopo la conclusione multi-ordine): dischi ritagliati da fogli polimerici commerciali,
+giustificata da ordine 5–6 ⇒ Δn≈3.5e-3 a spessore mm (vs ~14 ordini per Δn da
+cristallo), depol order-independent (haze), diametro/spessore/assenza incollaggi/costo.
+Formulata come ipotesi non dimostrabile (N=2, 3 bande), con caveat λ/4 (zero-order e
+multi-ordine avvolto indistinguibili a 3 bande) e nota che la calibrazione S3 ne è
+indipendente. Il below-design del rosso resta FUORI dalla tesi (issue aperto solo qui).
+
 ---
 
 

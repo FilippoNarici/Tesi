@@ -20,6 +20,7 @@ Da TODO utente in cap3 (review Overleaf). Dettaglio in memory `project_s3_datadr
 - [x] Riferimento sostituito con sola legge geometrica δ0·λ0/λ (material-free, 91.0/106.3/122.3; scarti −2.6/+4.7/+8.5 = dispersione normale): `tab:s3_calibrazione`, `tab:qw_ritardanza` (scarti −3.9/+2.3/+6.2), `fig:s3_calibration` rigenerata (`plot_s3_calibration` senza quartz_func, cella S3CAL aggiornata), eq:dispersione-qwp riscritta (forma generale + limite geometrico), Ghosh non più citato. Quarzo solo fallback codice.
 - [x] Paradigma lamine: etichetta = sola ritardanza nominale @633 (né materiale né ordine dichiarati); cap3 §lamina-qwp riscritta (niente formula d'ordine, eq:qwp-geometrico eliminata), cap4 "caratterizzate a posteriori", cap6 titoli senza "zero-order" + λ/2 mai "dichiarata zero-order" (claim falso rimosso), cap7 riformulato; "zero-order" resta solo nella definizione teorica cap2. **BOZZA, DA RIVEDERE.**
 - [x] TODO figure float (cap6:143): moot per l'utente, commento rimosso.
+- [x] Ipotesi fogli polimerici IN TESI (2026-06-12, richiesta utente): paragrafo a fine `subsec:risultati_hw` (cap6) — dischi ritagliati da fogli birifrangenti commerciali, giustificata da ordine 5–6 ⇒ Δn≈3,5·10⁻³ a spessore mm, depol order-independent (haze), dimensioni/costo; caveat N=2 + λ/4 indistinguibile + calibrazione S3 indipendente dall'ordine. Supera il precedente "solo nel journal". **BOZZA, DA RIVEDERE.**
 
 Questo file è la singola fonte di verità sullo stato di avanzamento. Aggiornare ad ogni task completato. Per istruzioni operative vedere `CLAUDE.md`.
 
