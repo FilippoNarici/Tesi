@@ -2,7 +2,7 @@
 
 \section{Panoramica del setup}
 \label{sec:panoramica-setup}
-
+% OK
 L'apparato opera in configurazione di trasmissione su rotaia ottica. Lo schema esteso è:
 \begin{equation}
 \text{Sorgente} \;\longrightarrow\; \text{Campione} \;\longrightarrow\; \left[\,\lambda/4\,\right] \;\longrightarrow\; \text{Analizzatore} \;\longrightarrow\; \text{Sensore}
@@ -23,12 +23,18 @@ dove la lamina $\lambda/4$ viene inserita solo per la determinazione di $S_3$. L
 \section{Componenti ottici}
 \label{sec:componenti-ottici}
 
-L'apparato è montato su una rotaia ottica Optosci con cavalieri scorrevoli, che garantisce l'allineamento dei componenti lungo un asse ottico comune e la riproducibilità del posizionamento tra sessioni di misura. La sorgente luminosa è il display di un tablet Samsung Galaxy Tab S7 FE, impostato su schermata bianca alla massima luminosità. Il pannello LCD emette luce bianca RGB a banda larga attraverso un polarizzatore integrato: la luce in uscita è già polarizzata linearmente con asse orientato approssimativamente in verticale in configurazione landscape, il che rende il display una sorgente estesa a stato di polarizzazione ben definito. L'analizzatore è un polarizzatore lineare Optosci di forma circolare, montato su supporto rotante calibrato con risoluzione angolare sufficiente per i passi di \SI{10}{\degree} previsti dal protocollo; un rapporto di estinzione elevato garantisce che la modulazione dell'intensità trasmessa segua fedelmente la legge di Malus. Per integrare i dispositivi nella rotaia sono stati realizzati supporti personalizzati mediante stampa 3D in PLA.
+L'apparato è montato su una rotaia ottica Optosci con cavalieri scorrevoli, che garantisce l'allineamento dei componenti lungo un asse ottico comune e la riproducibilità del posizionamento tra sessioni di misura. La sorgente luminosa è il display di un tablet Samsung Galaxy Tab S7 FE, impostato su schermata bianca alla massima luminosità. Il pannello LCD emette luce bianca RGB a banda larga attraverso un polarizzatore integrato: la luce in uscita è già polarizzata linearmente con asse orientato approssimativamente in verticale in configurazione landscape, il che rende il display una sorgente estesa a stato di polarizzazione ben definito. L'analizzatore è un polarizzatore lineare Optosci di forma circolare, montato su supporto rotante con risoluzione angolare sufficiente per i passi di \SI{10}{\degree} previsti dal protocollo; un rapporto di estinzione elevato garantisce che la modulazione dell'intensità trasmessa segua fedelmente la legge di Malus. Per integrare i dispositivi nella rotaia sono stati realizzati supporti personalizzati mediante stampa 3D in PLA.
 
 \subsection{Lamina \texorpdfstring{$\lambda/4$}{lambda/4} zero-order}
 \label{subsec:lamina-qwp}
 
-Per la determinazione del parametro $S_3$ viene utilizzata una lamina quarto d'onda Optosci di tipo \emph{zero-order}, progettata per la lunghezza d'onda di $\SI{633}{\nano\meter}$. Il materiale birifrangente della lamina non è dichiarato dal costruttore e resta ignoto: nelle analisi spettrali che seguono il quarzo cristallino compare unicamente come modello di dispersione di riferimento, ben caratterizzato in letteratura, e non come materiale accertato delle lamine. Rispetto a una lamina multi-ordine, la dipendenza dalla lunghezza d'onda è più debole, proprietà importante dato che il sensore opera simultaneamente sui tre canali colore. In prima approssimazione, trascurando la dispersione della birifrangenza del materiale, il ritardo alla lunghezza d'onda $\lambda$ del canale in esame è:
+Per la determinazione del parametro $S_3$ viene utilizzata una lamina quarto d'onda Optosci, progettata per la lunghezza d'onda di $\SI{633}{\nano\meter}$. Il materiale birifrangente della lamina non è dichiarato dal costruttore e resta ignoto: nelle analisi spettrali che seguono 
+
+% TODO: io toglierei la dipendenza dal quarzo, alla fine è molto improbabile le lamine siano di quarzo, non so cosa siano ma piu probabilmente polimeri?
+il quarzo cristallino compare unicamente come modello di dispersione di riferimento, ben caratterizzato in letteratura, e non come materiale accertato delle lamine.
+
+% TODO: questo paragrafo difficile da trattare, ho rimosso il fatto che la lamina sia zero order perche non ce lo dice nessuno, la abbiamo assunta come tale solo dopo l'analisi S3 indipendente e tra laltro comunque non siamo 100% sicuri sia zero order e non sia una qualche coincidenza sfortunatissima, io farei un cambio di paradigma globale della tesi su questa cosa che rifletta di piu il modo in cui abbiamo lavorato: innanzitutto misuriamo lamina w/4 e ne caratterizziamo ritardanza senza s3 (perche per usare s3 dovremmo gia aver misurato w/4), una volta che i dati ci dicono che probabilmente è zero order assumiamo che sia zero order e quindi poi usiamo tutte formule zero order, io partirei sempre con laccortezza di dire io so solo che la lamina dovrebbe essere con questa ritardanza a 633 ma finche non misuro non so ordine ne nulla altro che non sia quello, tutte queste cose non le devi mettere in questo paragrafetto, è proprio un cambio di approccio alle lamine
+Rispetto a una lamina multi-ordine, la dipendenza dalla lunghezza d'onda è più debole, proprietà importante dato che il sensore opera simultaneamente sui tre canali colore. In prima approssimazione, trascurando la dispersione della birifrangenza del materiale, il ritardo alla lunghezza d'onda $\lambda$ del canale in esame è:
 \begin{equation}
 \delta(\lambda) = \frac{\pi}{2} \cdot \frac{\SI{633}{\nano\meter}}{\lambda}
 \label{eq:qwp-geometrico}
