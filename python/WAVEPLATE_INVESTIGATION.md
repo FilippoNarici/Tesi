@@ -215,6 +215,22 @@ algoritmo semplice, picco 631 ≪ 644). Residuo piccolo (1.6°/3.1°), compatibi
 sensibilità di ricostruzione ai punti degeneri δ=90°/180° o scatter + ambiguità di
 design-λ. Culprit ~chiuso: non un sistematico singolo; irrilevante per S3.
 
+**2026-06-12 — riscontro polimeri + quarzo RIMOSSO dalla tesi.** Su richiesta utente
+(TODO cap3: "molto improbabile le lamine siano di quarzo, più probabilmente polimeri")
+testati modelli di dispersione polimerici sulla λ/4 (`verify_polymer_riscontro.py`,
+Cauchy 1-param da rapporti R450=Δn(450)/Δn(550) di letteratura): PMMA RMS 3.1°,
+PC bisfenolo-A (R450=1.08) 3.2°, quarzo 3.6° anchored — **indistinguibili**; in sola
+forma (k libero) il PC fitta meglio di tutti (RMS 1.5°, B/R implicito 1.1015 vs PC
+1.1045 quasi esatto) → coerente con ipotesi foglio polimerico, ma non conclusivo
+(il G resta sopra tutti i materiali: solita anomalia rosso-basso). Decisione utente:
+riferimento mono-materiale arbitrario → quarzo eliminato da TUTTA la tesi (cap3/5/6/7),
+sostituito dalla sola legge geometrica δ0·λ0/λ (material-free, scarti −2.6/+4.7/+8.5 =
+dispersione normale presente). Contestuale **cambio di paradigma lamine** in tesi:
+nessun ordine/materiale assunto a priori (etichetta = solo ritardanza nominale @633),
+caratterizzazione a posteriori (calibrazione → compatibilità singolo ordine → adozione
+formule 1/λ). Figura `s3_calibration.pdf` rigenerata (curva geometrica); quarzo resta
+solo come fallback nel codice (`waveplate_retardance`, `USE_MEASURED_S3_RETARDANCE=False`).
+
 **2026-06-11 (chiusura indagine).** Due verifiche finali: (1) il rapporto
 misurato/modello NON è costante sui canali (λ/4 R/G/B = 0.97/1.03/1.04) → NON c'è
 bias moltiplicativo; il "deficit del rosso" è la dispersione reale di una lamina con

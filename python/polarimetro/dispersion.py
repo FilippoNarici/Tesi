@@ -55,27 +55,31 @@ def fit_inverse_lambda(lambdas_nm, values, power=1):
     }
 
 
-def plot_s3_calibration(channel_lambdas, delta_measured_deg, quartz_func, *,
-                        design_point=None,
+def plot_s3_calibration(channel_lambdas, delta_measured_deg, *,
+                        design_point,
                         out_pdf=None, show=True,
                         figsize=(4.4, 3.6),
                         lambda_range=(445.0, 650.0)):
     """Figura di calibrazione di δ_a dell'analizzatore λ/4.
 
-    Mostra la ritardanza MISURATA per canale (punti RGB), il modello di quarzo
-    come riscontro indipendente (curva tratteggiata, NON un fit ai punti) e il
-    punto di design. La legenda riporta il fattore di correzione 1/sin δ_a.
+    Mostra la ritardanza MISURATA per canale (punti RGB), la sola legge
+    geometrica δ(λ) = δ0·λ0/λ di un ritardatore a singolo ordine come
+    riferimento material-free (curva tratteggiata, NON un fit ai punti) e
+    il punto di design. La legenda riporta il fattore di correzione 1/sin δ_a.
 
     `channel_lambdas`, `delta_measured_deg`: dict {'R'/'G'/'B': valore}.
-    `quartz_func`: callable λ_nm -> δ_deg (modello di quarzo).
-    `design_point`: dict {'lambda_nm', 'value'} opzionale (diamond nero).
+    `design_point`: dict {'lambda_nm', 'value'} (diamond nero + ancoraggio
+    della legge geometrica). Riscontro quarzo RIMOSSO (2026-06-12): a 3 bande
+    larghe quarzo/PMMA/PC sono indistinguibili (verify_polymer_riscontro.py),
+    un riferimento mono-materiale era arbitrario.
     """
     fig, ax = plt.subplots(figsize=figsize)
 
     x_curve = np.linspace(lambda_range[0], lambda_range[1], 400)
-    y_curve = np.array([quartz_func(x) for x in x_curve])
+    y_curve = (design_point['value'] * design_point['lambda_nm']) / x_curve
     ax.plot(x_curve, y_curve, color='black', linestyle='--', linewidth=1.0,
-            zorder=2, label='modello di quarzo (riscontro)')
+            zorder=2,
+            label=r'legge geometrica $\delta_0\,\lambda_0/\lambda$')
 
     for ch in ('R', 'G', 'B'):
         if ch not in channel_lambdas or ch not in delta_measured_deg:
@@ -88,16 +92,15 @@ def plot_s3_calibration(channel_lambdas, delta_measured_deg, quartz_func, *,
                    label=f"{ch} ({lam:.0f} nm): "
                          rf"$\delta_a={d:.1f}\degree$, $1/\sin\delta_a={corr:.3f}$")
 
-    if design_point is not None:
-        ax.scatter([design_point['lambda_nm']], [design_point['value']],
-                   color='black', s=46, marker='D', zorder=4,
-                   edgecolors='black', linewidths=0.7,
-                   label=f"design ({design_point['lambda_nm']:.0f} nm, "
-                         rf"$90\degree$)")
+    ax.scatter([design_point['lambda_nm']], [design_point['value']],
+               color='black', s=46, marker='D', zorder=4,
+               edgecolors='black', linewidths=0.7,
+               label=f"design ({design_point['lambda_nm']:.0f} nm, "
+                     rf"$90\degree$)")
 
     ax.set_xlabel(r"Lunghezza d'onda $\lambda$ (nm)")
     ax.set_ylabel(r'Ritardanza $\delta_a$ ($\degree$)')
-    ax.set_title(r'Calibrazione di $\delta_a$: misura vs modello di quarzo',
+    ax.set_title(r'Calibrazione di $\delta_a$: misura vs legge $1/\lambda$',
                  fontsize=9, pad=4)
     ax.set_xlim(lambda_range[0], lambda_range[1])
     ax.grid(True, linestyle=':', alpha=0.6)

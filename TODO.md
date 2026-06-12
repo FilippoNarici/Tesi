@@ -1,6 +1,6 @@
 # TODO — Stato del progetto
 
-Ultimo aggiornamento: 2026-06-12 (audit completo del LaTeX: corretti A1-A5 errori concettuali — inferenze dispersione nastro/zucchero invertite, convenzione segni cap2, λ/2 "zero-order"→nominale, overclaim cap7 — e B1-B7/C1-C5 mismatch testo-codice e numeri stantii. Audit COMPLETO (C6 incluso: validazioni lamine aggiunte in cap6). Review a colori in corso: 1.1 fatta. Prima, 2026-06-11: correzione S3 DATA-DRIVEN, vedi memory `project_s3_datadriven_calibration.md`). Prima, 2026-05-21: pass humanize em-dash + tell AI su cap1–cap7. TUTTE le sezioni cap5/cap6 DA RIVEDERE MANUALMENTE. Vedi memory `project_waveplate_multiorder.md`, `project_strati_3R_B_anomaly.md`, `feedback_chapters_manual_review.md`.
+Ultimo aggiornamento: 2026-06-12 sera (QUARZO RIMOSSO da tutta la tesi + paradigma lamine a posteriori, vedi sezione sotto). Prima, 2026-06-12 (audit completo del LaTeX: corretti A1-A5 errori concettuali — inferenze dispersione nastro/zucchero invertite, convenzione segni cap2, λ/2 "zero-order"→nominale, overclaim cap7 — e B1-B7/C1-C5 mismatch testo-codice e numeri stantii. Audit COMPLETO (C6 incluso: validazioni lamine aggiunte in cap6). Review a colori in corso: 1.1 fatta. Prima, 2026-06-11: correzione S3 DATA-DRIVEN, vedi memory `project_s3_datadriven_calibration.md`). Prima, 2026-05-21: pass humanize em-dash + tell AI su cap1–cap7. TUTTE le sezioni cap5/cap6 DA RIVEDERE MANUALMENTE. Vedi memory `project_waveplate_multiorder.md`, `project_strati_3R_B_anomaly.md`, `feedback_chapters_manual_review.md`.
 
 ## Correzione S3 data-driven (2026-06-11)
 
@@ -11,6 +11,15 @@ Risolto il punto debole "perché quarzo?" della correzione S3. δ_a(λ) dell'ana
 - [x] **Full re-run TUTTI i dataset FATTO (2026-06-11)**: tutti i 7 dataset rieseguiti headless via `python/_run_all.py` (nbclient, cache stokes_*/umap_* svuotate prima → ricalcolo S3 nuovo), 57.5 min, 7/7 OK. Rigenerati cache + UMAP embedding + tutti i PDF con la correzione nuova. Numeri cap6 riallineati alle figure: lambdaquarti δ 87.1/108.6/**128.5**; lambdamezzi δ 176.9/**156.8/134.5** (era 157.2/135.9; tab + sequenza prosa + scarti; n=−0.91/+0.71 e −20°/banda INVARIATI); strati slope 240.2/280.8/316.8 INVARIATE (tab plateau G/B aggiornata ≤2°; anomalia 3R-B 46.7→46.4); zucchero |AoLP| 3.95/4.92/6.12 (tab+caption R/B; Drude k=1.39e6 e c≈0.47 INVARIATI). Compila pulito (86 pp, 0 undefined).
 - [x] Figura di calibrazione dedicata (2026-06-11): `poldisp.plot_s3_calibration` (δ_a misurato vs curva quarzo + design), cella notebook **S3CAL** (gated lambdaquarti), PDF `Images/generated/lambdaquarti_50deg/s3_calibration.pdf`, inserita in cap6 `fig:s3_calibration`. Compila pulito. Sanity p≈DoP/θ uniforme lasciata in prosa (non in figura, per consistenza numerica).
 - [x] Cleanup (2026-06-11): rimossi i 6 script diagnostici `verify_*.py`; promossi `verify_s3_fixedpoint.py` → `python/calibrate_s3_retardance.py` (ricalibrazione) e `_run_all.py` → `python/run_all_datasets.py` (re-run headless). Processo documentato in **`python/S3_CALIBRATION.md`** (referenziato da `python/CLAUDE.md` + `CLAUDE.md` radice). Coerente con [[feedback_diagnostic_cleanup]].
+
+## Quarzo rimosso + paradigma lamine a posteriori (2026-06-12)
+
+Da TODO utente in cap3 (review Overleaf). Dettaglio in memory `project_s3_datadriven_calibration.md` e journal `python/WAVEPLATE_INVESTIGATION.md`.
+
+- [x] Riscontro polimeri (`python/verify_polymer_riscontro.py`): PMMA 3.1° ≈ PC 3.2° ≈ quarzo 3.6° RMS anchored → indistinguibili a 3 bande; PC migliore in forma (RMS 1.5°) → coerente con ipotesi foglio polimerico. Decisione utente: riferimento mono-materiale arbitrario → quarzo eliminato dalla tesi.
+- [x] Riferimento sostituito con sola legge geometrica δ0·λ0/λ (material-free, 91.0/106.3/122.3; scarti −2.6/+4.7/+8.5 = dispersione normale): `tab:s3_calibrazione`, `tab:qw_ritardanza` (scarti −3.9/+2.3/+6.2), `fig:s3_calibration` rigenerata (`plot_s3_calibration` senza quartz_func, cella S3CAL aggiornata), eq:dispersione-qwp riscritta (forma generale + limite geometrico), Ghosh non più citato. Quarzo solo fallback codice.
+- [x] Paradigma lamine: etichetta = sola ritardanza nominale @633 (né materiale né ordine dichiarati); cap3 §lamina-qwp riscritta (niente formula d'ordine, eq:qwp-geometrico eliminata), cap4 "caratterizzate a posteriori", cap6 titoli senza "zero-order" + λ/2 mai "dichiarata zero-order" (claim falso rimosso), cap7 riformulato; "zero-order" resta solo nella definizione teorica cap2. **BOZZA, DA RIVEDERE.**
+- [x] TODO figure float (cap6:143): moot per l'utente, commento rimosso.
 
 Questo file è la singola fonte di verità sullo stato di avanzamento. Aggiornare ad ogni task completato. Per istruzioni operative vedere `CLAUDE.md`.
 

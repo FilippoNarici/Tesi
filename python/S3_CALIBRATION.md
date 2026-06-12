@@ -57,20 +57,24 @@ letto con stima depol-unbiased dalla direzione del vettore. Vedi
 
 ## 4. Il risultato
 
-| canale | λ (nm) | δ_a misurato | 1/sin δ_a | δ_a quarzo (riscontro) |
-|:------:|:------:|:------------:|:---------:|:----------------------:|
-| R | 626 | **88.4°**  | 1.000 | 91.1° |
-| G | 536 | **111.0°** | 1.071 | 107.9° |
-| B | 466 | **130.8°** | 1.321 | 126.2° |
+| canale | λ (nm) | δ_a misurato | 1/sin δ_a | δ_a geom. 1/λ (rif.) |
+|:------:|:------:|:------------:|:---------:|:--------------------:|
+| R | 626 | **88.4°**  | 1.000 | 91.0° |
+| G | 536 | **111.0°** | 1.071 | 106.3° |
+| B | 466 | **130.8°** | 1.321 | 122.3° |
 
 Verifiche interne (non imposte, emergono dalla soluzione):
 - il fattore di depolarizzazione `p` ricostruito riproduce la DoP misurata;
 - `theta` esce uniforme (~32°) sui tre canali, come deve per una lamina omogenea.
 
-Riscontro material-free: il modello di quarzo (mai usato nell'inversione) cade
-entro pochi gradi → quarzo **validato a posteriori**, non assunto. A R,
-`delta_a ≈ 90°` → correzione `≈ 1.000`, **insensibile** a qualunque modello: il
-canale rosso è robusto comunque. Conta solo G/B.
+Riscontro material-free (**aggiornato 2026-06-12**): il riferimento in tesi è la
+sola legge geometrica `δ0·λ0/λ` ancorata al design (riscontro quarzo RIMOSSO dalla
+tesi: a 3 bande larghe quarzo/PMMA/PC sono indistinguibili — anchored RMS 3.6/3.1/3.2°,
+PC fitta meglio in forma — vedi `verify_polymer_riscontro.py`; un riferimento
+mono-materiale era arbitrario, e l'utente ritiene le lamine probabilmente polimeriche).
+La misura supera la legge geometrica di +4.7°/+8.5° a G/B = dispersione normale
+della birifrangenza, material-free. A R, `delta_a ≈ 90°` → correzione `≈ 1.000`,
+**insensibile** a qualunque modello: il canale rosso è robusto comunque. Conta solo G/B.
 
 ## 5. Implementazione (codice)
 
@@ -103,8 +107,9 @@ con `delta_a` (130.8°). È un limite separato della readout, non della correzio
 - **cap6** `\section{Calibrazione della correzione cromatica di S3}`
   (`sec:calibrazione_s3`): apre i risultati quantitativi. Eq. auto-riferimento
   (`eq:s3_selfref`), tabella (`tab:s3_calibrazione`), figura (`fig:s3_calibration`).
-- **cap5** `sec:determinazione-s3`: `delta_a` misurato (forward-ref), quarzo =
-  riscontro.
+- **cap5** `sec:determinazione-s3`: `delta_a` misurato (forward-ref), riferimento =
+  legge geometrica 1/λ material-free (quarzo rimosso dalla tesi 2026-06-12; resta
+  solo come fallback nel codice, `stokes.waveplate_retardance`).
 - **cap6** `subsec:risultati_qw`: la $\lambda/4$ come campione (de-circolarizzata).
 - **notebook** cella `S3CAL` (gated `lambdaquarti`) → `poldisp.plot_s3_calibration`
   → `Images/generated/lambdaquarti_50deg/s3_calibration.pdf`.
