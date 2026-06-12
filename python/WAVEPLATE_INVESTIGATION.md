@@ -71,6 +71,38 @@ metrica industriale è il Re-ratio = 0.746, in fascia.
 5. Ancoraggio assoluto del segno globale: il prodotto etichettato "λ/4 @633" legge ~90°
    (non ~270°) al rosso — unica assunzione non strumentale della catena.
 
+### Plausibilità del reverse: testimonianze esterne (2026-06-12, sera)
+
+Obiezione utente: "reverse film in una waveplate didattica = improbabile". Risolta:
+
+1. **Cellophane/cellulosa = IL materiale classico delle lamine λ/2 economiche, ed è
+   NATURALMENTE reverse.** Letteratura peer-reviewed: *"Cellophane film as half wave
+   retarder of wide spectrum (λ=400–780 nm)"* (Optical Materials) — un cellophane che
+   tiene δ≈180° su TUTTO il visibile è per definizione un reverse forte (δ piatta ⇒
+   Re∝λ ⇒ Re466/Re536 = 466/536 = 0.869). Citato perfino nelle Feynman Lectures.
+   Paper recente: *"Broadband quarter- and half-wave plates manufactured with
+   cellophane films"*. Brevetti interi sul diacetato di cellulosa COME film a
+   ritardo reverse (EP2472296A1, US7410680: DoS 2.5–2.8 ⇒ "retardation crescente
+   con λ su tutto il visibile" = reverse). Nessuna tecnologia OLED necessaria:
+   materiale da packaging, qualunque epoca, costo nullo → perfetto per kit didattico.
+2. **Pancharatnam escluso dai dati**: l'asse veloce per canale è fermo entro ±0.3°
+   (λ/2: 38.2/37.5/37.9), uno stack 3-lamine avrebbe rotazione d'asse di gradi.
+   → film monolitico.
+3. **Riframing del ramo forte/mild: NON è un possibile errore, è un'ambiguità
+   intrinseca.** Su una lamina non marcata non si sa quale asse è il veloce; le due
+   assegnazioni danno Γ={177,157,134} (Re-ratio466/536=0.746) oppure Γ={183,203,225}
+   (0.965), dati identici per costruzione. Il cellophane "flat-180" di letteratura
+   sta in mezzo (0.869). Entrambi i rami = famiglia cellulosa/reverse; il multi-ordine
+   e la dispersione normale restano esclusi in entrambi.
+
+**Ipotesi finale aggiornata:** λ/2 = disco di film cellulosico (cellophane/diacetato)
+laminato in vetro, ritardatore a basso ordine a dispersione inversa "wide spectrum" —
+materiale didattico tradizionale, documentato in letteratura proprio come λ/2 a
+largo spettro. λ/4 = film polimerico stirato a dispersione normale (PVA/PC-like).
+AoLP come cross-check: spuntata (dipende da cos δ, porta sistematiche 2–6° anche
+sulla λ/4 calibrata; al B della λ/2 pende verso normale ma dentro le sistematiche
+e contro |s3| che esclude il normale con margine 6×).
+
 **CONSEGUENZE TESI (da decidere con l'utente, NON ancora applicate):** la sezione
 λ/2 di cap6 (multi-ordine + aliasing + tabella scarti vs k/λ), il paragrafo ipotesi
 fogli tagliati (appena aggiunto), i cenni cap4/cap7 "multi-ordine" e l'argomento
