@@ -59,9 +59,9 @@ letto con stima depol-unbiased dalla direzione del vettore. Vedi
 
 | canale | λ (nm) | δ_a misurato | 1/sin δ_a | δ_a quarzo (riscontro) |
 |:------:|:------:|:------------:|:---------:|:----------------------:|
-| R | 626 | **88.4°**  | 1.000 | 90.9° |
-| G | 536 | **111.0°** | 1.071 | 107.5° |
-| B | 466 | **130.8°** | 1.321 | 126.9° |
+| R | 626 | **88.4°**  | 1.000 | 91.1° |
+| G | 536 | **111.0°** | 1.071 | 107.9° |
+| B | 466 | **130.8°** | 1.321 | 126.2° |
 
 Verifiche interne (non imposte, emergono dalla soluzione):
 - il fattore di depolarizzazione `p` ricostruito riproduce la DoP misurata;

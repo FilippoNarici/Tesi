@@ -54,7 +54,7 @@ L'ultimo ingrediente chiude il problema senza introdurre circolarità. La differ
 \end{equation}
 dove $\theta$ è l'orientazione dell'asse della lamina. Il ritardo $\delta_a$ vi compare al quadrato e si auto-riferisce: rapportando la \cref{eq:s3_selfref} alle componenti lineari $S_1$, $S_2$, nelle quali $p$ si elide, si ottiene un sistema di due equazioni nelle due incognite $\delta_a$ e $\theta$, risolto in modo auto-consistente con la rotazione di Poincaré effettivamente usata nella pipeline. La soluzione non assume alcun materiale, alcun ordine, né la correzione che si intende calibrare.
 
-I valori così ottenuti sono riportati nella \cref{tab:s3_calibrazione}. La bontà interna della procedura è confermata da due verifiche che non sono state imposte ma emergono dalla soluzione: il fattore di depolarizzazione $p$ ricostruito dall'inversione riproduce il grado di polarizzazione totale misurato indipendentemente sui tre canali, decrescente verso il blu, e l'orientazione $\theta$ risulta uniforme fra i canali, come deve essere per una lamina spazialmente omogenea osservata a un'unica orientazione meccanica. Il modello di quarzo cristallino, valutato con la dispersione di Ghosh (\cref{eq:dispersione-qwp}) e mai usato nell'inversione, fornisce $90{,}9^\circ$, $107{,}5^\circ$ e $126{,}9^\circ$ sui tre canali: concorda con la ritardanza misurata entro pochi gradi senza esserne il presupposto, come mostra la \cref{fig:s3_calibration}. La compatibilità della lamina con un singolo ordine ne risulta confermata a posteriori, e il modello di quarzo legittimato come parametrizzazione di comodo di una curva che i dati determinano da soli.
+I valori così ottenuti sono riportati nella \cref{tab:s3_calibrazione}. La bontà interna della procedura è confermata da due verifiche che non sono state imposte ma emergono dalla soluzione: il fattore di depolarizzazione $p$ ricostruito dall'inversione riproduce il grado di polarizzazione totale misurato indipendentemente sui tre canali, decrescente verso il blu, e l'orientazione $\theta$ risulta uniforme fra i canali, come deve essere per una lamina spazialmente omogenea osservata a un'unica orientazione meccanica. Il modello di quarzo cristallino, valutato con la dispersione di Ghosh (\cref{eq:dispersione-qwp}) e mai usato nell'inversione, fornisce $91{,}1^\circ$, $107{,}9^\circ$ e $126{,}2^\circ$ sui tre canali: concorda con la ritardanza misurata entro pochi gradi senza esserne il presupposto, come mostra la \cref{fig:s3_calibration}. La compatibilità della lamina con un singolo ordine ne risulta confermata a posteriori, e il modello di quarzo legittimato come parametrizzazione di comodo di una curva che i dati determinano da soli.
 
 \begin{table}[H]
     \centering
@@ -64,9 +64,9 @@ I valori così ottenuti sono riportati nella \cref{tab:s3_calibrazione}. La bont
         \hline
         \textbf{Canale} & $\lambda_\mathrm{eff}$ [\si{\nano\meter}] & $\delta_a$ misurato [\si{\degree}] & $1/\sin\delta_a$ & $\delta_a$ quarzo [\si{\degree}] \\
         \hline
-        Rosso & 626 & $88{,}4$  & $1{,}000$ & $90{,}9$  \\
-        Verde & 536 & $111{,}0$ & $1{,}071$ & $107{,}5$ \\
-        Blu   & 466 & $130{,}8$ & $1{,}321$ & $126{,}9$ \\
+        Rosso & 626 & $88{,}4$  & $1{,}000$ & $91{,}1$  \\
+        Verde & 536 & $111{,}0$ & $1{,}071$ & $107{,}9$ \\
+        Blu   & 466 & $130{,}8$ & $1{,}321$ & $126{,}2$ \\
         \hline
     \end{tabular}
 \end{table}
@@ -124,9 +124,9 @@ La stima quantitativa della ritardanza segue la stessa pipeline di clustering de
         \hline
         \textbf{Canale} & $\lambda_\mathrm{eff}$ [\si{\nano\meter}] & $\tilde\delta_\mathrm{win}$ [\si{\degree}] & $\delta_\mathrm{quarzo}$ [\si{\degree}] & Scarto [\si{\degree}] \\
         \hline
-        Rosso & 626 & $87{,}1$  & $90{,}9$  & $-3{,}8$ \\
-        Verde & 536 & $108{,}6$ & $107{,}5$ & $+1{,}1$ \\
-        Blu   & 466 & $128{,}5$ & $126{,}9$ & $+1{,}6$ \\
+        Rosso & 626 & $87{,}1$  & $91{,}1$  & $-4{,}0$ \\
+        Verde & 536 & $108{,}6$ & $107{,}9$ & $+0{,}7$ \\
+        Blu   & 466 & $128{,}5$ & $126{,}2$ & $+2{,}3$ \\
         \hline
     \end{tabular}
 \end{table}
