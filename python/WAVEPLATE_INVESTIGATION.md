@@ -50,6 +50,27 @@ in entrambi i casi zero-order, MAI multi-ordine. (2) Cauchy 1-param è rozza;
 numeri indicativi. (3) R450 Cauchy-equivalente 0.51-0.60 sembra estremo, ma la
 metrica industriale è il Re-ratio = 0.746, in fascia.
 
+### Verifiche anti-errore-umano (2026-06-12, sera — richieste dall'utente)
+
+1. **Modulo di s3 nel disco λ/2 (sign-immune, immune a OGNI errore di verso/etichetta):**
+   misurato +0.050/+0.314/+0.533; predetto ramo reverse 0.048/0.320/0.550 (match ≤0.02);
+   predetto dispersione NORMALE 0.031/0.437/0.696 → **normale esclusa dal solo modulo**
+   (servirebbe un errore del 36% nella correzione 1/sinδ_a al G, impossibile).
+2. **Invariante cross-sessione** (segno residuo `(I−45−I+45)/I` nello SFONDO, stessa
+   luce LCD in tutti i dataset): firma R+/G−/B−− condivisa da 6/7 dataset; lambdamezzi
+   (+0.086/−0.090/−0.228) ≈ barraoff (+0.088/−0.086/−0.227) → **nessuno scambio wav
+   né analizzatore flippato nella sessione λ/2** (zucchero devia al R, sessione diversa,
+   irrilevante qui).
+3. **Lamina montata a 140° invece di 50°** (invisibile in θ ripiegata e in AoLP mod 180):
+   equivale a δ→360−δ; il ramo complementare 183/203/225 è comunque **reverse mild**
+   (Re-ratio 0.92 < 1); con dispersione normale i moduli |s3| non tornano (punto 1).
+   → in OGNI permutazione di montaggio la λ/2 resta un reverse film a basso ordine;
+   l'ambiguità 50/140 tocca solo l'intensità del reverse (0.746 vs 0.92).
+4. **Bias di estrazione δ** (depol cos/sin mixing): calcolato, sposta ≤6° vicino ai punti
+   degeneri, non può produrre 246→134.
+5. Ancoraggio assoluto del segno globale: il prodotto etichettato "λ/4 @633" legge ~90°
+   (non ~270°) al rosso — unica assunzione non strumentale della catena.
+
 **CONSEGUENZE TESI (da decidere con l'utente, NON ancora applicate):** la sezione
 λ/2 di cap6 (multi-ordine + aliasing + tabella scarti vs k/λ), il paragrafo ipotesi
 fogli tagliati (appena aggiunto), i cenni cap4/cap7 "multi-ordine" e l'argomento
