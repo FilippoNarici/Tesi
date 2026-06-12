@@ -20,7 +20,16 @@ Da TODO utente in cap3 (review Overleaf). Dettaglio in memory `project_s3_datadr
 - [x] Riferimento sostituito con sola legge geometrica δ0·λ0/λ (material-free, 91.0/106.3/122.3; scarti −2.6/+4.7/+8.5 = dispersione normale): `tab:s3_calibrazione`, `tab:qw_ritardanza` (scarti −3.9/+2.3/+6.2), `fig:s3_calibration` rigenerata (`plot_s3_calibration` senza quartz_func, cella S3CAL aggiornata), eq:dispersione-qwp riscritta (forma generale + limite geometrico), Ghosh non più citato. Quarzo solo fallback codice.
 - [x] Paradigma lamine: etichetta = sola ritardanza nominale @633 (né materiale né ordine dichiarati); cap3 §lamina-qwp riscritta (niente formula d'ordine, eq:qwp-geometrico eliminata), cap4 "caratterizzate a posteriori", cap6 titoli senza "zero-order" + λ/2 mai "dichiarata zero-order" (claim falso rimosso), cap7 riformulato; "zero-order" resta solo nella definizione teorica cap2. **BOZZA, DA RIVEDERE.**
 - [x] TODO figure float (cap6:143): moot per l'utente, commento rimosso.
-- [x] Ipotesi fogli polimerici IN TESI (2026-06-12, richiesta utente): paragrafo a fine `subsec:risultati_hw` (cap6) — dischi ritagliati da fogli birifrangenti commerciali, giustificata da ordine 5–6 ⇒ Δn≈3,5·10⁻³ a spessore mm, depol order-independent (haze), dimensioni/costo; caveat N=2 + λ/4 indistinguibile + calibrazione S3 indipendente dall'ordine. Supera il precedente "solo nel journal". **BOZZA, DA RIVEDERE.**
+- [x] ~~Ipotesi fogli polimerici IN TESI~~ (2026-06-12 pomeriggio) — SUPERATA in giornata dalla falsificazione del multi-ordine (vedi sotto).
+
+## λ/2 = dispersione inversa: multi-ordine falsificato, tesi riscritta (2026-06-12 sera)
+
+Indagine congiunta lamine richiesta dall'utente; percorso completo + registro ipotesi in `python/WAVEPLATE_INVESTIGATION.md`, script `python/verify_joint_order.py`.
+
+- [x] Falsificazione multi-ordine: modello a banda integrata (eq |V| con spettri reali) → ordine ≥2 darebbe DoP_G ≤0.78 vs 0.845 misurata (= λ/4 a ordine 0). Robusto al modello di banda. Verifiche anti-errore-umano: |s3| sign-immune esclude dispersione normale (0.31/0.53 vs 0.44/0.70); invariante sfondo cross-sessione esclude swap wav/analizzatore; ramo complementare (ambiguità intrinseca asse veloce/lento) comunque reverse.
+- [x] Interpretazione: λ/2 = ritardatore ordine zero a dispersione di ritardanza INVERSA (wideband; Re466/Re536 = 0.746 o 0.96, cellophane-ideale 0.87); λ/4 = ordine zero normale. Ipotesi costruttiva: film sottile (~35-65 µm) laminato fra vetri, i mm = vetro (costruzione standard "polymer zero-order" a catalogo).
+- [x] TESI riscritta col percorso epistemico (richiesta utente: spiegare perché l'ipotesi apparentemente far-fetched vince su quelle semplici): cap6 subsec λ/2 (discesa → Re material-frame → opzioni semplici escluse → multi-ordine falsificato via eq:band_retention → reverse + plausibilità → ipotesi costruttiva); cap2 frase ritardatori a largo spettro; cap4/cap7 allineati; tilt in discussione riferito al nastro. 2 citazioni verificate DOI: `OrtizGutierrez2001Cellophane` (Opt. Mater. 17, 395, 2001), `Uchiyama2012Copolycarbonate` (Polym. J. 44, 995, 2012). Compila pulito, 0 undefined. **BOZZA, DA RIVEDERE MANUALMENTE.**
+- [x] Aggiornati: CLAUDE.md radice (insidia wrap), memory `project_waveplate_multiorder.md` (supersede), journal (conseguenze applicate).
 
 Questo file è la singola fonte di verità sullo stato di avanzamento. Aggiornare ad ogni task completato. Per istruzioni operative vedere `CLAUDE.md`.
 

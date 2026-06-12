@@ -126,7 +126,14 @@ AoLP come cross-check: spuntata (dipende da cos δ, porta sistematiche 2–6° a
 sulla λ/4 calibrata; al B della λ/2 pende verso normale ma dentro le sistematiche
 e contro |s3| che esclude il normale con margine 6×).
 
-**CONSEGUENZE TESI (da decidere con l'utente, NON ancora applicate):** la sezione
+**CONSEGUENZE TESI — APPLICATE 2026-06-12 (decisione utente: "mettiamola in tesi, spiegando il percorso"):**
+cap6 subsec λ/2 riscritta col percorso epistemico (discesa → Re material-frame +
+ambiguità assi → opzioni semplici escluse (|s3| sign-immune) → multi-ordine
+falsificato via eq:band_retention → reverse + plausibilità cellophane/copolimeri
+cite OrtizGutierrez2001Cellophane + Uchiyama2012Copolycarbonate → ipotesi
+costruttiva film-in-vetro). cap2: frase ritardatori a largo spettro. cap4/cap7
+allineati. Tilt in discussione riferito al nastro. Bozza, DA RIVEDERE MANUALMENTE.
+Testo storico della valutazione qui sotto: la sezione
 λ/2 di cap6 (multi-ordine + aliasing + tabella scarti vs k/λ), il paragrafo ipotesi
 fogli tagliati (appena aggiunto), i cenni cap4/cap7 "multi-ordine" e l'argomento
 "n≥1 impossibile" (vale solo per dispersione normale) andrebbero riscritti attorno
