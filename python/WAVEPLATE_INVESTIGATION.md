@@ -17,6 +17,12 @@ Spessori: Re(633)=316 nm (λ/2) e 158 nm (λ/4); con Δn cellophane 0.005-0.009 
 d ≈ 35-65 µm (un singolo foglio da imballaggio ≈ mezz'onda da solo, oss. di Feynman).
 I mm visibili = dischi di vetro. Sanity: nastro adesivo misurato ~417 nm/strato, stessa scala.
 
+Evidenza di mercato (2026-06-12): film-fra-vetri = costruzione STANDARD a catalogo:
+Thorlabs "Polymer Zero-Order" (LCP laminato fra finestre N-BK7), Edmund "Polymer
+Waveplates" ("low-cost alternative to quartz, true zero order"), Meadowlark Precision
+Polymer Retarders, e Newport "Achromatic Polymer Half-Wave" = λ/2 wideband (reverse)
+a listino. La #8 non postula nulla fuori catalogo.
+
 ## ⚠️ SVOLTA 2026-06-12 (sera): il multi-ordine è FALSIFICATO. Ipotesi finale congiunta.
 
 Indagine congiunta richiesta dall'utente ("difficile credere λ/4 zero-order se il
