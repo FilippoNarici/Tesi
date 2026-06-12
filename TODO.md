@@ -1,6 +1,6 @@
 # TODO — Stato del progetto
 
-Ultimo aggiornamento: 2026-06-11 (correzione S3 ora DATA-DRIVEN: δ_a analizzatore MISURATO non quarzo. Vedi sotto + memory `project_s3_datadriven_calibration.md`). Prima, 2026-05-21: pass humanize em-dash + tell AI su cap1–cap7. TUTTE le sezioni cap5/cap6 DA RIVEDERE MANUALMENTE. Vedi memory `project_waveplate_multiorder.md`, `project_strati_3R_B_anomaly.md`, `feedback_chapters_manual_review.md`.
+Ultimo aggiornamento: 2026-06-12 (audit completo del LaTeX: corretti A1-A5 errori concettuali — inferenze dispersione nastro/zucchero invertite, convenzione segni cap2, λ/2 "zero-order"→nominale, overclaim cap7 — e B1-B7/C1-C5 mismatch testo-codice e numeri stantii. Resta C6 = validazioni cap4:15, richiede decisione utente. Review a colori in corso: 1.1 fatta. Prima, 2026-06-11: correzione S3 DATA-DRIVEN, vedi memory `project_s3_datadriven_calibration.md`). Prima, 2026-05-21: pass humanize em-dash + tell AI su cap1–cap7. TUTTE le sezioni cap5/cap6 DA RIVEDERE MANUALMENTE. Vedi memory `project_waveplate_multiorder.md`, `project_strati_3R_B_anomaly.md`, `feedback_chapters_manual_review.md`.
 
 ## Correzione S3 data-driven (2026-06-11)
 
