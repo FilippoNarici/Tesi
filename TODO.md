@@ -28,10 +28,13 @@ Review completa dei 7 capitoli come farebbe un revisore/professore. Esiti classi
 - [x] C3: cap6 zucchero — pareti vetro/cannuccia: birifrangenza locale δ≠0 non mima rotazione uniforme AoLP.
 - [x] C4: cap5 §dolp_aolp — perché DoLP e non DoP totale (referenzia eq:DOP, che smette di essere non-referenziata).
 
-**Aperti (B = consistenza, batch 2):**
-- [ ] B1: cap6 λ/2 asse veloce 37° vs 38° nella stessa subsec; offset λ/4 (16°) vs λ/2 (13°) a parità di montaggio nominale 50° — AI estrae θ mediano dai cache, utente conferma clausola tolleranza supporto.
-- [ ] B4: zucchero — "entro pochi punti percentuali" sottostima (spread ±8–9% monotono); temperatura mai dichiarata ([α] dipende da T, confermare non registrata); ψ definito come modulo ma k del fit negativo (notazione).
-- [ ] B8: schema ottico come equazione numerata (eq:schema-ottico, mai referenziata) — valutare diagramma TikZ in cap3 (bundle con A4).
+**Batch 2 FATTO (2026-07-03, sera):**
+- [x] B1: θ mediano dal cluster vincente (cache, HDBSCAN deterministico): λ/4 = 34,2/34,3/35,0° R/G/B; λ/2 = 38,1/37,5/38,0° → cap6 λ/2 corretto 37°→38° + clausola tolleranza impostazione manuale del supporto (offset 16° vs 12°). **Claim "asse non ruota entro 0,4°" (ipotesi costruttiva) smentito dai numeri (spread 0,8°/0,6°) → rilassato a "entro un grado"** — da verificare da dove veniva lo 0,4° originario.
+- [x] B4: zucchero — "pochi punti percentuali" → "±9% attorno alla media, decrescita monotona"; fit dichiarato su AoLP con segno (AoLP(λ)=k/λ², ψ=|k|/λ², caption fig:zucchero_fit allineata); frase temperatura ambiente non registrata + dipendenza termica debole di [α]. **DA RIVEDERE (confermare che T non è stata registrata).**
+- [x] A4: scala spaziale RICAVATA dai dati (spessore barra 70,0 px DS4 su sezione nota 8 mm, IQR 70–71, identica su R/G/B): 29 µm/px piano colore nativo, 114 µm/px analisi a f=4, FOV ≈ 10×8 cm. Frase in cap3 §sensore (con provenienza a posteriori dalla trave, indicativa per gli altri campioni) + claim "qualche centinaio di µm" in cap6 sec:discussione ora ancorata (114 µm/px, \cref{sec:sensore}).
+
+**Aperti (coda):**
+- [ ] B8: schema ottico come equazione numerata (eq:schema-ottico, mai referenziata) — valutare diagramma TikZ in cap3.
 - [ ] B9: ~24 equazioni numerate mai referenziate (contro convenzione CLAUDE.md) — referenziare o de-numerare le definizionali. Cosmetico, in coda.
 
 ## Correzione S3 data-driven (2026-06-11)
