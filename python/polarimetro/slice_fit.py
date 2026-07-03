@@ -245,7 +245,13 @@ def fit_layers(plateaus):
     ss_tot = float(((y - y.mean()) ** 2).sum())
     r2 = (1.0 - ss_res / ss_tot) if ss_tot > 0 else float('nan')
     rms = float(np.sqrt(ss_res / max(len(y), 1)))
+    # errore standard statistico della pendenza (fit through-origin):
+    # sigma_m^2 = ss_res / (N-1) / sum(x^2)
+    n_pts = len(y)
+    slope_err = (float(np.sqrt(ss_res / (n_pts - 1) / denom))
+                 if n_pts > 1 else float('nan'))
     n_unw = int(np.sum(np.abs(y - y_raw) > 1e-6))
-    return {'slope': m, 'r2': r2, 'rms': rms, 'x': x, 'y': y,
+    return {'slope': m, 'slope_err': slope_err, 'r2': r2, 'rms': rms,
+            'x': x, 'y': y,
             'y_raw': y_raw, 'labels': [q[2] for q in pts],
             'n_unwrapped': n_unw}
