@@ -17,22 +17,22 @@ Review completa dei 7 capitoli come farebbe un revisore/professore. Esiti classi
 **Aperti (priorità alta):**
 - [ ] **A4 — scala spaziale** (bassa priorità, da non perdere): mm/pixel e dimensione FOV mai dichiarati in cap3; la claim di cap6 sec:discussione "strutture più piccole di qualche centinaio di micrometri" la richiede. Aggiungere FOV in mm + risoluzione effettiva a f=4 in cap3; opzionale scale bar su una figura rappresentativa.
 
-**Aperti (B = consistenza, non ancora triagiati dall'utente):**
-- [ ] B1: cap6 λ/2 asse veloce 37° vs 38° nella stessa subsec; offset λ/4 (16°) vs λ/2 (13°) a parità di montaggio nominale 50° — una clausola sulla tolleranza di impostazione del supporto.
-- [ ] B2: accuratezza "~1–5°" in tab:confronto (l'abstract non cita più 2–5°, risolto a metà).
-- [ ] B3: cap6 λ/4 "stessa procedura impiegata per la λ/2" ma la λ/2 viene dopo — invertire la frase.
-- [ ] B4: zucchero — "entro pochi punti percentuali" sottostima (spread ±8–9% monotono); temperatura mai dichiarata ([α] dipende da T); ψ definito come modulo ma k del fit negativo (notazione).
-- [ ] B5: sensore 10 MP (cap3) vs "4000×3000" (cap5) — allineare.
-- [ ] B6: costo "centinaia di euro" (cap1) vs "<100 € escluso smartphone" (abstract/cap6/cap7) — formula unica.
-- [ ] B7: Lista dei simboli — δ in rad ma tesi in gradi; θ solo "angolo analizzatore" ma nelle mappe è asse veloce; mancano ψ, β, δ_a, Re, DoLP/AoLP; unità Stokes W/m² vs conteggi.
-- [ ] B8: schema ottico come equazione numerata (eq:schema-ottico, mai referenziata) — valutare diagramma TikZ in cap3.
-- [ ] B9: ~25 equazioni numerate mai referenziate (contro convenzione CLAUDE.md) — referenziare o de-numerare le definizionali.
+**Batch 1 FATTO (2026-07-03, sera):**
+- [x] B2: audit accuratezza — nessun conflitto residuo dopo il fix dell'abstract (tab:confronto "~1–5°" + caption caveat, sec:discussione "pochi gradi"). No-op.
+- [x] B3: cap6 λ/4 → "procedura comune a entrambe le lamine d'onda" (via il riferimento in avanti alla λ/2).
+- [x] B5 → **scoperta più grossa (verificato su DNG reale via rawpy)**: i file sono Linear RAW a 4 piani RGBG co-registrati sulla griglia piena 3648×2736 (10 MP, `raw_type=Stack`, nessun mosaico CFA). cap5 §preelaborazione descriveva un'estrazione fotosito-su-quattro a metà risoluzione "senza demosaicizzazione" — FALSO: riscritta onestamente (piani interpolati dal device sulla griglia piena, niente WB/gamma/matrice colore, risoluzione cromatica effettiva = sotto-griglia Bayer, irrilevante a f=4). Corretti: cap5 "4000×3000"→3648×2736, cap6 "ordine di 10⁵"→"circa 6·10⁵ (912×684)", caption fig:bayer in cap3. **DA RIVEDERE.**
+- [x] B6: cap1 → "spesa aggiuntiva inferiore al centinaio di euro, almeno due ordini di grandezza al di sotto" (smartphone escluso implicito in "aggiuntiva").
+- [x] B7: Lista dei simboli riscritta — δ/δ_a/ψ/β in gradi, θ con doppio uso dichiarato (analizzatore Cap.2–5, asse veloce mappe Cap.6), aggiunti s_i, DoLP/AoLP, Re, m; Stokes in u.a. (conteggi); colonna descrizione p{8.6cm}.
+- [x] C1: cap3 §acquisizione-lineari — frase sul giro intero vs periodicità 180° (media eccentricità/oscillazioni del supporto).
+- [x] C2: cap3 §protocollo — stabilità display verificata a posteriori (fluttuazioni → residui Malus + depolarizzazione sfondo; DoLP sfondo ≈1 in tutte le sessioni).
+- [x] C3: cap6 zucchero — pareti vetro/cannuccia: birifrangenza locale δ≠0 non mima rotazione uniforme AoLP.
+- [x] C4: cap5 §dolp_aolp — perché DoLP e non DoP totale (referenzia eq:DOP, che smette di essere non-referenziata).
 
-**Aperti (C = domande da prevenire, una frase ciascuna):**
-- [ ] C1: perché 36 pose su 360° con segnale 180°-periodico (media eccentricità/wobble del supporto).
-- [ ] C2: stabilità temporale LCD (PWM/refresh vs 1/90 s su 38 frame) — se l'invarianza di S0 sfondo fra frame la supporta, dirlo.
-- [ ] C3: boccetta zucchero — vetro con birifrangenza da stress e cannuccia nel fascio, esclusi dal clustering (una clausola).
-- [ ] C4: DoP totale (con S3) definito in cap2 ma mappe riportano solo DoLP — motivare.
+**Aperti (B = consistenza, batch 2):**
+- [ ] B1: cap6 λ/2 asse veloce 37° vs 38° nella stessa subsec; offset λ/4 (16°) vs λ/2 (13°) a parità di montaggio nominale 50° — AI estrae θ mediano dai cache, utente conferma clausola tolleranza supporto.
+- [ ] B4: zucchero — "entro pochi punti percentuali" sottostima (spread ±8–9% monotono); temperatura mai dichiarata ([α] dipende da T, confermare non registrata); ψ definito come modulo ma k del fit negativo (notazione).
+- [ ] B8: schema ottico come equazione numerata (eq:schema-ottico, mai referenziata) — valutare diagramma TikZ in cap3 (bundle con A4).
+- [ ] B9: ~24 equazioni numerate mai referenziate (contro convenzione CLAUDE.md) — referenziare o de-numerare le definizionali. Cosmetico, in coda.
 
 ## Correzione S3 data-driven (2026-06-11)
 
