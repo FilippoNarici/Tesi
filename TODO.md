@@ -1,6 +1,36 @@
 # TODO — Stato del progetto
 
-Ultimo aggiornamento: 2026-06-12 sera (QUARZO RIMOSSO da tutta la tesi + paradigma lamine a posteriori, vedi sezione sotto). Prima, 2026-06-12 (audit completo del LaTeX: corretti A1-A5 errori concettuali — inferenze dispersione nastro/zucchero invertite, convenzione segni cap2, λ/2 "zero-order"→nominale, overclaim cap7 — e B1-B7/C1-C5 mismatch testo-codice e numeri stantii. Audit COMPLETO (C6 incluso: validazioni lamine aggiunte in cap6). Review a colori in corso: 1.1 fatta. Prima, 2026-06-11: correzione S3 DATA-DRIVEN, vedi memory `project_s3_datadriven_calibration.md`). Prima, 2026-05-21: pass humanize em-dash + tell AI su cap1–cap7. TUTTE le sezioni cap5/cap6 DA RIVEDERE MANUALMENTE. Vedi memory `project_waveplate_multiorder.md`, `project_strati_3R_B_anomaly.md`, `feedback_chapters_manual_review.md`.
+Ultimo aggiornamento: 2026-07-03 (peer review interna full-thesis, vedi sezione sotto). Prima, 2026-06-12 sera (QUARZO RIMOSSO da tutta la tesi + paradigma lamine a posteriori, vedi sezione sotto). Prima, 2026-06-12 (audit completo del LaTeX: corretti A1-A5 errori concettuali — inferenze dispersione nastro/zucchero invertite, convenzione segni cap2, λ/2 "zero-order"→nominale, overclaim cap7 — e B1-B7/C1-C5 mismatch testo-codice e numeri stantii. Audit COMPLETO (C6 incluso: validazioni lamine aggiunte in cap6). Review a colori in corso: 1.1 fatta. Prima, 2026-06-11: correzione S3 DATA-DRIVEN, vedi memory `project_s3_datadriven_calibration.md`). Prima, 2026-05-21: pass humanize em-dash + tell AI su cap1–cap7. TUTTE le sezioni cap5/cap6 DA RIVEDERE MANUALMENTE. Vedi memory `project_waveplate_multiorder.md`, `project_strati_3R_B_anomaly.md`, `feedback_chapters_manual_review.md`.
+
+## Peer review interna full-thesis (2026-07-03)
+
+Review completa dei 7 capitoli come farebbe un revisore/professore. Esiti classificati A (major), B (consistenza), C (domande da prevenire). Triage utente: A1/A2 fixati, A5 quantificato (±2°), A3 = priorità massima ma non rapido, A4 in coda.
+
+**Risolti in giornata:**
+- [x] **A1** — errore fisico frange DoLP righello (cap6 caption `fig:righello_overview` + prosa): "bande scure = δ multiplo di π e stato lineare" era auto-contraddittorio (lineare ⇒ DoLP≈1). Corretto: bande scure = stato emergente prossimo al circolare (δ multiplo dispari di 90°, assi locali a ~45° dalla polarizzazione incidente); δ = kπ ⇒ stato lineare ⇒ DoLP risale. Confermato dall'utente. **BOZZA, DA RIVEDERE.**
+- [x] **A2** — abstract stantio (pre-riscrittura λ/2 del 2026-06-12): rimosso "lamine concordano con nominali entro 2–5°" (falso per λ/2 a G/B) e "saccarosio riproduce Drude" (cap6 dice dispersione più piatta); ora cita calibrazione S3 data-driven, λ/4 singolo ordine, λ/2 dispersione inversa (capacità diagnostica), nastro >1500°, Drude "in prima approssimazione". **BOZZA, DA RIVEDERE.**
+- [x] **A5** — errore angolare manuale analizzatore quantificato in cap3 (input utente: ±2° per posa): componente casuale attenuata dalla sovradeterminazione ai minimi quadrati, offset comune assorbito dall'allineamento a valle.
+
+**Aperti (priorità alta):**
+- [ ] **A3 — incertezze statistiche su tutti i valori di cap6** (il più importante, non rapido). Nessuna tabella ha barre d'errore; cap5:253 promette "incertezza standard" di k mai riportata in cap6. Piano: (1) pipeline: esportare errore standard dei fit (k dispersione lamine/zucchero, m nastro — per fit through-origin σ_m = rms/√Σn²) e dispersione del cluster vincente (mediana ± MAD) da `umap_runner`/`slice_fit`/`dispersion`; (2) aggiornare tab:s3_calibrazione, tab:qw/hw_ritardanza, tab:nastro_slope, tab:zucchero_conc + prosa; (3) etichettare esplicitamente come incertezze SOLO statistiche (no calibrazione assoluta, coerente con sec:discussione). In più: R² su fit a 3 punti / 1 parametro è debole → affiancare/preferire rms dei residui in gradi.
+- [ ] **A4 — scala spaziale** (bassa priorità, da non perdere): mm/pixel e dimensione FOV mai dichiarati in cap3; la claim di cap6 sec:discussione "strutture più piccole di qualche centinaio di micrometri" la richiede. Aggiungere FOV in mm + risoluzione effettiva a f=4 in cap3; opzionale scale bar su una figura rappresentativa.
+
+**Aperti (B = consistenza, non ancora triagiati dall'utente):**
+- [ ] B1: cap6 λ/2 asse veloce 37° vs 38° nella stessa subsec; offset λ/4 (16°) vs λ/2 (13°) a parità di montaggio nominale 50° — una clausola sulla tolleranza di impostazione del supporto.
+- [ ] B2: accuratezza "~1–5°" in tab:confronto (l'abstract non cita più 2–5°, risolto a metà).
+- [ ] B3: cap6 λ/4 "stessa procedura impiegata per la λ/2" ma la λ/2 viene dopo — invertire la frase.
+- [ ] B4: zucchero — "entro pochi punti percentuali" sottostima (spread ±8–9% monotono); temperatura mai dichiarata ([α] dipende da T); ψ definito come modulo ma k del fit negativo (notazione).
+- [ ] B5: sensore 10 MP (cap3) vs "4000×3000" (cap5) — allineare.
+- [ ] B6: costo "centinaia di euro" (cap1) vs "<100 € escluso smartphone" (abstract/cap6/cap7) — formula unica.
+- [ ] B7: Lista dei simboli — δ in rad ma tesi in gradi; θ solo "angolo analizzatore" ma nelle mappe è asse veloce; mancano ψ, β, δ_a, Re, DoLP/AoLP; unità Stokes W/m² vs conteggi.
+- [ ] B8: schema ottico come equazione numerata (eq:schema-ottico, mai referenziata) — valutare diagramma TikZ in cap3.
+- [ ] B9: ~25 equazioni numerate mai referenziate (contro convenzione CLAUDE.md) — referenziare o de-numerare le definizionali.
+
+**Aperti (C = domande da prevenire, una frase ciascuna):**
+- [ ] C1: perché 36 pose su 360° con segnale 180°-periodico (media eccentricità/wobble del supporto).
+- [ ] C2: stabilità temporale LCD (PWM/refresh vs 1/90 s su 38 frame) — se l'invarianza di S0 sfondo fra frame la supporta, dirlo.
+- [ ] C3: boccetta zucchero — vetro con birifrangenza da stress e cannuccia nel fascio, esclusi dal clustering (una clausola).
+- [ ] C4: DoP totale (con S3) definito in cap2 ma mappe riportano solo DoLP — motivare.
 
 ## Correzione S3 data-driven (2026-06-11)
 
