@@ -33,9 +33,9 @@ Review completa dei 7 capitoli come farebbe un revisore/professore. Esiti classi
 - [x] B4: zucchero — "pochi punti percentuali" → "±9% attorno alla media, decrescita monotona"; fit dichiarato su AoLP con segno (AoLP(λ)=k/λ², ψ=|k|/λ², caption fig:zucchero_fit allineata); frase temperatura ambiente non registrata + dipendenza termica debole di [α]. **DA RIVEDERE (confermare che T non è stata registrata).**
 - [x] A4: scala spaziale RICAVATA dai dati (spessore barra 70,0 px DS4 su sezione nota 8 mm, IQR 70–71, identica su R/G/B): 29 µm/px piano colore nativo, 114 µm/px analisi a f=4, FOV ≈ 10×8 cm. Frase in cap3 §sensore (con provenienza a posteriori dalla trave, indicativa per gli altri campioni) + claim "qualche centinaio di µm" in cap6 sec:discussione ora ancorata (114 µm/px, \cref{sec:sensore}).
 
-**Aperti (coda):**
-- [ ] B8: schema ottico come equazione numerata (eq:schema-ottico, mai referenziata) — valutare diagramma TikZ in cap3.
-- [ ] B9: ~24 equazioni numerate mai referenziate (contro convenzione CLAUDE.md) — referenziare o de-numerare le definizionali. Cosmetico, in coda.
+**Batch 3 FATTO (2026-07-03, sera):**
+- [x] B8: eq:schema-ottico eliminata → diagramma TikZ a blocchi in cap3 (`fig:schema-ottico`: Sorgente→Campione→[λ/4 tratteggiata, solo S3]→Analizzatore→Sensore), librerie `arrows.meta, positioning` aggiunte in Thesis.tex. **DA RIVEDERE (resa grafica).**
+- [x] B9: tutte le equazioni orfane referenziate con \cref naturali (scan = 0 orfane): cap2 (disuguaglianza satura dal DOP, mueller_pol dalla derivazione Malus, mueller_composizione dal sandwich di rotazione, ritardanza dalla fotoelastica), cap3 (malus_classica da estinzione), cap5 (stokes_intensita, centroide, malus_generalizzata_analisi, pseudoinversa, angolo_offset, rotazione_stokes, rotazione_poincare, beta_poincare, mueller_retarder dal modello retardance), cap6 (biot, fotoelastica dal righello, ritardanza_fotoelastica dalla trave, ritardo-strati, cluster_score, fit_strati, warp_field, peso_stabilita+peso_applicato dalla trave). Convenzione CLAUDE.md ora rispettata.
 
 ## Correzione S3 data-driven (2026-06-11)
 

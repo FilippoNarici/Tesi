@@ -38,7 +38,7 @@ con l'uguaglianza valida esclusivamente per luce totalmente polarizzata. Il \tex
 \label{eq:DOP}
 \text{DOP} = \frac{\sqrt{S_1^2 + S_2^2 + S_3^2}}{S_0},
 \end{equation}
-e vale 1 per luce totalmente polarizzata e 0 per luce completamente non polarizzata.
+e vale 1 per luce totalmente polarizzata, caso in cui la \cref{eq:stokes_disuguaglianza} è satura, e 0 per luce completamente non polarizzata.
 
 Dal punto di vista sperimentale, $S_0$, $S_1$ e $S_2$ si ottengono da misure di intensità attraverso un analizzatore lineare a diversi angoli, come mostrato dalla legge di Malus generalizzata (\cref{sec:malus}). Il parametro $S_3$ richiede l'inserimento di una lamina $\lambda/4$ prima dell'analizzatore.
 
@@ -62,7 +62,7 @@ Nel caso di luce parzialmente polarizzata, la legge si generalizza utilizzando i
 \label{eq:malus_generalizzata}
 I(\theta) = \frac{1}{2}\bigl(S_0 + S_1\cos 2\theta + S_2\sin 2\theta\bigr).
 \end{equation}
-L'\cref{eq:malus_generalizzata} può essere derivata applicando la matrice di Mueller di un polarizzatore lineare ruotato di $\theta$ al vettore di Stokes incidente e leggendo la componente $S_0'$ del vettore uscente (il formalismo delle matrici di Mueller è introdotto nella \cref{sec:mueller}). Si osservi che l'intensità trasmessa dipende solo dai primi tre parametri di Stokes e non da $S_3$: un polarizzatore lineare è insensibile alla polarizzazione circolare.
+L'\cref{eq:malus_generalizzata} può essere derivata applicando la matrice di Mueller di un polarizzatore lineare ruotato di $\theta$ (\cref{eq:mueller_pol}) al vettore di Stokes incidente e leggendo la componente $S_0'$ del vettore uscente (il formalismo delle matrici di Mueller è introdotto nella \cref{sec:mueller}). Si osservi che l'intensità trasmessa dipende solo dai primi tre parametri di Stokes e non da $S_3$: un polarizzatore lineare è insensibile alla polarizzazione circolare.
 
 Acquisendo $N$ immagini a diversi angoli $\theta_i$ dell'analizzatore, l'\cref{eq:malus_generalizzata} fornisce un sistema sovradeterminato di equazioni lineari nei tre parametri incogniti $S_0$, $S_1$ e $S_2$, risolvibile tramite il metodo della pseudo-inversa.
 
@@ -90,7 +90,7 @@ La matrice di Mueller di un polarizzatore lineare ideale con asse di trasmission
 \label{eq:mueller_pol}
 \Mmat_\text{pol}(0^\circ) = \frac{1}{2}\begin{pmatrix} 1 & 1 & 0 & 0 \\ 1 & 1 & 0 & 0 \\ 0 & 0 & 0 & 0 \\ 0 & 0 & 0 & 0 \end{pmatrix}.
 \end{equation}
-Per un polarizzatore con asse ruotato di un angolo $\theta$, la matrice si ottiene applicando la trasformazione di rotazione $\Mmat_\text{pol}(\theta) = \Mmat_R(-\theta)\,\Mmat_\text{pol}(0^\circ)\,\Mmat_R(\theta)$, dove $\Mmat_R(\theta)$ è la matrice di rotazione nello spazio di Stokes (\cref{eq:mueller_rotatore}).
+Per un polarizzatore con asse ruotato di un angolo $\theta$, la matrice si ottiene applicando la trasformazione di rotazione $\Mmat_\text{pol}(\theta) = \Mmat_R(-\theta)\,\Mmat_\text{pol}(0^\circ)\,\Mmat_R(\theta)$, caso particolare della composizione della \cref{eq:mueller_composizione}, dove $\Mmat_R(\theta)$ è la matrice di rotazione nello spazio di Stokes (\cref{eq:mueller_rotatore}).
 
 \subsection{Lamina a ritardo (retarder)}
 \label{subsec:mueller_retarder}
@@ -137,7 +137,7 @@ dove $[\alpha]_T^\lambda$ è la \textbf{rotazione specifica} (dipendente dalla t
 \label{eq:fotoelastica}
 \Delta n = C\,(\sigma_1 - \sigma_2),
 \end{equation}
-dove $C$ è la costante fotoelastica del materiale e $\sigma_1$, $\sigma_2$ sono le tensioni principali nel piano perpendicolare alla direzione di propagazione. La ritardanza del campione diventa quindi:
+dove $C$ è la costante fotoelastica del materiale e $\sigma_1$, $\sigma_2$ sono le tensioni principali nel piano perpendicolare alla direzione di propagazione. La ritardanza del campione, per la \cref{eq:ritardanza}, diventa quindi:
 \begin{equation}
 \label{eq:ritardanza_fotoelastica}
 \delta = \frac{2\pi}{\lambda}\,C\,(\sigma_1 - \sigma_2)\,d.

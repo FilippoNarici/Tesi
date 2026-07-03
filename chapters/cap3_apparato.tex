@@ -3,12 +3,29 @@
 \section{Panoramica del setup}
 \label{sec:panoramica-setup}
 % OK
-L'apparato opera in configurazione di trasmissione su rotaia ottica. Lo schema esteso è:
-\begin{equation}
-\text{Sorgente} \;\longrightarrow\; \text{Campione} \;\longrightarrow\; \left[\,\lambda/4\,\right] \;\longrightarrow\; \text{Analizzatore} \;\longrightarrow\; \text{Sensore}
-\label{eq:schema-ottico}
-\end{equation}
-dove la lamina $\lambda/4$ viene inserita solo per la determinazione di $S_3$. La \cref{fig:setup-foto} mostra due viste dell'apparato assemblato.
+L'apparato opera in configurazione di trasmissione su rotaia ottica, secondo lo schema della \cref{fig:schema-ottico}: la luce polarizzata emessa dal display attraversa il campione, l'eventuale lamina $\lambda/4$, inserita solo per la determinazione di $S_3$, e l'analizzatore rotante, e viene infine raccolta dal sensore CMOS dello smartphone. La \cref{fig:setup-foto} mostra due viste dell'apparato assemblato.
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[
+        node distance=5.5mm,
+        comp/.style={draw, rectangle, minimum height=12mm, minimum width=21mm, align=center, font=\small},
+        opt/.style={comp, dashed},
+        flow/.style={-{Stealth}, thick}
+    ]
+        \node[comp] (src) {Sorgente\\ \scriptsize display LCD};
+        \node[comp, right=of src] (sam) {Campione};
+        \node[opt, right=of sam] (qwp) {Lamina $\lambda/4$\\ \scriptsize solo per $S_3$};
+        \node[comp, right=of qwp] (ana) {Analizzatore\\ \scriptsize rotante, passi $10^\circ$};
+        \node[comp, right=of ana] (sen) {Sensore\\ \scriptsize CMOS smartphone};
+        \draw[flow] (src) -- (sam);
+        \draw[flow] (sam) -- (qwp);
+        \draw[flow] (qwp) -- (ana);
+        \draw[flow] (ana) -- (sen);
+    \end{tikzpicture}
+    \caption{Schema a blocchi della catena ottica in trasmissione. La luce linearmente polarizzata emessa dal display LCD attraversa il campione e l'analizzatore lineare rotante prima di raggiungere il sensore CMOS dello smartphone; la lamina $\lambda/4$ (riquadro tratteggiato) viene inserita nel cammino ottico solo per le due acquisizioni dedicate alla determinazione di $S_3$ (\cref{sec:protocollo}).}
+    \label{fig:schema-ottico}
+\end{figure}
 
 \begin{figure}[H]
     \centering
@@ -23,7 +40,7 @@ dove la lamina $\lambda/4$ viene inserita solo per la determinazione di $S_3$. L
 \section{Componenti ottici}
 \label{sec:componenti-ottici}
 
-L'apparato è montato su una rotaia ottica Optosci con cavalieri scorrevoli, che garantisce l'allineamento dei componenti lungo un asse ottico comune e la riproducibilità del posizionamento tra sessioni di misura. La sorgente luminosa è il display di un tablet Samsung Galaxy Tab S7 FE, impostato su schermata bianca alla massima luminosità. Il pannello LCD emette luce bianca RGB a banda larga attraverso un polarizzatore integrato: la luce in uscita è già polarizzata linearmente con asse orientato approssimativamente in verticale in configurazione landscape, il che rende il display una sorgente estesa a stato di polarizzazione ben definito. L'analizzatore è un polarizzatore lineare Optosci di forma circolare, montato su supporto rotante graduato con cui vengono impostati manualmente i passi di \SI{10}{\degree} previsti dal protocollo; l'errore di posizionamento angolare della singola posa è stimato in circa $\pm\SI{2}{\degree}$. La componente casuale di questo errore si attenua statisticamente nella ricostruzione ai minimi quadrati sulle 36 pose, mentre un eventuale offset comune a tutte le posizioni equivale a una rotazione rigida del sistema di riferimento, assorbita a valle dall'allineamento alla direzione di polarizzazione del display (\cref{ch:analisi}). Un rapporto di estinzione elevato garantisce che la modulazione dell'intensità trasmessa segua fedelmente la legge di Malus. Per integrare i dispositivi nella rotaia sono stati realizzati supporti personalizzati mediante stampa 3D in PLA.
+L'apparato è montato su una rotaia ottica Optosci con cavalieri scorrevoli, che garantisce l'allineamento dei componenti lungo un asse ottico comune e la riproducibilità del posizionamento tra sessioni di misura. La sorgente luminosa è il display di un tablet Samsung Galaxy Tab S7 FE, impostato su schermata bianca alla massima luminosità. Il pannello LCD emette luce bianca RGB a banda larga attraverso un polarizzatore integrato: la luce in uscita è già polarizzata linearmente con asse orientato approssimativamente in verticale in configurazione landscape, il che rende il display una sorgente estesa a stato di polarizzazione ben definito. L'analizzatore è un polarizzatore lineare Optosci di forma circolare, montato su supporto rotante graduato con cui vengono impostati manualmente i passi di \SI{10}{\degree} previsti dal protocollo; l'errore di posizionamento angolare della singola posa è stimato in circa $\pm\SI{2}{\degree}$. La componente casuale di questo errore si attenua statisticamente nella ricostruzione ai minimi quadrati sulle 36 pose, mentre un eventuale offset comune a tutte le posizioni equivale a una rotazione rigida del sistema di riferimento, assorbita a valle dall'allineamento alla direzione di polarizzazione del display (\cref{ch:analisi}). Un rapporto di estinzione elevato garantisce che la modulazione dell'intensità trasmessa segua fedelmente la legge di Malus (\cref{eq:malus_classica}). Per integrare i dispositivi nella rotaia sono stati realizzati supporti personalizzati mediante stampa 3D in PLA.
 
 \subsection{Lamina \texorpdfstring{$\lambda/4$}{lambda/4}}
 \label{subsec:lamina-qwp}
